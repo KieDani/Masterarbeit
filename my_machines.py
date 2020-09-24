@@ -92,7 +92,7 @@ def JaxDeepRBM(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
 
 
 def JaxFFNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
-    print('Now we try the JaxFFNN')
+    print('JaxFFNN is used')
 
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(
@@ -137,6 +137,8 @@ class Torch_FFNN_model(torch.nn.Module):
 
 
 def TorchFFNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
+    print('TorchFFNN is used')
+
     Torch_TFFNN = Torch_FFNN_model(hilbert, alpha)
 
     ma = nk.machine.Torch(Torch_TFFNN, hilbert=hilbert)
@@ -239,6 +241,8 @@ class Torch_ConvNN_model(torch.nn.Module):
 
 
 def TorchConvNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
+    print('TorchConvNN is used')
+
     Torch_ConvNN = Torch_ConvNN_model(hilbert, alpha)
 
     ma = nk.machine.Torch(Torch_ConvNN, hilbert=hilbert)
