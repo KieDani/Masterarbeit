@@ -34,9 +34,9 @@ def build_Heisenbergchain_S1(L):
     ]
 
     # Custom Graph Hamiltonian operator
-    op = nk.operator.GraphOperator(hi, bond_ops=bond_operator)
+    ha = nk.operator.GraphOperator(hi, bond_ops=bond_operator)
 
-    return op, hi, g
+    return ha, hi, g
 
 
 def build_Heisenbergchain_S1_transformed(L):
@@ -66,6 +66,6 @@ def build_Heisenbergchain_S1_transformed(L):
     ]
 
     # Custom Graph Hamiltonian operator
-    op = nk.operator.GraphOperator(hi, bond_ops=bond_operator)
+    ha = nk.operator.GraphOperator(hi, bond_ops=bond_operator)
 
-    return op, hi, g
+    return ha, hi, g
