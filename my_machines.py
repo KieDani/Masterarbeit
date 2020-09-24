@@ -214,7 +214,7 @@ class Torch_Conv1d_Layer(_ConvNd):
 #alpha is the number filters used per Conv1d layer
 class Torch_ConvNN_model(torch.nn.Module):
     def __init__(self, hilbert, alpha=1):
-        super(Torch_FFNN_model, self).__init__()
+        super(Torch_ConvNN_model, self).__init__()
         input_size = hilbert.size
         self.layer1 = torch.nn.Conv1d(1, alpha, kernel_size=input_size)
         self.layer2 = torch.nn.Linear(alpha*input_size, 2)
@@ -224,7 +224,7 @@ class Torch_ConvNN_model(torch.nn.Module):
 
     def forward(self, x):
         # Does circular padding
-        def _do_padding(self, input):
+        def _do_padding(input):
             length = input.shape[2]
             tmp = torch.empty(input.shape[0], input.shape[1], 2 * length - 1, dtype=input.dtype)
             tmp[:, :, 0:length] = input[:, :, :]
