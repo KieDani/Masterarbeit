@@ -137,9 +137,9 @@ class Torch_FFNN_model(torch.nn.Module):
 
 
 def TorchFFNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
-    Torch_TFFNN_model = Torch_FFNN_model(hilbert, alpha)
+    Torch_TFFNN = Torch_FFNN_model(hilbert, alpha)
 
-    ma = nk.machine.Torch(Torch_TFFNN_model, hilbert=hilbert)
+    ma = nk.machine.Torch(Torch_TFFNN, hilbert=hilbert)
 
     # Optimizer
     if (optimizer == 'Sgd'):
@@ -239,9 +239,9 @@ class Torch_ConvNN_model(torch.nn.Module):
 
 
 def TorchConvNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
-    Torch_ConvNN_model = Torch_ConvNN_model(hilbert, alpha)
+    Torch_ConvNN = Torch_ConvNN_model(hilbert, alpha)
 
-    ma = nk.machine.Torch(Torch_ConvNN_model, hilbert=hilbert)
+    ma = nk.machine.Torch(Torch_ConvNN, hilbert=hilbert)
 
     # Optimizer
     if (optimizer == 'Sgd'):
