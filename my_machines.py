@@ -144,8 +144,9 @@ def TorchFFNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
     ma = nk.machine.Torch(Torch_TFFNN, hilbert=hilbert)
 
     # Optimizer
+    # Note: there is a mistake in netket/optimizer/torch.py -> change optim to _torch.optim
     if (optimizer == 'Sgd'):
-        op = op = Torch(ma, SGD, lr=lr)
+        op = Torch(ma, SGD, lr=lr)
     elif (optimizer == 'Adam'):
         op = Torch(ma, Adam, lr=lr)
     else:
@@ -248,6 +249,7 @@ def TorchConvNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
     ma = nk.machine.Torch(Torch_ConvNN, hilbert=hilbert)
 
     # Optimizer
+    # Note: there is a mistake in netket/optimizer/torch.py -> change optim to _torch.optim
     if (optimizer == 'Sgd'):
         op = op = Torch(ma, SGD, lr=lr)
     elif (optimizer == 'Adam'):
