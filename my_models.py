@@ -69,6 +69,3 @@ def build_Heisenbergchain_S1_transformed(L):
     op = nk.operator.GraphOperator(hi, bond_ops=bond_operator)
 
     return op, hi, g
-
-
-#TODO build Stringcorrelation operator here and do not change netket
