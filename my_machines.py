@@ -136,7 +136,8 @@ class Torch_FFNN_model(torch.nn.Module):
 #Torch_TFFNN_model = Torch_TFFNN_model()
 
 
-def TorchFFNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
+#alpha should be twice as high as used with Jax, because PyTorch deals with real numbers!
+def TorchFFNN(hilbert, alpha=2, optimizer='Sgd', lr=0.1):
     print('TorchFFNN is used')
 
     Torch_TFFNN = Torch_FFNN_model(hilbert, alpha)
