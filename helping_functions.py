@@ -4,6 +4,7 @@ import numpy as np
 import my_operators as operators
 
 
+#TODO check, why transformed Hamiltonian does not work!
 #If possible, returns exact energy. Else, it returns None!
 def Lanczos(hamilton, L):
     if L <= 12:
