@@ -23,6 +23,7 @@ sr = nk.optimizer.SR(ma, diag_shift=0.5)
 gs = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=__number_samples__, sr=sr)
 gs = functions.add_operator(gs, hilbert=hi, L=__L__, operator=None)
 dataname = 'test'
+dataname = functions.create_path(dataname)
 start = time.time()
 gs.run(n_iter=__number_iterations__, out='test')
 end = time.time()

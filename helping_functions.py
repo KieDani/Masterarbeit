@@ -2,6 +2,7 @@ import netket as nk
 import scipy
 import numpy as np
 import my_operators as operators
+import os
 
 
 #TODO check, why transformed Hamiltonian does not work!
@@ -32,3 +33,13 @@ def add_operator(gs, hilbert, L, operator = None):
             return gs
     else:
         return gs
+
+
+def create_path(dataname, path='run'):
+    try:
+        os.makedirs(path)
+    except OSError:
+        print("Creation of the directory %s failed" % path)
+    else:
+        print("Successfully created the directory %s" % path)
+    return '/'.join((path, dataname))
