@@ -5,17 +5,13 @@ import matplotlib.pyplot as plt
 
 
 def plot(dataname, L):
-
     data=json.load(open(dataname))
-
     # Extract the relevant information
 
     length = L
 
     iters=[]
     energy=[]
-    sfs = list()
-    xAxis = list()
     sfs_fast = list()
     xAxis_fast = list()
 
@@ -35,14 +31,8 @@ def plot(dataname, L):
             sf.append(iteration['Ferro_correlation_function' + str(i)]["Mean"])
         return calcMean(sf)
 
-    def getsf_fast(i):
-        sf = list()
-        for iteration in data["Output"]:
-            sf.append(iteration['Ferro_correlation_function_fast' + str(i)]["Mean"])
-        return calcMean(sf)
-
     for i in range(1, length):
-        sfs_fast.append(getsf_fast(i))
+        sfs_fast.append(getsf(i))
         xAxis_fast.append(i)
 
     plt.plot(iters, energy)
@@ -51,3 +41,8 @@ def plot(dataname, L):
 
     plt.plot(xAxis_fast, sfs_fast)
     plt.show()
+
+
+
+#plot(dataname='run/L100.log', L=100)
+plot(dataname='run/L10.log', L=10)
