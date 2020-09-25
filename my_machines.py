@@ -96,8 +96,7 @@ def JaxFFNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
 
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(
-        Dense(input_size * alpha), LogCoshLayer,
-        Dense(input_size * alpha), LogCoshLayer,
+        Dense(input_size * alpha), Relu,
         Dense(1))
     ma = nk.machine.Jax(
         hilbert,
