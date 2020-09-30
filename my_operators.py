@@ -242,8 +242,25 @@ class FerroCorrelationZ(AbstractOperator):
         diag_ind = 0
 
         for i in range(x.shape[0]):
-            # mels[diag_ind] = 0.0
-            mels[diag_ind] = x[i, j] * x[i, k]
+
+            mels[diag_ind] = 1
+            if(x[i, j] >= 1):
+                mels[diag_ind] = mels[diag_ind] * 1
+            elif(x[i, j] <= -1):
+                mels[diag_ind] = mels[diag_ind] * 1
+            else:
+                mels[diag_ind] = 0
+
+            if (x[i, k] >= 1):
+                mels[diag_ind] = mels[diag_ind] * 1
+            elif (x[i, k] <= -1):
+                mels[diag_ind] = mels[diag_ind] * 1
+            else:
+                mels[diag_ind] = 0
+
+
+            # This might be wrong, because x in [+2, -2] instead of [+1, -1] ?
+            #mels[diag_ind] = x[i, j] * x[i, k]
 
             odiag_ind = 1 + diag_ind
 
