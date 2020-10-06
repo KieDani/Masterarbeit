@@ -247,14 +247,14 @@ class FerroCorrelationZ(AbstractOperator):
             if(x[i, j] >= 1):
                 mels[diag_ind] = mels[diag_ind] * 1
             elif(x[i, j] <= -1):
-                mels[diag_ind] = mels[diag_ind] * 1
+                mels[diag_ind] = mels[diag_ind] * -1
             else:
                 mels[diag_ind] = 0
 
             if (x[i, k] >= 1):
                 mels[diag_ind] = mels[diag_ind] * 1
             elif (x[i, k] <= -1):
-                mels[diag_ind] = mels[diag_ind] * 1
+                mels[diag_ind] = mels[diag_ind] * -1
             else:
                 mels[diag_ind] = 0
 
@@ -304,6 +304,7 @@ class FerroCorrelationZ(AbstractOperator):
 
 
 
+#copied from my old code. Maybe I can make the code look nicer. But I only needed it to compare it to the fast version.
 def FerroCorrelationZ_slow(hilbert, l):
     hi = hilbert
     # We need to specify the local operators as a matrix acting on a local Hilbert space
@@ -323,7 +324,7 @@ def FerroCorrelationZ_slow(hilbert, l):
         for i in range(0, l):
             helper.append(i)
     sf.append((mszs).tolist())
-    print('Ausmaße der Observable:')
+    print('Size of Observable:')
     print(mszs.shape)
     sites.append(helper)
     string_correlation_function = nk.operator.LocalOperator(hi, sf, sites)

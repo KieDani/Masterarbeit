@@ -22,9 +22,9 @@ exact_energy = functions.Lanczos(hamilton=ha_orig, L=__L__)
 sr = nk.optimizer.SR(ma, diag_shift=0.5)
 
 gs = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=__number_samples__, sr=sr)
-observables_fast = functions.get_operator(hilbert=hi, L=__L__, operator='FerroCorr')
-observables_slow = functions.get_operator(hilbert=hi, L=__L__, operator='FerroCorr_slow')
-observables = {**observables_fast, **observables_slow}
+observables = functions.get_operator(hilbert=hi, L=__L__, operator='FerroCorr')
+#observables_slow = functions.get_operator(hilbert=hi, L=__L__, operator='FerroCorr_slow')
+#observables = {**observables, **observables_slow}
 dataname = ''.join(('L', str(__L__)))
 dataname = functions.create_path(dataname)
 print('')
