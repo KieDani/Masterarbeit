@@ -27,6 +27,7 @@ dataname = 'L10'
 dataname = functions.create_path(dataname)
 print('')
 start = time.time()
+#TODO remove observables from run-method -> Greater speed! But adjust plot to ..._estim.log file!
 gs.run(n_iter=__number_iterations__, out=dataname, obs=observables)
 end = time.time()
 print(end - start)
