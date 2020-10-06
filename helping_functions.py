@@ -18,21 +18,21 @@ def Lanczos(hamilton, L):
 
 
 #allowed inputs for operator: 'FerroCorr', 'StringCorr', None
-def add_operator(gs, hilbert, L, operator = None):
+def get_operator(hilbert, L, operator = None):
+    observables = {}
     if(operator == 'FerroCorr'):
         for i in range(1, L):
             observ_fast = operators.FerroCorrelationZ(hilbert=hilbert, j=0, k=i)
             name_fast = 'Ferro_correlation_function' + str(i)
-            gs.add_observable(observ_fast, name_fast)
-        return gs
+            observables[name_fast] = observ_fast
+            #gs.add_observable(observ_fast, name_fast)
     elif(operator == 'StringCorr'):
         for i in range(1, L):
             observ_fast = operators.StringCorrelation(hilbert=hilbert, l=i)
             name_fast = 'String_correlation_function' + str(i)
-            gs.add_observable(observ_fast, name_fast)
-        return gs
-    else:
-        return gs
+            observables[name_fast] = observ_fast
+            #gs.add_observable(observ_fast, name_fast)
+    return observables
 
 
 def create_path(dataname, path='run'):
