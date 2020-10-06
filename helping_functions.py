@@ -32,6 +32,12 @@ def get_operator(hilbert, L, operator = None):
             name_fast = 'String_correlation_function' + str(i)
             observables[name_fast] = observ_fast
             #gs.add_observable(observ_fast, name_fast)
+    elif(operator == 'FerroCorr_slow'):
+        for i in range(2, np.minimum(L + 1, 9)):
+            observ = operators.FerroCorrelationZ_slow(hilbert, l = i)
+            name = 'Ferro_correlation_function_slow' + str(i-1)
+            observables[name] = observ
+            #gs.add_observable(observ, name)
     return observables
 
 

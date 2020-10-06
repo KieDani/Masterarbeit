@@ -7,7 +7,7 @@ import helping_functions as functions
 import time
 
 
-__L__ = 10
+__L__ = 8
 __number_samples__ = 1000
 __number_iterations__ = 250
 
@@ -22,8 +22,10 @@ exact_energy = functions.Lanczos(hamilton=ha_orig, L=__L__)
 sr = nk.optimizer.SR(ma, diag_shift=0.5)
 
 gs = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=__number_samples__, sr=sr)
-observables = functions.get_operator(hilbert=hi, L=__L__, operator='FerroCorr')
-dataname = ''.join('L', str(__L__))
+observables_fast = functions.get_operator(hilbert=hi, L=__L__, operator='FerroCorr')
+observables_slow = functions.get_operator(hilbert=hi, L=__L__, operator='FerroCorr_slow')
+observables = {**observables_fast, **observables_slow}
+dataname = ''.join(('L', str(__L__)))
 dataname = functions.create_path(dataname)
 print('')
 start = time.time()
@@ -34,5 +36,5 @@ print(end - start)
 
 print('Estimated results:')
 gs2 = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=20000)
-gs2.run(n_iter=1, out=''.join(dataname, '_estimate'), obs=observables)
-gs2.estimate(observables)
+gs2.run(n_iter=1, out=''.join((dataname, '_estimate')), obs=observables)
+print(gs2.estimate(observables))
