@@ -1,11 +1,12 @@
-#TODO Put netket as zip-File to colab
+#TODO Put folder to Google Drive
 
-from zipfile import ZipFile
-file_name = 'netket.zip'
+#connect Google Drive and Google Colab
+from google.colab import drive
+drive.mount('/content/drive')
 
-with ZipFile(file_name, 'r') as zip:
-    zip.extractall()
-    print('Done')
+
+Go to the right folder
+cd 'drive/My Drive/Masterarbeit/'
 
 
 pip install numba==0.50
