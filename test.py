@@ -7,7 +7,7 @@ import helping_functions as functions
 import time
 
 
-__L__ = 12
+__L__ = 50
 __number_samples__ = 1000
 __number_iterations__ = 1000
 
