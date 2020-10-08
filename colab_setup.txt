@@ -6,22 +6,11 @@ drive.mount('/content/drive')
 
 
 #Go to the right folder
-cd 'drive/My Drive/Masterarbeit/'
+%cd 'drive/My Drive/Masterarbeit/'
 
 
-pip install numba==0.50
+%pip install numba==0.50
 
-#TODO put my Project as zip-FIle on colab
-
-from zipfile import ZipFile
-file_name = 'Masterarbeit.zip'
-
-with ZipFile(file_name, 'r') as zip:
-    zip.extractall()
-    print('Done')
-
-
-#TODO move the Files to the main place
 
 #test, if netket works
 import netket
