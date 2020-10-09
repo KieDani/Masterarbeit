@@ -265,7 +265,22 @@ def TorchConvNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
 
 
 
+# Only Jax-optimizers are used at the moment -> watch out, if PyTorch is used!
+# Input: machine with already loaded parameters. Here, only optimizer and sampler are updated
+def load_machine(machine, optimizer='Sgd', lr=0.1):
+    ma = machine
+    # Optimizer
+    if (optimizer == 'Sgd'):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == 'Adam'):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
 
+    # Sampler
+    sa = nk.sampler.MetropolisLocal(machine=ma)
+
+    return op, sa
 
 
 
