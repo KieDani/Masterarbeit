@@ -49,3 +49,10 @@ def create_path(dataname, path='run'):
     else:
         print("Successfully created the directory %s" % path)
     return '/'.join((path, dataname))
+
+def create_machinefile(machine_name, L, alpha, dataname):
+    with open(''.join((dataname, '.machine')), 'w') as f:
+        f.write(''.join((machine_name, '\n')))
+        f.write(''.join(('L = ', str(L), '\n')))
+        f.write(''.join(('Alpha = ', str(alpha), '\n')))
+

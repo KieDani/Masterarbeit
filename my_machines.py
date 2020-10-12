@@ -63,7 +63,9 @@ def JaxRBM(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
     # Sampler
     sa = nk.sampler.MetropolisLocal(machine=ma)
 
-    return ma, op, sa
+    machine_name = 'JaxRBM'
+
+    return ma, op, sa, machine_name
 
 
 def JaxDeepRBM(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
@@ -88,7 +90,9 @@ def JaxDeepRBM(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
     # Sampler
     sa = nk.sampler.MetropolisLocal(machine=ma)
 
-    return ma, op, sa
+    machine_name = 'JaxDeepRBM'
+
+    return ma, op, sa, machine_name
 
 
 def JaxFFNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
@@ -115,7 +119,9 @@ def JaxFFNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
     # Sampler
     sa = nk.sampler.MetropolisLocal(machine=ma)
 
-    return ma, op, sa
+    machine_name = 'JaxFFNN'
+
+    return ma, op, sa, machine_name
 
 
 
@@ -156,7 +162,9 @@ def TorchFFNN(hilbert, alpha=2, optimizer='Sgd', lr=0.1):
     sa = nk.sampler.MetropolisLocal(machine=ma)
     ma.init_random_parameters(seed=12, sigma=0.01)
 
-    return ma, op, sa
+    machine_name = 'TorchFFNN'
+
+    return ma, op, sa, machine_name
 
 
 #Can be used with padding=='circular'
@@ -261,7 +269,9 @@ def TorchConvNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
     sa = nk.sampler.MetropolisLocal(machine=ma)
     ma.init_random_parameters(seed=12, sigma=0.01)
 
-    return ma, op, sa
+    machine_name = 'TorchConvNN'
+
+    return ma, op, sa, machine_name
 
 
 
