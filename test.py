@@ -15,7 +15,7 @@ def run(L=__L__):
     alpha = 2
     ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
     ha_orig, hi_orig, g_orig = models.build_Heisenbergchain_S1(L=L)
-    ma, op, sa, machine_name = machines.JaxDeepFFNN(hilbert=hi, alpha=alpha, optimizer='Adamax', lr=0.15)
+    ma, op, sa, machine_name = machines.JaxDeepFFNN(hilbert=hi, alpha=alpha, optimizer='Adamax', lr=0.02)
 
     #TODO: check, why Lanczos does not work for transformed Hamiltonian
     exact_energy = functions.Lanczos(hamilton=ha_orig, L=L)
