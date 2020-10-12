@@ -124,6 +124,35 @@ def JaxFFNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
     return ma, op, sa, machine_name
 
 
+def JaxDeepFFNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
+    print('JaxDeepFFNN is used')
+
+    input_size = hilbert.size
+    init_fun, apply_fun = stax.serial(
+        Dense(input_size * alpha), Relu, Dense(input_size * alpha), Relu,
+        Dense(1))
+    ma = nk.machine.Jax(
+        hilbert,
+        (init_fun, apply_fun), dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+
+    # Optimizer
+    if (optimizer == 'Sgd'):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == 'Adam'):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+
+    # Sampler
+    sa = nk.sampler.MetropolisLocal(machine=ma)
+
+    machine_name = 'JaxDeepFFNN'
+
+    return ma, op, sa, machine_name
+
+
 
 class Torch_FFNN_model(torch.nn.Module):
     def __init__(self, hilbert, alpha):

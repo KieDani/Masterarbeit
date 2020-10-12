@@ -12,10 +12,10 @@ __number_samples__ = 1000
 __number_iterations__ = 1000
 
 def run(L=__L__):
-    alpha = 4
+    alpha = 2
     ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
     ha_orig, hi_orig, g_orig = models.build_Heisenbergchain_S1(L=L)
-    ma, op, sa, machine_name = machines.JaxFFNN(hilbert=hi, alpha=4, optimizer='Sgd', lr=0.5)
+    ma, op, sa, machine_name = machines.JaxDeepFFNN(hilbert=hi, alpha=alpha, optimizer='Adamax', lr=0.15)
 
     #TODO: check, why Lanczos does not work for transformed Hamiltonian
     exact_energy = functions.Lanczos(hamilton=ha_orig, L=L)
@@ -23,7 +23,7 @@ def run(L=__L__):
     #TODO automaticaly add or remove SR
     sr = nk.optimizer.SR(ma, diag_shift=0.5)
 
-    gs = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=__number_samples__ / 2)#, sr=sr)
+    gs = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=__number_samples__)#, sr=sr)
     #observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr')
     dataname = ''.join(('L', str(L)))
     dataname = functions.create_path(dataname)
@@ -32,11 +32,11 @@ def run(L=__L__):
 
     functions.create_machinefile(machine_name, L, alpha, dataname)
 
-    gs.run(n_iter=__number_iterations__, out=dataname)#, obs=observables)
+    gs.run(n_iter=int(__number_iterations__/2), out=dataname)#, obs=observables)
 
     op, sa = machines.load_machine(machine=ma, optimizer='Sgd', lr=0.1)
-    gs = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=__number_samples__ / 2)
-    gs.run(n_iter=__number_iterations__, out=dataname)  # , obs=observables)
+    gs = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=__number_samples__)
+    gs.run(n_iter=int(__number_iterations__/2), out=dataname)  # , obs=observables)
 
     end = time.time()
     print(end - start)
@@ -49,13 +49,13 @@ def run(L=__L__):
 
 #ensure, that the machine is the same as used before!
 def load(dataname=None , L=__L__):
-    alpha = 4
+    alpha = 2
     if (dataname == None):
         dataname = ''.join(('L', str(L)))
         dataname = functions.create_path(dataname)
     ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
     print('load the machine: ', dataname)
-    ma, op, sa, machine_name = machines.JaxFFNN(hilbert=hi, alpha=4)
+    ma, op, sa, machine_name = machines.JaxDeepFFNN(hilbert=hi, alpha=alpha)
     ma.load(''.join((dataname, '.wf')))
     op, sa = machines.load_machine(machine=ma, optimizer='Sgd', lr=0.05)
     observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr')
@@ -68,5 +68,5 @@ def load(dataname=None , L=__L__):
 
 
 
-#run(L=12)
+run(L=12)
 #load(L=12)
