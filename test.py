@@ -9,12 +9,12 @@ import time
 
 __L__ = 50
 __number_samples__ = 1000
-__number_iterations__ = 200
+__number_iterations__ = 1000
 
 def run(L=__L__):
     ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
     ha_orig, hi_orig, g_orig = models.build_Heisenbergchain_S1(L=L)
-    ma, op, sa = machines.JaxFFNN(hilbert=hi, alpha=4, optimizer='Sgd', lr=0.1)
+    ma, op, sa = machines.JaxFFNN(hilbert=hi, alpha=3, optimizer='Sgd', lr=0.5)
 
     #TODO: check, why Lanczos does not work for transformed Hamiltonian
     exact_energy = functions.Lanczos(hamilton=ha_orig, L=L)
@@ -22,16 +22,18 @@ def run(L=__L__):
     #TODO automaticaly add or remove SR
     sr = nk.optimizer.SR(ma, diag_shift=0.5)
 
-    gs = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=__number_samples__)#, sr=sr)
-    observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr')
-    #observables_slow = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr_slow')
-    #observables = {**observables, **observables_slow}
+    gs = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=__number_samples__ / 2)#, sr=sr)
+    #observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr')
     dataname = ''.join(('L', str(L)))
     dataname = functions.create_path(dataname)
     print('')
     start = time.time()
-    #TODO remove observables from run-method -> Greater speed! But adjust plot to ..._estim.log file!
     gs.run(n_iter=__number_iterations__, out=dataname)#, obs=observables)
+
+    op, sa = machines.load_machine(machine=ma, optimizer='Sgd', lr=0.1)
+    gs = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=__number_samples__ / 2)
+    gs.run(n_iter=__number_iterations__, out=dataname)  # , obs=observables)
+
     end = time.time()
     print(end - start)
 
@@ -48,7 +50,7 @@ def load(dataname=None , L=__L__):
         dataname = functions.create_path(dataname)
     ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
     print('load the machine: ', dataname)
-    ma, op, sa = machines.JaxFFNN(hilbert=hi, alpha=4)
+    ma, op, sa = machines.JaxFFNN(hilbert=hi, alpha=3)
     ma.load(''.join((dataname, '.wf')))
     op, sa = machines.load_machine(machine=ma, optimizer='Sgd', lr=0.01)
     observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr')
