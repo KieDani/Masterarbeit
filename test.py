@@ -68,5 +68,5 @@ def load(dataname=None , L=__L__):
 
 
 
-run(L=12)
+#run(L=12)
 #load(L=12)
