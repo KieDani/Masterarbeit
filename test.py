@@ -70,6 +70,6 @@ def load(dataname=None , L=__L__, alpha=__alpha__):
 #run(L=12)
 #load(L=12)
 
-for l in [10, 20, 30]:
+for l in [5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19]:
     run(L=l)
     load(L=l)
