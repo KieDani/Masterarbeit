@@ -1,0 +1,1 @@
+I wrote this repository to easily use the netket package (See: https://netket.org). Therefore, I added some useful machines, operators and hamiltonians. Furthermore, I added some functions to simplify the usage.
