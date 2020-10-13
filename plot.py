@@ -21,9 +21,9 @@ def plot(dataname, L, observables=True):
 
     def calcMean(array):
         sum = 0.
-        for i in range(10):
+        for i in range(15):
             sum += array[-i+0]
-        return sum/10.
+        return sum/15.
 
     def getsf(i):
         sf = list()
