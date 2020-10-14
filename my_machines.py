@@ -27,6 +27,20 @@ def logcosh(x):
     return x + jax.numpy.log(1.0 + jax.numpy.exp(-2.0 * x)) - jax.numpy.log(2.0)
 LogCoshLayer = stax.elementwise(logcosh)
 
+#https://arxiv.org/pdf/1705.09792.pdf
+#complex activation function, see https://arxiv.org/pdf/1802.08026.pdf
+@jax.jit
+def modrelu(x):
+    return jnp.maximum(1, jnp.abs(x)) * x/jnp.abs(x)
+ModReLu = stax.elementwise(modrelu)
+
+#https://arxiv.org/pdf/1705.09792.pdf
+#complex activation function, see https://arxiv.org/pdf/1802.08026.pdf
+@jax.jit
+def complexrelu(x):
+    return jnp.maximum(0, x.real) + 1j* jnp.maximum(0, x.imag)
+ComplexReLu = stax.elementwise(complexrelu)
+
 
 def SumLayer():
     def init_fun(rng, input_shape):
@@ -100,7 +114,7 @@ def JaxFFNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
 
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(
-        Dense(input_size * alpha), Relu,
+        Dense(input_size * alpha), ComplexReLu,
         Dense(1))
     ma = nk.machine.Jax(
         hilbert,
@@ -129,7 +143,7 @@ def JaxDeepFFNN(hilbert, alpha=1, optimizer='Sgd', lr=0.1):
 
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(
-        Dense(input_size * alpha), Relu, Dense(input_size * alpha), Relu,
+        Dense(input_size * alpha), ComplexReLu, Dense(input_size * alpha), ComplexReLu,
         Dense(1))
     ma = nk.machine.Jax(
         hilbert,
