@@ -93,10 +93,12 @@ def present(Ls, path):
             energy.append(iteration["Energy"]["Mean"])
 
         def calcMean(array):
+            length = np.minimum(15, len(array))
+            print(length)
             sum = 0.
-            for i in range(15):
+            for i in range(length):
                 sum += array[-i + 0]
-            return sum / 15.
+            return sum / float(length)
 
         def getsf(i):
             sf = list()
