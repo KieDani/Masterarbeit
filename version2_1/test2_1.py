@@ -120,7 +120,7 @@ def baue_graph_transformed(L, dimension=1, TotalSz=False):
 
     return op, hi, g
 
-def MultiRBMansatz(L, dimension=1, number_samples=2000, number_iterations=500, methode='Sr', opti='Sgd', sampl='Local', Alpha=2):
+def MultiRBMansatz(L, dimension=1, number_samples=2000, number_iterations=500, methode='Sr', opti='Sgd', sampl='Hamiltonian', Alpha=2):
 	diagShift = 0
 	if (methode == 'Sr'):
 		iterative = True
