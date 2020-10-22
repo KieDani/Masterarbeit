@@ -60,7 +60,7 @@ def create_machinefile(machine_name, L, alpha, dataname, use_sr):
 
 def test_operator_startingpoint(hilbert, L):
     observables = {}
-    for j in range(0, L):
+    for start, j in enumerate([1, int(L/5.), int(L/4.), int(L/2.), int(3 * L/2.)]):
         for k in range(j+1, L):
             observ_fast = operators.FerroCorrelationZ(hilbert=hilbert, j=j, k=k)
             name_fast = ''.join((str(j), 'Ferro_correlation_function', str(k - j)))
