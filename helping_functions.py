@@ -65,4 +65,5 @@ def test_operator_startingpoint(hilbert, L):
         for k in range(j+1, L):
             observ_fast = operators.FerroCorrelationZ(hilbert=hilbert, j=j, k=k)
             name_fast = ''.join((str(j), 'Ferro_correlation_function', str(k - j)))
+            observables[name_fast] = observ_fast
     return observables
