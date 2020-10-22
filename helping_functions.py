@@ -56,3 +56,13 @@ def create_machinefile(machine_name, L, alpha, dataname):
         f.write(''.join(('L = ', str(L), '\n')))
         f.write(''.join(('Alpha = ', str(alpha), '\n')))
 
+
+
+
+def test_operator_startingpoint(hilbert, L):
+    observables = {}
+    for j in range(0, L):
+        for k in range(j+1, L):
+            observ_fast = operators.FerroCorrelationZ(hilbert=hilbert, j=j, k=k)
+            name_fast = ''.join((str(j), 'Ferro_correlation_function', str(k - j)))
+    return observables
