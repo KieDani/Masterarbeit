@@ -337,8 +337,8 @@ def load_machine(machine, hamiltonian, optimizer='Sgd', lr=0.1):
         op = Wrap(ma, AdaMaxJax(lr))
 
     # Sampler
-    # sa = nk.sampler.MetropolisLocal(machine=ma)
-    sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    sa = nk.sampler.MetropolisLocal(machine=ma)
+    # sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
 
     return op, sa
 
