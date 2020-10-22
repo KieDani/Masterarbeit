@@ -55,7 +55,7 @@ def SumLayer():
 SumLayer = SumLayer()
 
 
-def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1):
+def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxRBM is used')
 
     input_size = hilbert.size
@@ -75,15 +75,17 @@ def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1):
         op = Wrap(ma, AdaMaxJax(lr))
 
     # Sampler
-    # sa = nk.sampler.MetropolisLocal(machine=ma)
-    sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    if(sampler == 'Local')
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
 
     machine_name = 'JaxRBM'
 
     return ma, op, sa, machine_name
 
 
-def JaxDeepRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1):
+def JaxDeepRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler = 'Local'):
     print('JaxDeepRBM is used')
 
     input_size = hilbert.size
@@ -103,15 +105,17 @@ def JaxDeepRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1):
         op = Wrap(ma, AdaMaxJax(lr))
 
     # Sampler
-    # sa = nk.sampler.MetropolisLocal(machine=ma)
-    sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    if (sampler == 'Local')
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
 
     machine_name = 'JaxDeepRBM'
 
     return ma, op, sa, machine_name
 
 
-def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1):
+def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxFFNN is used')
 
     input_size = hilbert.size
@@ -133,15 +137,17 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1):
         op = Wrap(ma, AdaMaxJax(lr))
 
     # Sampler
-    # sa = nk.sampler.MetropolisLocal(machine=ma)
-    sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    if (sampler == 'Local')
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
 
     machine_name = 'JaxFFNN'
 
     return ma, op, sa, machine_name
 
 
-def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1):
+def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxDeepFFNN is used')
 
     input_size = hilbert.size
@@ -163,8 +169,10 @@ def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1):
         op = Wrap(ma, AdaMaxJax(lr))
 
     # Sampler
-    # sa = nk.sampler.MetropolisLocal(machine=ma)
-    sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    if (sampler == 'Local')
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
 
     machine_name = 'JaxDeepFFNN'
 
@@ -189,7 +197,7 @@ class Torch_FFNN_model(torch.nn.Module):
 
 
 #alpha should be twice as high as used with Jax, because PyTorch deals with real numbers!
-def TorchFFNN(hilbert, hamiltonian, alpha=2, optimizer='Sgd', lr=0.1):
+def TorchFFNN(hilbert, hamiltonian, alpha=2, optimizer='Sgd', lr=0.1, sampler = 'Local'):
     print('TorchFFNN is used')
 
     Torch_TFFNN = Torch_FFNN_model(hilbert, alpha)
@@ -206,8 +214,10 @@ def TorchFFNN(hilbert, hamiltonian, alpha=2, optimizer='Sgd', lr=0.1):
         op = Torch(ma, Adamax, lr=lr)
 
     # Sampler
-    # sa = nk.sampler.MetropolisLocal(machine=ma)
-    sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    if (sampler == 'Local')
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     ma.init_random_parameters(seed=12, sigma=0.01)
 
     machine_name = 'TorchFFNN'
@@ -297,7 +307,7 @@ class Torch_ConvNN_model(torch.nn.Module):
         return x
 
 
-def TorchConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1):
+def TorchConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('TorchConvNN is used')
 
     Torch_ConvNN = Torch_ConvNN_model(hilbert, alpha)
@@ -314,8 +324,10 @@ def TorchConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1):
         op = Torch(ma, Adamax, lr=lr)
 
     # Sampler
-    # sa = nk.sampler.MetropolisLocal(machine=ma)
-    sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    if (sampler == 'Local')
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     ma.init_random_parameters(seed=12, sigma=0.01)
 
     machine_name = 'TorchConvNN'
@@ -326,7 +338,7 @@ def TorchConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1):
 
 # Only Jax-optimizers are used at the moment -> watch out, if PyTorch is used!
 # Input: machine with already loaded parameters. Here, only optimizer and sampler are updated
-def load_machine(machine, hamiltonian, optimizer='Sgd', lr=0.1):
+def load_machine(machine, hamiltonian, optimizer='Sgd', lr=0.1, sampler='Local'):
     ma = machine
     # Optimizer
     if (optimizer == 'Sgd'):
@@ -337,8 +349,10 @@ def load_machine(machine, hamiltonian, optimizer='Sgd', lr=0.1):
         op = Wrap(ma, AdaMaxJax(lr))
 
     # Sampler
-    # sa = nk.sampler.MetropolisLocal(machine=ma)
-    sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    if (sampler == 'Local')
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
 
     return op, sa
 
