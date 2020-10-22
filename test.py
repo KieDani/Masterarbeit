@@ -9,7 +9,7 @@ import time
 
 __L__ = 50
 __number_samples__ = 1000
-__number_iterations__ = 600
+__number_iterations__ = 400
 __alpha__ = 4
 
 def run(L=__L__, alpha=__alpha__, use_sr = False):
