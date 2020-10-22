@@ -132,8 +132,6 @@ def plot_startingpoints(dataname, L):
     data = json.load(open(dataname))
     # Extract the relevant information
 
-    length = L
-
     iters = []
     energy = []
 
@@ -142,10 +140,11 @@ def plot_startingpoints(dataname, L):
         energy.append(iteration["Energy"]["Mean"])
 
     def calcMean(array):
+        length = np.minimum(15, len(array))
         sum = 0.
-        for i in range(15):
+        for i in range(length):
             sum += array[-i + 0]
-        return sum / 15.
+        return sum / float(length)
 
     def getsf(j, k):
         sf = list()
@@ -158,13 +157,15 @@ def plot_startingpoints(dataname, L):
 
     colors = ['black', 'green', 'blue', 'red']
     for start, j in enumerate([1, int(L/4.), int(L/2.), int(3 * L/2.)]):
+        print('.')
         sfs_fast = list()
         xAxis_fast = list()
-        for k in range(j + 1, L):
+        for k in range(j + 2, L):
             sfs_fast.append(getsf(j, k))
-            xAxis_fast.append(j, k)
+            xAxis_fast.append(k-j)
 
-        plt.plot(xAxis_fast, sfs_fast, color= colors[start])
+        plt.plot(xAxis_fast, sfs_fast, color= colors[start], label=''.join(('startingpoint: ', str(start))))
+        plt.legend()
     plt.show()
 
 
@@ -173,3 +174,6 @@ def plot_startingpoints(dataname, L):
 #plot(dataname='run/L20_estimate.log', L=20, observables=True)
 
 #present(Ls=[6, 10, 15, 20], path='results/Sr')
+
+plot_startingpoints('run/startingpoint/L10_estimate.log', 10)
+
