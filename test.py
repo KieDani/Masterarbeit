@@ -8,8 +8,8 @@ import time
 
 
 __L__ = 50
-__number_samples__ = 1000
-__number_iterations__ = 600
+__number_samples__ = 800
+__number_iterations__ = 400
 __alpha__ = 4
 
 def run(L=__L__, alpha=__alpha__, use_sr = False):
@@ -28,7 +28,7 @@ def run(L=__L__, alpha=__alpha__, use_sr = False):
 
     #observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr')
     dataname = ''.join(('L', str(L)))
-    dataname = functions.create_path(dataname, path='run')
+    dataname = functions.create_path(dataname, path='run/startingpoint')
     print('')
     start = time.time()
 
@@ -53,7 +53,7 @@ def run(L=__L__, alpha=__alpha__, use_sr = False):
 def load(dataname=None , L=__L__, alpha=__alpha__, use_sr = False):
     if (dataname == None):
         dataname = ''.join(('L', str(L)))
-        dataname = functions.create_path(dataname, path='run')
+        dataname = functions.create_path(dataname, path='run/startingpoint')
     ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
     print('load the machine: ', dataname)
     ma, op, sa, machine_name = machines.JaxDeepFFNN(hilbert=hi, hamiltonian=ha, alpha=alpha)
@@ -77,6 +77,6 @@ def load(dataname=None , L=__L__, alpha=__alpha__, use_sr = False):
 #run(L=12)
 #load(L=12)
 
-# for l in [40, 50, 60, 70, 80]:
-#     run(L=l)
-#     load(L=l)
+for l in [10, 20, 30]:
+    run(L=l, alpha=8)
+    load(L=l, alpha=8)
