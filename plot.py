@@ -128,7 +128,48 @@ def present(Ls, path):
 
 
 
+def plot_startingpoints(dataname, L):
+    data = json.load(open(dataname))
+    # Extract the relevant information
+
+    length = L
+
+    iters = []
+    energy = []
+
+    for iteration in data["Output"]:
+        iters.append(iteration["Iteration"])
+        energy.append(iteration["Energy"]["Mean"])
+
+    def calcMean(array):
+        sum = 0.
+        for i in range(15):
+            sum += array[-i + 0]
+        return sum / 15.
+
+    def getsf(j, k):
+        sf = list()
+        for iteration in data["Output"]:
+            sf.append(iteration[''.join((str(j), 'Ferro_correlation_function', str(k - j)))]["Mean"])
+        return calcMean(sf)
+
+    plt.plot(iters, energy)
+    plt.show()
+
+    colors = ['black', 'green', 'blue', 'red']
+    for start, j in enumerate([1, int(L/4.), int(L/2.), int(3 * L/2.)]):
+        sfs_fast = list()
+        xAxis_fast = list()
+        for k in range(j + 1, L):
+            sfs_fast.append(getsf(j, k))
+            xAxis_fast.append(j, k)
+
+        plt.plot(xAxis_fast, sfs_fast, color= colors[start])
+    plt.show()
+
+
+
 #plot(dataname='run/L100.log', L=100)
 #plot(dataname='run/L20_estimate.log', L=20, observables=True)
 
-present(Ls=[6, 10, 15, 20], path='results/Sr')
+#present(Ls=[6, 10, 15, 20], path='results/Sr')
