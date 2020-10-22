@@ -154,11 +154,11 @@ def plot_startingpoints(dataname, L):
         return calcMean(sf)
 
     plt.plot(iters, energy)
+    plt.title('Energy-iteration')
     plt.show()
 
     colors = ['black', 'green', 'blue', 'red']
     for start, j in enumerate([1, int(L/4.), int(L/2.), int(3 * L/2.)]):
-        print('.')
         sfs_fast = list()
         xAxis_fast = list()
         for k in range(j + 2, L):
@@ -167,6 +167,7 @@ def plot_startingpoints(dataname, L):
 
         plt.plot(xAxis_fast, sfs_fast, color= colors[start], label=''.join(('startingpoint: ', str(start))))
         plt.legend()
+    plt.title('operator-distance')
     plt.show()
 
 
