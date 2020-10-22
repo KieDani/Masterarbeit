@@ -8,7 +8,7 @@ import time
 
 
 __L__ = 50
-__number_samples__ = 1000
+__number_samples__ = 800
 __number_iterations__ = 400
 __alpha__ = 4
 
