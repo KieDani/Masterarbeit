@@ -32,7 +32,7 @@ def run(L=__L__, alpha=__alpha__, use_sr = False):
     print('')
     start = time.time()
 
-    functions.create_machinefile(machine_name, L, alpha, dataname)
+    functions.create_machinefile(machine_name, L, alpha, dataname, use_sr)
 
     gs.run(n_iter=int(__number_iterations__), out=dataname)#, obs=observables)
 
@@ -68,7 +68,7 @@ def load(dataname=None , L=__L__, alpha=__alpha__, use_sr = False):
         sr = nk.optimizer.SR(ma, diag_shift=0.1)
         gs2 = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=5000, sr=sr)#, n_discard=5000)
 
-    functions.create_machinefile(machine_name, L, alpha, dataname)
+    functions.create_machinefile(machine_name, L, alpha, dataname, use_sr)
     gs2.run(n_iter=20, out=''.join((dataname, '_estimate')), obs=observables, write_every=4, save_params_every=4)
     print(gs2.estimate(observables))
 
