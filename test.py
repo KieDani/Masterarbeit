@@ -28,7 +28,7 @@ def run(L=__L__, alpha=__alpha__, use_sr = False):
 
     #observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr')
     dataname = ''.join(('L', str(L)))
-    dataname = functions.create_path(dataname, path='run/startingpoint')
+    dataname = functions.create_path(dataname, path='run')
     print('')
     start = time.time()
 
@@ -53,7 +53,7 @@ def run(L=__L__, alpha=__alpha__, use_sr = False):
 def load(dataname=None , L=__L__, alpha=__alpha__, use_sr = False):
     if (dataname == None):
         dataname = ''.join(('L', str(L)))
-        dataname = functions.create_path(dataname, path='run/startingpoint')
+        dataname = functions.create_path(dataname, path='run')
     ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
     print('load the machine: ', dataname)
     ma, op, sa, machine_name = machines.JaxDeepFFNN(hilbert=hi, hamiltonian=ha, alpha=alpha)
@@ -63,10 +63,10 @@ def load(dataname=None , L=__L__, alpha=__alpha__, use_sr = False):
 
     print('Estimated results:')
     if(use_sr == False):
-        gs2 = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=10000)#, sr=sr)#, n_discard=5000)
+        gs2 = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=5000)#, sr=sr)#, n_discard=5000)
     else:
         sr = nk.optimizer.SR(ma, diag_shift=0.1)
-        gs2 = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=10000, sr=sr)#, n_discard=5000)
+        gs2 = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=5000, sr=sr)#, n_discard=5000)
 
     functions.create_machinefile(machine_name, L, alpha, dataname)
     gs2.run(n_iter=20, out=''.join((dataname, '_estimate')), obs=observables, write_every=4, save_params_every=4)
@@ -77,6 +77,6 @@ def load(dataname=None , L=__L__, alpha=__alpha__, use_sr = False):
 #run(L=12)
 #load(L=12)
 
-for l in [10, 20, 30]:
+for l in [10, 20, 30, 40]:
     run(L=l, alpha=8)
     load(L=l, alpha=8)
