@@ -77,6 +77,8 @@ def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loca
     # Sampler
     if(sampler == 'Local'):
         sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
 
@@ -107,6 +109,8 @@ def JaxDeepRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler =
     # Sampler
     if (sampler == 'Local'):
         sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
 
@@ -139,6 +143,8 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
     # Sampler
     if (sampler == 'Local'):
         sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
 
@@ -171,6 +177,8 @@ def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
     # Sampler
     if (sampler == 'Local'):
         sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
 
@@ -216,6 +224,8 @@ def TorchFFNN(hilbert, hamiltonian, alpha=2, optimizer='Sgd', lr=0.1, sampler = 
     # Sampler
     if (sampler == 'Local'):
         sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     ma.init_random_parameters(seed=12, sigma=0.01)
@@ -326,6 +336,8 @@ def TorchConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
     # Sampler
     if (sampler == 'Local'):
         sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     ma.init_random_parameters(seed=12, sigma=0.01)
@@ -351,6 +363,8 @@ def load_machine(machine, hamiltonian, optimizer='Sgd', lr=0.1, sampler='Local')
     # Sampler
     if (sampler == 'Local'):
         sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
 
