@@ -55,6 +55,21 @@ def SumLayer():
 SumLayer = SumLayer()
 
 
+def FormatLayer():
+    def init_fun(rng, input_shape):
+        output_shape = (-1, 1)
+        return output_shape, ()
+
+    @jax.jit
+    def apply_fun(params, inputs, **kwargs):
+        #print(inputs)
+        #print(inputs[:,0])
+        return inputs[:,0]
+
+    return init_fun, apply_fun
+FormatLayer = FormatLayer()
+
+
 def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxRBM is used')
 
@@ -125,7 +140,7 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(
         Dense(input_size * alpha), ComplexReLu,
-        Dense(1))
+        Dense(1), FormatLayer)
     ma = nk.machine.Jax(
         hilbert,
         (init_fun, apply_fun), dtype=complex
@@ -159,7 +174,7 @@ def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(
         Dense(input_size * alpha), ComplexReLu, Dense(input_size * alpha), ComplexReLu,
-        Dense(1))
+        Dense(1), FormatLayer)
     ma = nk.machine.Jax(
         hilbert,
         (init_fun, apply_fun), dtype=complex
