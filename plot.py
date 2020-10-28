@@ -157,15 +157,15 @@ def plot_startingpoints(dataname, L):
     plt.title('Energy-iteration')
     plt.show()
 
-    colors = ['black', 'green', 'blue', 'red']
-    for start, j in enumerate([1, int(L/4.), int(L/2.), int(3 * L/2.)]):
+    colors = ['black', 'grey', 'green', 'blue', 'red', 'orange', 'brown']
+    for start, j in enumerate([1, 2, 3, 4, 5, int(L/4.), int(L/2.)]):
         sfs_fast = list()
         xAxis_fast = list()
         for k in range(j + 2, L):
             sfs_fast.append(getsf(j, k))
             xAxis_fast.append(k-j)
 
-        plt.plot(xAxis_fast, sfs_fast, color= colors[start], label=''.join(('startingpoint: ', str(start))))
+        plt.plot(xAxis_fast, sfs_fast, color= colors[start], label=''.join(('startingpoint: ', str(j))))
         plt.legend()
     plt.title('operator-distance')
     plt.show()
@@ -177,5 +177,5 @@ def plot_startingpoints(dataname, L):
 
 #present(Ls=[6, 10, 15, 20], path='results/Sr')
 
-plot_startingpoints('run/startingpoint/L10_estimate.log', 10)
+plot_startingpoints('run/startingpoint/L35_estimate.log', 35)
 
