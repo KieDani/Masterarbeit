@@ -305,7 +305,7 @@ class FerroCorrelationZ(AbstractOperator):
 
 
 #copied from my old code. Maybe I can make the code look nicer. But I only needed it to compare it to the fast version.
-def FerroCorrelationZ_slow(hilbert, l):
+def FerroCorrelationZ_slow(hilbert, j, k):
     hi = hilbert
     # We need to specify the local operators as a matrix acting on a local Hilbert space
     sf = []
@@ -314,16 +314,18 @@ def FerroCorrelationZ_slow(hilbert, l):
     bigfatone = _np.asarray([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
     helper = []
     mszs = _np.kron(sigmaz, bigfatone)
-    if (l == 2):
+    if ((k-j) == 1):
         mszs = _np.kron(sigmaz, sigmaz)
-        helper = [0, 1]
+        helper = [j, k]
     else:
-        for i in range(1, l - 2):
+        for i in range(j+1, k - 1):
             mszs = _np.kron(mszs, bigfatone)
         mszs = _np.kron(mszs, sigmaz)
-        for i in range(0, l):
+        for i in range(j, k+1):
             helper.append(i)
     sf.append((mszs).tolist())
+    print(k, ' ', j, ' ', k-j)
+    print(helper)
     print('Size of Observable:')
     print(mszs.shape)
     sites.append(helper)
