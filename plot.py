@@ -129,7 +129,7 @@ def present(Ls, path):
 
 
 
-def plot_startingpoints(dataname, L):
+def plot_startingpoints(dataname, L, fast=True):
     data = json.load(open(dataname))
     # Extract the relevant information
 
@@ -154,18 +154,25 @@ def plot_startingpoints(dataname, L):
         return calcMean(sf)
 
     plt.plot(iters, energy)
+    plt.plot(iters, -np.ones(len(iters)) * (L-1) * 1.4, color = 'red')
+    print(energy +np.ones(len(iters)) * (L-1) * 1.4)
     plt.title('Energy-iteration')
     plt.show()
 
-    colors = ['black', 'grey', 'green', 'blue', 'red', 'orange', 'brown']
+    colors = ['black', 'brown', 'grey', 'green', 'blue', 'orange', 'yellow']
     for start, j in enumerate([1, 2, 3, 4, 5, int(L/4.), int(L/2.)]):
         sfs_fast = list()
         xAxis_fast = list()
-        for k in range(j + 2, L):
+        if(fast == True):
+            max_range = L
+        else:
+            max_range = np.minimum(j + 8, L)
+        for k in range(j + 1, max_range):
             sfs_fast.append(getsf(j, k))
             xAxis_fast.append(k-j)
 
         plt.plot(xAxis_fast, sfs_fast, color= colors[start], label=''.join(('startingpoint: ', str(j))))
+        plt.plot(xAxis_fast, 0.374 * np.ones(len(xAxis_fast)), color = 'red')
         plt.legend()
     plt.title('operator-distance')
     plt.show()
@@ -177,5 +184,5 @@ def plot_startingpoints(dataname, L):
 
 #present(Ls=[6, 10, 15, 20], path='results/Sr')
 
-plot_startingpoints('run/startingpoint/L35_estimate.log', 35)
+plot_startingpoints('run/startingpoint_slow/L60_estimate.log', 60, fast=False)
 
