@@ -9,8 +9,8 @@ import time
 
 
 __L__ = 8
-__number_samples__ = 1000
-__number_iterations__ = 150
+__number_samples__ = 800
+__number_iterations__ = 350
 
 
 
@@ -165,8 +165,8 @@ def MultiRBMansatz(L, dimension=1, number_samples=2000, number_iterations=500, m
 		diag_shift=diagShift,
 		use_iterative=iterative)
 
-	start, end = starte_berechnung(dateiname='netket2.1-L='+str(L), number_iterations=number_iterations, stepSize=1, gs=gs,
-								   hilbert=hi)
+	start, end = starte_berechnung(dateiname='startingpoint_2_1/L='+str(L), number_iterations=number_iterations, stepSize=1, gs=gs,
+								   hilbert=hi, L=L)
 
 	if nk.MPI.rank() == 0:
 		print('###Multi Value  RBM calculation')
@@ -201,43 +201,41 @@ def baue_StringCorr(hilbert, l):
 	return string_correlation_function
 
 
-def baue_FerroCorr(hilbert, l):
-	hi = hilbert
-	# We need to specify the local operators as a matrix acting on a local Hilbert space
-	sf = []
-	sites = []
-	sigmaz = np.asarray([[1,0,0], [0,0,0],[0,0,-1]])
-	bigfatone = np.asarray([[1,0,0], [0,1,0],[0,0,1]])
-	helper = []
-	mszs = np.kron(sigmaz, bigfatone)
-	if (l==2):
-		mszs = np.kron(sigmaz, sigmaz)
-		helper = [0, 1]
-	else:
-		for i in range(1,l-2):
-			mszs = np.kron(mszs, bigfatone)
-		mszs = np.kron(mszs, sigmaz)
-		for i in range(0, l):
-			helper.append(i)
-	sf.append((mszs).tolist())
-	print('Ausmaße der Observable:')
-	print(mszs.shape)
-	#printmpi('Zugehörige Gitterplätze:')
-	#printmpi(helper)
-	sites.append(helper)
-	string_correlation_function = nk.operator.LocalOperator(hi, sf, sites)
-	print('Zugehörige Gitterplätze:')
-	print(string_correlation_function.acting_on)
-
-	return string_correlation_function
+def FerroCorrelationZ_slow(hilbert, j, k):
+    hi = hilbert
+    # We need to specify the local operators as a matrix acting on a local Hilbert space
+    sf = []
+    sites = []
+    sigmaz = np.asarray([[1, 0, 0], [0, 0, 0], [0, 0, -1]])
+    bigfatone = np.asarray([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
+    helper = []
+    mszs = np.kron(sigmaz, bigfatone)
+    if ((k-j) == 1):
+        mszs = np.kron(sigmaz, sigmaz)
+        helper = [j, k]
+    else:
+        for i in range(j+1, k - 1):
+            mszs = np.kron(mszs, bigfatone)
+        mszs = np.kron(mszs, sigmaz)
+        for i in range(j, k+1):
+            helper.append(i)
+    sf.append((mszs).tolist())
+    print(k, ' ', j, ' ', k-j)
+    print(helper)
+    print('Size of Observable:')
+    print(mszs.shape)
+    sites.append(helper)
+    string_correlation_function = nk.operator.LocalOperator(hi, sf, sites)
+    return string_correlation_function
 
 
 #Hier kann man praktischerweise dann Observablen hinzufügen
-def starte_berechnung(dateiname, number_iterations, stepSize, gs, hilbert):
-	for i in range(2, np.minimum(__L__+1, 9)):
-		observ = baue_FerroCorr(hilbert=hilbert, l=i)
-		name = 'Ferro_correlation_function' + str(i)
-		gs.add_observable(observ, name)
+def starte_berechnung(dateiname, number_iterations, stepSize, gs, hilbert, L):
+	for start, j in enumerate([1, 2, 3, 4, 5, int(L / 5.), int(L / 4.), int(L / 2.), int(3 * L / 2.)]):
+		for k in range(j + 1, np.minimum(j + 8, L)):
+			observ = FerroCorrelationZ_slow(hilbert=hilbert, j=j, k=k)
+			name = ''.join((str(j), 'Ferro_correlation_function', str(k - j)))
+			gs.add_observable(observ, name)
 	start = time.time()
 	gs.run(output_prefix=dateiname, n_iter=number_iterations, step_size=stepSize)
 	end = time.time()
@@ -247,30 +245,31 @@ def starte_berechnung(dateiname, number_iterations, stepSize, gs, hilbert):
 
 
 
-ha, hi, g = baue_graph_original(__L__, 1)
-ha2, hi2, g2 = baue_graph_transformed(__L__, 1)
+for l in [30, 35, 40, 45, 50, 55, 60]:
+	ha, hi, g = baue_graph_original(l, 1)
+	ha2, hi2, g2 = baue_graph_transformed(l, 1)
 
-print('\n')
+	print('\n')
 
-if(__L__ <= 12):
-    print('Now we do the original Hamiltonian')
-    start = time.time()
-    exact_result = nk.exact.lanczos_ed(ha, first_n=1, compute_eigenvectors=False)
-    exact_gs_energy = exact_result.eigenvalues[0]
-    end = time.time()
-    print('The exact ground-state energy is E0= ' + str(exact_gs_energy))
-    print('Dauer exakte Diagonalisierung: ' + str(end - start))
+	if(l <= 12):
+		print('Now we do the original Hamiltonian')
+		start = time.time()
+		exact_result = nk.exact.lanczos_ed(ha, first_n=1, compute_eigenvectors=False)
+		exact_gs_energy = exact_result.eigenvalues[0]
+		end = time.time()
+		print('The exact ground-state energy is E0= ' + str(exact_gs_energy))
+		print('Dauer exakte Diagonalisierung: ' + str(end - start))
 
-    print('\n')
-    print('Now we do the transformed Hamiltonian')
-    start = time.time()
-    exact_result = nk.exact.lanczos_ed(ha2, first_n=1, compute_eigenvectors=False)
-    exact_gs_energy = exact_result.eigenvalues[0]
-    end = time.time()
-    print('The exact ground-state energy is E0= ' + str(exact_gs_energy))
-    print('Dauer exakte Diagonalisierung: ' + str(end - start))
+		print('\n')
+		print('Now we do the transformed Hamiltonian')
+		start = time.time()
+		exact_result = nk.exact.lanczos_ed(ha2, first_n=1, compute_eigenvectors=False)
+		exact_gs_energy = exact_result.eigenvalues[0]
+		end = time.time()
+		print('The exact ground-state energy is E0= ' + str(exact_gs_energy))
+		print('Dauer exakte Diagonalisierung: ' + str(end - start))
 
-print('\n')
+	print('\n')
 
 
-MultiRBMansatz(L=__L__, number_samples=__number_samples__, number_iterations=__number_iterations__)
+	MultiRBMansatz(L=l, number_samples=__number_samples__, number_iterations=__number_iterations__)
