@@ -98,7 +98,7 @@ def baue_graph_transformed(L, dimension=1, TotalSz=False):
     if(TotalSz==True):
         hi = nk.hilbert.Spin(s=1, total_sz=0.0, graph=g)
     else:
-        hi = nk.hilbert.Spin(s=1, total_sz=0.0, graph=g)
+        hi = nk.hilbert.Spin(s=1, graph=g)
 
     # Pauli Matrices for Spin 1
     sigmax = 1./np.sqrt(2)*np.asarray([[0, 1, 0], [1,0,1], [0,1,0]])
