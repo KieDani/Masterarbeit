@@ -184,5 +184,5 @@ def plot_startingpoints(dataname, L, fast=True):
 
 #present(Ls=[6, 10, 15, 20], path='results/Sr')
 
-plot_startingpoints('run/startingpoint_power/L40_estimate.log', 40, fast=True)
+plot_startingpoints('run/startingpoint_superpower/L30_estimate.log', 30, fast=True)
 
