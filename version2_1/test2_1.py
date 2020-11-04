@@ -45,7 +45,7 @@ def baue_graph_original(L, dimension=1, TotalSz=False):
     if(TotalSz==True):
         hi = nk.hilbert.Spin(s=1, total_sz=0.0, graph=g)
     else:
-        hi = nk.hilbert.Spin(s=1, total_sz=0.0, graph=g)
+        hi = nk.hilbert.Spin(s=1, graph=g)
 
     # Pauli Matrices for Spin 1
     sigmax = 1./np.sqrt(2)*np.asarray([[0, 1, 0], [1,0,1], [0,1,0]])
@@ -98,7 +98,7 @@ def baue_graph_transformed(L, dimension=1, TotalSz=False):
     if(TotalSz==True):
         hi = nk.hilbert.Spin(s=1, total_sz=0.0, graph=g)
     else:
-        hi = nk.hilbert.Spin(s=1, total_sz=0.0, graph=g)
+        hi = nk.hilbert.Spin(s=1, graph=g)
 
     # Pauli Matrices for Spin 1
     sigmax = 1./np.sqrt(2)*np.asarray([[0, 1, 0], [1,0,1], [0,1,0]])
@@ -168,6 +168,8 @@ def MultiRBMansatz(L, dimension=1, number_samples=2000, number_iterations=500, m
 	start, end = starte_berechnung(dateiname='startingpoint_2_1/L='+str(L), number_iterations=number_iterations, stepSize=1, gs=gs,
 								   hilbert=hi, L=L)
 
+	ma.save('startingpoint_2_1/L='+str(L)+'.save')
+
 	if nk.MPI.rank() == 0:
 		print('###Multi Value  RBM calculation')
 		print('Has', ma.n_par, 'parameters')
@@ -230,20 +232,56 @@ def FerroCorrelationZ_slow(hilbert, j, k):
 
 
 #Hier kann man praktischerweise dann Observablen hinzufügen
-def starte_berechnung(dateiname, number_iterations, stepSize, gs, hilbert, L):
-	for start, j in enumerate([1, 2, 3, 4, 5, int(L / 5.), int(L / 4.), int(L / 2.), int(3 * L / 2.)]):
-		for k in range(j + 1, np.minimum(j + 8, L)):
-			observ = FerroCorrelationZ_slow(hilbert=hilbert, j=j, k=k)
-			name = ''.join((str(j), 'Ferro_correlation_function', str(k - j)))
-			gs.add_observable(observ, name)
+def starte_berechnung(dateiname, number_iterations, stepSize, gs, hilbert, L, operators=False):
+	if(operators==True):
+		for start, j in enumerate([1, 2, 3, 4, 5, int(L / 5.), int(L / 4.), int(L / 2.), int(3 * L / 2.)]):
+			for k in range(j + 1, np.minimum(j + 8, L)):
+				observ = FerroCorrelationZ_slow(hilbert=hilbert, j=j, k=k)
+				name = ''.join((str(j), 'Ferro_correlation_function', str(k - j)))
+				gs.add_observable(observ, name)
 	start = time.time()
 	gs.run(output_prefix=dateiname, n_iter=number_iterations, step_size=stepSize)
 	end = time.time()
 	return start, end
 
 
+def lade_RBM(dateiname, L, alpha):
+	ha, hi, g = baue_graph_transformed(L=L)
+	ma = nk.machine.RbmMultiVal(alpha=alpha, hilbert=hi)
+	ma.load(filename=dateiname)
+
+	iterative = True
+	diagShift = 0.1
+
+	ha, hi, g = baue_graph_transformed(L, 1)
+
+	op = nk.optimizer.Sgd(learning_rate=0.1)
 
 
+	sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=ha)
+
+	ma.init_random_parameters(seed=123, sigma=0.01)
+
+	gs = nk.variational.Vmc(
+		hamiltonian=ha,
+		sampler=sa,
+		optimizer=op,
+		n_samples=5000,
+		diag_shift=diagShift,
+		use_iterative=iterative)
+
+	start, end = starte_berechnung(dateiname='startingpoint_2_1/L=' + str(L) + '_estimate', number_iterations=20,
+								   stepSize=1, gs=gs,
+								   hilbert=hi, L=L, operators=True)
+
+
+
+
+
+
+# l=10
+# MultiRBMansatz(L=l, number_samples=100, number_iterations=51, Alpha=8)
+# lade_RBM(dateiname='startingpoint_2_1/L='+str(l)+'.save', L=l, alpha= 8)
 
 for l in [30, 35, 40, 45, 50, 55, 60]:
 	ha, hi, g = baue_graph_original(l, 1)
@@ -272,4 +310,5 @@ for l in [30, 35, 40, 45, 50, 55, 60]:
 	print('\n')
 
 
-	MultiRBMansatz(L=l, number_samples=__number_samples__, number_iterations=__number_iterations__)
+	MultiRBMansatz(L=l, number_samples=__number_samples__, number_iterations=__number_iterations__, Alpha=8)
+	lade_RBM(dateiname='startingpoint_2_1/L=' + str(l) + '.save', L=l, alpha=8)

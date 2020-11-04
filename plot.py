@@ -160,7 +160,7 @@ def plot_startingpoints(dataname, L, fast=True):
     plt.show()
 
     colors = ['black', 'brown', 'grey', 'green', 'blue', 'orange', 'yellow']
-    for start, j in enumerate([1, 2, 3, 4, 5, int(L/4.), int(L/2.)]):
+    for start, j in enumerate([1, 2, 3, int(L/4.), int(L/2.)]):
         sfs_fast = list()
         xAxis_fast = list()
         if(fast == True):
@@ -184,5 +184,5 @@ def plot_startingpoints(dataname, L, fast=True):
 
 #present(Ls=[6, 10, 15, 20], path='results/Sr')
 
-plot_startingpoints('run/startingpoint_slow/L60_estimate.log', 60, fast=False)
+plot_startingpoints('run/startingpoint_superpower/L30_estimate.log', 30, fast=True)
 
