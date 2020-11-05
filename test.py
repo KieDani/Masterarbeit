@@ -68,6 +68,6 @@ def load(dataname=None , L=__L__, alpha=__alpha__, use_sr = False):
 #run(L=12)
 #load(L=12)
 
-for l in [10, 20, 30, 40]:
-    run(L=l, alpha=8)
-    load(L=l, alpha=8)
+# for l in [10, 20, 30, 40]:
+#     run(L=l, alpha=8)
+#     load(L=l, alpha=8)
