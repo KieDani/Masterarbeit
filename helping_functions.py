@@ -30,7 +30,7 @@ def get_operator(hilbert, L, operator = None, symmetric = True):
                 observables[name_fast] = observ_fast
         else:
             for i in range(1, int(L/2.)):
-                observ_fast = operators.FerroCorrelationZ(hilbert=hilbert, j=L/2-i, k=L/2+i)
+                observ_fast = operators.FerroCorrelationZ(hilbert=hilbert, j=int(L/2.)-i, k=int(L/2.)+i)
                 name_fast = 'Ferro_correlation_function' + str(int(2*i)) #because k-j=2*i
                 observables[name_fast] = observ_fast
     elif(operator == 'StringCorr'):
