@@ -6,7 +6,7 @@ import helping_functions as functions
 
 
 
-def plot(dataname, L, observables=True):
+def plot(dataname, L, observables=True, symmetric_operator = False):
     data=json.load(open(dataname))
     # Extract the relevant information
 
@@ -35,14 +35,21 @@ def plot(dataname, L, observables=True):
         return calcMean(sf)
 
     plt.plot(iters, energy)
+    plt.plot(iters, -np.ones(len(iters)) * (L - 1) * 1.4, color='red')
     plt.show()
 
     if(observables == True):
-        for i in range(1, length):
-            sfs_fast.append(getsf(i))
-            xAxis_fast.append(i)
+        if(symmetric_operator == True):
+            for i in range(1, int(L / 2.)):
+                sfs_fast.append(getsf(2*i))
+                xAxis_fast.append(2*i)
+        else:
+            for i in range(1, length):
+                sfs_fast.append(getsf(i))
+                xAxis_fast.append(i)
 
         plt.plot(xAxis_fast, sfs_fast)
+        plt.plot(xAxis_fast, 0.374 * np.ones(len(xAxis_fast)), color='red')
         plt.show()
 
 
@@ -184,5 +191,7 @@ def plot_startingpoints(dataname, L, fast=True):
 
 #present(Ls=[6, 10, 15, 20], path='results/Sr')
 
-plot_startingpoints('run/startingpoint_superpower/L30_estimate.log', 30, fast=True)
+#plot_startingpoints('run/startingpoint_superpower/L30_estimate.log', 30, fast=True)
+
+plot('run/symmetric_operator/L50_estimate.log', L=50, symmetric_operator=True)
 
