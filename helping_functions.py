@@ -73,3 +73,14 @@ def test_operator_startingpoint(hilbert, L, fast=True):
                 name_fast = ''.join((str(j), 'Ferro_correlation_function', str(k - j)))
                 observables[name_fast] = observ_fast
     return observables
+
+def test_operator_both_sides(hilbert, L):
+    observables = {}
+    for i in range(1, int(L/2.)):
+        observ_fast = operators.FerroCorrelationZ(hilbert=hilbert, j=int(L/2.), k=int(L/2.) + i)
+        name_fast = 'Ferro_correlation_function' + str(i)
+        observ_fast_mirrored = operators.FerroCorrelationZ(hilbert=hilbert, j=int(L / 2.), k=int(L / 2.) - i)
+        name_fast_mirrored = 'Ferro_correlation_function_mirrored' + str(i)
+        observables[name_fast] = observ_fast
+        observables[name_fast_mirrored] = observ_fast_mirrored
+    return observables
