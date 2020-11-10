@@ -16,6 +16,7 @@ from torch.nn.modules.conv import _ConvNd, Conv1d
 from torch import Tensor
 from torch.nn.modules.utils import _single
 from torch.nn.common_types import _size_1_t
+import functools
 
 
 
@@ -68,6 +69,85 @@ def FormatLayer():
 
     return init_fun, apply_fun
 FormatLayer = FormatLayer()
+
+
+def InputForConvLayer():
+    def init_fun(rng, input_shape):
+        print(input_shape)
+        output_shape = (input_shape[0], input_shape[1], 1)
+        print(output_shape)
+        return output_shape, ()
+    @jax.jit
+    def apply_fun(params, inputs, **kwargs):
+        #print(inputs)
+        #print(inputs[:,0])
+        #print(inputs.shape)
+        outputs = jnp.empty((inputs.shape[0], inputs.shape[1], 1), dtype=jnp.complex128)
+        outputs = jax.ops.index_update(outputs, jax.ops.index[:,:,1], inputs[:,:])
+        #print(outputs.shape)
+        return outputs
+    return init_fun, apply_fun
+InputForConvLayer = InputForConvLayer()
+
+
+def InputForDenseLayer():
+    def init_fun(rng, input_shape):
+        print(input_shape)
+        output_shape = (input_shape[0], input_shape[1])
+        print(output_shape)
+        return output_shape, ()
+    @jax.jit
+    def apply_fun(params, inputs, **kwargs):
+        #print(inputs.shape)
+        outputs = jnp.empty((inputs.shape[0], inputs.shape[1]), dtype=jnp.complex128)
+        outputs = jax.ops.index_update(outputs, jax.ops.index[:,:], inputs[:,:,1])
+        print(outputs.shape)
+        #return outputs
+    return init_fun, apply_fun
+InputForDenseLayer = InputForDenseLayer()
+
+
+
+
+
+
+
+Conv1d = functools.partial(stax.GeneralConv, ('NHC', 'HIO', 'NHC'))
+
+def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    print('JaxSymmRBM is used')
+
+    input_size = hilbert.size
+    ma = nk.machine.Jax(
+        hilbert,
+        stax.serial(InputForConvLayer, Conv1d(1, (3,)), InputForDenseLayer ,stax.Dense(alpha * input_size - 2), LogCoshLayer, SumLayer),
+        dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+
+    # Optimizer
+    if (optimizer == 'Sgd'):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == 'Adam'):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+
+    # Sampler
+    if (sampler == 'Local'):
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+
+    machine_name = 'JaxRBM'
+
+    return ma, op, sa, machine_name
+
+
+
+
 
 
 def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
