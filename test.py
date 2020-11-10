@@ -50,7 +50,7 @@ def load(dataname=None , L=__L__, alpha=__alpha__, use_sr = False):
     ma, op, sa, machine_name = machines.JaxRBM(hilbert=hi, hamiltonian=ha, alpha=alpha)
     ma.load(''.join((dataname, '.wf')))
     op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer='Adamax', lr=0.001, sampler='Local')
-    observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr')
+    observables = functions.test_operator_startingpoint(hilbert=hi, L=L)
 
     print('Estimated results:')
     if(use_sr == False):

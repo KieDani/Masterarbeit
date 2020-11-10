@@ -179,7 +179,7 @@ def plot_startingpoints(dataname, L, fast=True):
 
 
 
-def plot_operator_both_sides(dataname, L, fast=True):
+def plot_operator_both_sides(dataname, L):
     data = json.load(open(dataname))
     # Extract the relevant information
 
@@ -200,7 +200,7 @@ def plot_operator_both_sides(dataname, L, fast=True):
     def getsf(j, k, mirrored = ''):
         sf = list()
         for iteration in data["Output"]:
-            sf.append(iteration[''.join((str(j), 'Ferro_correlation_function', mirrored, str(k - j)))]["Mean"])
+            sf.append(iteration[''.join(('Ferro_correlation_function', mirrored, str(k - j)))]["Mean"])
         return calcMean(sf)
 
     plt.plot(iters, energy)
@@ -232,6 +232,8 @@ def plot_operator_both_sides(dataname, L, fast=True):
 #present(Ls=[6, 10, 15, 20], path='results/Sr')
 
 #plot_startingpoints('run/startingpoint_superpower/L30_estimate.log', 30, fast=True)
+
+plot_operator_both_sides(dataname='run/operator_both_sides_RBM/L30_estimate.log', L=30)
 
 
 
