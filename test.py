@@ -28,7 +28,7 @@ def run(L=__L__, alpha=__alpha__, use_sr = False):
 
     #observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr')
     dataname = ''.join(('L', str(L)))
-    dataname = functions.create_path(dataname, path='run/operator_both_sides_RBM')
+    dataname = functions.create_path(dataname, path='run/operator_both_sides_SymRBM')
     print('')
     start = time.time()
 
@@ -44,7 +44,7 @@ def run(L=__L__, alpha=__alpha__, use_sr = False):
 def load(dataname=None , L=__L__, alpha=__alpha__, use_sr = False):
     if (dataname == None):
         dataname = ''.join(('L', str(L)))
-        dataname = functions.create_path(dataname, path='run/operator_both_sides_RBM')
+        dataname = functions.create_path(dataname, path='run/operator_both_sides_SymRBM')
     ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
     print('load the machine: ', dataname)
     ma, op, sa, machine_name = machines.JaxSymmRBM(hilbert=hi, hamiltonian=ha, alpha=alpha)
