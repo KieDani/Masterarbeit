@@ -140,7 +140,7 @@ def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
     input_size = hilbert.size
     ma = nk.machine.Jax(
         hilbert,
-        stax.serial(InputForConvLayer, PaddingLayer ,Conv1d(alpha, (input_size,)), InputForDenseLayer ,stax.Dense(alpha * input_size), LogCoshLayer, SumLayer),
+        stax.serial(InputForConvLayer, PaddingLayer, Conv1d(alpha, (input_size,)), LogCoshLayer, InputForDenseLayer, SumLayer),
         dtype=complex
     )
     ma.init_random_parameters(seed=12, sigma=0.01)
