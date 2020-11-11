@@ -168,7 +168,7 @@ def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
         sa = nk.sampler.ExactSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
-    machine_name = 'JaxRBM'
+    machine_name = 'JaxSymmRBM'
     return ma, op, sa, machine_name
 
 
