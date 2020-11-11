@@ -43,6 +43,25 @@ def complexrelu(x):
 ComplexReLu = stax.elementwise(complexrelu)
 
 
+#periodic padding
+def PaddingLayer():
+    def init_fun(rng, input_shape):
+        # print('input: ', input_shape)
+        output_shape = (input_shape[0], 2*input_shape[1]-1, input_shape[2])
+        # print(output_shape)
+        return output_shape, ()
+    @jax.jit
+    def apply_fun(params, inputs, **kwargs):
+        input_size = inputs.shape[1]
+        outputs = jnp.empty((inputs.shape[0], 2 * input_size- 1, inputs.shape[2]), dtype=jnp.complex128)
+        outputs = jax.ops.index_update(outputs, jax.ops.index[:, 0:input_size, :], inputs[:, :, :])
+        outputs = jax.ops.index_update(outputs, jax.ops.index[:, input_size:2 * inputs.shape[1] - 1, :],
+                                       inputs[:, 0:input_size - 1, :])
+        return outputs
+    return init_fun, apply_fun
+PaddingLayer = PaddingLayer()
+
+
 def SumLayer():
     def init_fun(rng, input_shape):
         output_shape = (-1, 1)
@@ -73,9 +92,9 @@ FormatLayer = FormatLayer()
 
 def InputForConvLayer():
     def init_fun(rng, input_shape):
-        print(input_shape)
+        #print(input_shape)
         output_shape = (input_shape[0], input_shape[1], 1)
-        print(output_shape)
+        #print(output_shape)
         return output_shape, ()
     @jax.jit
     def apply_fun(params, inputs, **kwargs):
@@ -92,17 +111,17 @@ InputForConvLayer = InputForConvLayer()
 
 def InputForDenseLayer():
     def init_fun(rng, input_shape):
-        print(input_shape)
+        #print(input_shape)
         output_shape = (input_shape[0], input_shape[1])
-        print(output_shape)
+        #print(output_shape)
         return output_shape, ()
     @jax.jit
     def apply_fun(params, inputs, **kwargs):
         #print(inputs.shape)
         outputs = jnp.empty((inputs.shape[0], inputs.shape[1]), dtype=jnp.complex128)
         outputs = jax.ops.index_update(outputs, jax.ops.index[:,:], inputs[:,:,1])
-        print(outputs.shape)
-        #return outputs
+        #print(outputs.shape)
+        return outputs
     return init_fun, apply_fun
 InputForDenseLayer = InputForDenseLayer()
 
@@ -120,7 +139,7 @@ def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
     input_size = hilbert.size
     ma = nk.machine.Jax(
         hilbert,
-        stax.serial(InputForConvLayer, Conv1d(1, (3,)), InputForDenseLayer ,stax.Dense(alpha * input_size - 2), LogCoshLayer, SumLayer),
+        stax.serial(InputForConvLayer, PaddingLayer ,Conv1d(1, (input_size,)), InputForDenseLayer ,stax.Dense(alpha * input_size), LogCoshLayer, SumLayer),
         dtype=complex
     )
     ma.init_random_parameters(seed=12, sigma=0.01)
