@@ -102,7 +102,7 @@ def InputForConvLayer():
         #print(inputs[:,0])
         #print(inputs.shape)
         outputs = jnp.empty((inputs.shape[0], inputs.shape[1], 1), dtype=jnp.complex128)
-        outputs = jax.ops.index_update(outputs, jax.ops.index[:,:,1], inputs[:,:])
+        outputs = jax.ops.index_update(outputs, jax.ops.index[:,:,0], inputs[:,:])
         #print(outputs.shape)
         return outputs
     return init_fun, apply_fun
@@ -111,15 +111,18 @@ InputForConvLayer = InputForConvLayer()
 
 def InputForDenseLayer():
     def init_fun(rng, input_shape):
-        #print(input_shape)
+        print(input_shape)
         output_shape = (input_shape[0], input_shape[1])
         #print(output_shape)
         return output_shape, ()
     @jax.jit
     def apply_fun(params, inputs, **kwargs):
         #print(inputs.shape)
-        outputs = jnp.empty((inputs.shape[0], inputs.shape[1]), dtype=jnp.complex128)
-        outputs = jax.ops.index_update(outputs, jax.ops.index[:,:], inputs[:,:,1])
+        num_channels = inputs.shape[2]
+        input_size = inputs.shape[1]
+        outputs = jnp.empty((inputs.shape[0], input_size*num_channels), dtype=jnp.complex128)
+
+        outputs = jax.ops.index_update(outputs, jax.ops.index[:,:], inputs[:,:,0])
         #print(outputs.shape)
         return outputs
     return init_fun, apply_fun
@@ -139,7 +142,7 @@ def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
     input_size = hilbert.size
     ma = nk.machine.Jax(
         hilbert,
-        stax.serial(InputForConvLayer, PaddingLayer ,Conv1d(1, (input_size,)), InputForDenseLayer ,stax.Dense(alpha * input_size), LogCoshLayer, SumLayer),
+        stax.serial(InputForConvLayer, PaddingLayer ,Conv1d(alpha, (input_size,)), InputForDenseLayer ,stax.Dense(alpha * input_size), LogCoshLayer, SumLayer),
         dtype=complex
     )
     ma.init_random_parameters(seed=12, sigma=0.01)
