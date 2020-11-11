@@ -111,19 +111,17 @@ InputForConvLayer = InputForConvLayer()
 
 def InputForDenseLayer():
     def init_fun(rng, input_shape):
-        print(input_shape)
-        output_shape = (input_shape[0], input_shape[1])
+        #print(input_shape)
+        output_shape = (input_shape[0], input_shape[1]*input_shape[2])
         #print(output_shape)
         return output_shape, ()
     @jax.jit
     def apply_fun(params, inputs, **kwargs):
-        #print(inputs.shape)
         num_channels = inputs.shape[2]
         input_size = inputs.shape[1]
         outputs = jnp.empty((inputs.shape[0], input_size*num_channels), dtype=jnp.complex128)
-
-        outputs = jax.ops.index_update(outputs, jax.ops.index[:,:], inputs[:,:,0])
-        #print(outputs.shape)
+        for i in range(0, num_channels):
+            outputs = jax.ops.index_update(outputs, jax.ops.index[:, i*input_size:(i+1)*input_size], inputs[:, :, i])
         return outputs
     return init_fun, apply_fun
 InputForDenseLayer = InputForDenseLayer()
