@@ -50,7 +50,7 @@ def load(dataname=None , L=__L__, alpha=__alpha__, use_sr = False):
     ma, op, sa, machine_name = machines.JaxSymmRBM(hilbert=hi, hamiltonian=ha, alpha=alpha)
     ma.load(''.join((dataname, '.wf')))
     op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer='Adamax', lr=0.001, sampler='Local')
-    observables = functions.test_operator_startingpoint(hilbert=hi, L=L)
+    observables = functions.test_operator_both_sides(hilbert=hi, L=L)
 
     print('Estimated results:')
     if(use_sr == False):
