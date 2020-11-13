@@ -17,14 +17,22 @@ def Lanczos(hamilton, L):
         return None
 
 
+#ToDo if symmetric=True works fine, make it standard and remove parameter symmetric
+#symmetric=True works only for 'FerroCorr'
 #allowed inputs for operator: 'FerroCorr', 'StringCorr', None
-def get_operator(hilbert, L, operator = None):
+def get_operator(hilbert, L, operator = None, symmetric = True):
     observables = {}
     if(operator == 'FerroCorr'):
-        for i in range(1, L):
-            observ_fast = operators.FerroCorrelationZ(hilbert=hilbert, j=0, k=i)
-            name_fast = 'Ferro_correlation_function' + str(i)
-            observables[name_fast] = observ_fast
+        if(symmetric==False):
+            for i in range(1, L):
+                observ_fast = operators.FerroCorrelationZ(hilbert=hilbert, j=0, k=i)
+                name_fast = 'Ferro_correlation_function' + str(i)
+                observables[name_fast] = observ_fast
+        else:
+            for i in range(1, int(L/2.)):
+                observ_fast = operators.FerroCorrelationZ(hilbert=hilbert, j=int(L/2.)-i, k=int(L/2.)+i)
+                name_fast = 'Ferro_correlation_function' + str(int(2*i)) #because k-j=2*i
+                observables[name_fast] = observ_fast
     elif(operator == 'StringCorr'):
         for i in range(1, L):
             observ_fast = operators.StringCorrelation(hilbert=hilbert, l=i)

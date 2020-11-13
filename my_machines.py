@@ -16,6 +16,7 @@ from torch.nn.modules.conv import _ConvNd, Conv1d
 from torch import Tensor
 from torch.nn.modules.utils import _single
 from torch.nn.common_types import _size_1_t
+import functools
 
 
 
@@ -62,17 +63,63 @@ def FormatLayer():
 
     @jax.jit
     def apply_fun(params, inputs, **kwargs):
-        #print(inputs)
-        #print(inputs[:,0])
         return inputs[:,0]
 
     return init_fun, apply_fun
 FormatLayer = FormatLayer()
 
 
+def InputForConvLayer():
+    def init_fun(rng, input_shape):
+        output_shape = (input_shape[0], input_shape[1], 1)
+        return output_shape, ()
+    @jax.jit
+    def apply_fun(params, inputs, **kwargs):
+        outputs = jnp.empty((inputs.shape[0], inputs.shape[1], 1), dtype=jnp.complex128)
+        outputs = jax.ops.index_update(outputs, jax.ops.index[:,:,0], inputs[:,:])
+        return outputs
+    return init_fun, apply_fun
+InputForConvLayer = InputForConvLayer()
+
+
+def InputForDenseLayer():
+    def init_fun(rng, input_shape):
+        output_shape = (input_shape[0], input_shape[1]*input_shape[2])
+        return output_shape, ()
+    @jax.jit
+    def apply_fun(params, inputs, **kwargs):
+        num_channels = inputs.shape[2]
+        input_size = inputs.shape[1]
+        outputs = jnp.empty((inputs.shape[0], input_size*num_channels), dtype=jnp.complex128)
+        for i in range(0, num_channels):
+            outputs = jax.ops.index_update(outputs, jax.ops.index[:, i*input_size:(i+1)*input_size], inputs[:, :, i])
+        return outputs
+    return init_fun, apply_fun
+InputForDenseLayer = InputForDenseLayer()
+
+
+#periodic padding
+def PaddingLayer():
+    def init_fun(rng, input_shape):
+        output_shape = (input_shape[0], 2*input_shape[1]-1, input_shape[2])
+        return output_shape, ()
+    @jax.jit
+    def apply_fun(params, inputs, **kwargs):
+        input_size = inputs.shape[1]
+        outputs = jnp.empty((inputs.shape[0], 2 * input_size- 1, inputs.shape[2]), dtype=jnp.complex128)
+        outputs = jax.ops.index_update(outputs, jax.ops.index[:, 0:input_size, :], inputs[:, :, :])
+        outputs = jax.ops.index_update(outputs, jax.ops.index[:, input_size:2 * inputs.shape[1] - 1, :],
+                                       inputs[:, 0:input_size - 1, :])
+        return outputs
+    return init_fun, apply_fun
+PaddingLayer = PaddingLayer()
+
+
+Conv1d = functools.partial(stax.GeneralConv, ('NHC', 'HIO', 'NHC'))
+
+
 def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxRBM is used')
-
     input_size = hilbert.size
     ma = nk.machine.Jax(
         hilbert,
@@ -80,7 +127,6 @@ def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loca
         dtype=complex
     )
     ma.init_random_parameters(seed=12, sigma=0.01)
-
     # Optimizer
     if(optimizer == 'Sgd'):
         op = Wrap(ma, SgdJax(lr))
@@ -88,7 +134,6 @@ def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loca
         op = Wrap(ma, AdamJax(lr))
     else:
         op = Wrap(ma, AdaMaxJax(lr))
-
     # Sampler
     if(sampler == 'Local'):
         sa = nk.sampler.MetropolisLocal(machine=ma)
@@ -96,23 +141,19 @@ def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loca
         sa = nk.sampler.ExactSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
-
     machine_name = 'JaxRBM'
-
     return ma, op, sa, machine_name
 
 
-def JaxDeepRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler = 'Local'):
-    print('JaxDeepRBM is used')
-
+def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    print('JaxSymmRBM is used')
     input_size = hilbert.size
     ma = nk.machine.Jax(
         hilbert,
-        stax.serial(stax.Dense(alpha * input_size), LogCoshLayer, stax.Dense(alpha * input_size), LogCoshLayer, SumLayer),
+        stax.serial(InputForConvLayer, PaddingLayer, Conv1d(alpha, (input_size,)), LogCoshLayer, InputForDenseLayer, SumLayer),
         dtype=complex
     )
     ma.init_random_parameters(seed=12, sigma=0.01)
-
     # Optimizer
     if (optimizer == 'Sgd'):
         op = Wrap(ma, SgdJax(lr))
@@ -120,7 +161,6 @@ def JaxDeepRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler =
         op = Wrap(ma, AdamJax(lr))
     else:
         op = Wrap(ma, AdaMaxJax(lr))
-
     # Sampler
     if (sampler == 'Local'):
         sa = nk.sampler.MetropolisLocal(machine=ma)
@@ -128,15 +168,39 @@ def JaxDeepRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler =
         sa = nk.sampler.ExactSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    machine_name = 'JaxSymmRBM'
+    return ma, op, sa, machine_name
 
+
+def JaxDeepRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler = 'Local'):
+    print('JaxDeepRBM is used')
+    input_size = hilbert.size
+    ma = nk.machine.Jax(
+        hilbert,
+        stax.serial(stax.Dense(alpha * input_size), LogCoshLayer, stax.Dense(alpha * input_size), LogCoshLayer, SumLayer),
+        dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+    # Optimizer
+    if (optimizer == 'Sgd'):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == 'Adam'):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+    # Sampler
+    if (sampler == 'Local'):
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxDeepRBM'
-
     return ma, op, sa, machine_name
 
 
 def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxFFNN is used')
-
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(
         Dense(input_size * alpha), ComplexReLu,
@@ -146,7 +210,6 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
         (init_fun, apply_fun), dtype=complex
     )
     ma.init_random_parameters(seed=12, sigma=0.01)
-
     # Optimizer
     if (optimizer == 'Sgd'):
         op = Wrap(ma, SgdJax(lr))
@@ -154,7 +217,6 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
         op = Wrap(ma, AdamJax(lr))
     else:
         op = Wrap(ma, AdaMaxJax(lr))
-
     # Sampler
     if (sampler == 'Local'):
         sa = nk.sampler.MetropolisLocal(machine=ma)
@@ -162,15 +224,12 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
         sa = nk.sampler.ExactSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
-
     machine_name = 'JaxFFNN'
-
     return ma, op, sa, machine_name
 
 
 def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxDeepFFNN is used')
-
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(
         Dense(input_size * alpha), ComplexReLu, Dense(input_size * alpha), ComplexReLu,
@@ -180,7 +239,6 @@ def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         (init_fun, apply_fun), dtype=complex
     )
     ma.init_random_parameters(seed=12, sigma=0.01)
-
     # Optimizer
     if (optimizer == 'Sgd'):
         op = Wrap(ma, SgdJax(lr))
@@ -188,7 +246,6 @@ def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         op = Wrap(ma, AdamJax(lr))
     else:
         op = Wrap(ma, AdaMaxJax(lr))
-
     # Sampler
     if (sampler == 'Local'):
         sa = nk.sampler.MetropolisLocal(machine=ma)
@@ -196,11 +253,8 @@ def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         sa = nk.sampler.ExactSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
-
     machine_name = 'JaxDeepFFNN'
-
     return ma, op, sa, machine_name
-
 
 
 class Torch_FFNN_model(torch.nn.Module):
@@ -209,24 +263,18 @@ class Torch_FFNN_model(torch.nn.Module):
         input_size = hilbert.size
         self.fc1 = torch.nn.Linear(input_size, alpha*input_size)
         self.fc2 = torch.nn.Linear(alpha*input_size, 2)
-
     def forward(self, x):
         #x.to(torch.device("cuda:0"))
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
-
         return x
-#Torch_TFFNN_model = Torch_TFFNN_model()
 
 
 #alpha should be twice as high as used with Jax, because PyTorch deals with real numbers!
 def TorchFFNN(hilbert, hamiltonian, alpha=2, optimizer='Sgd', lr=0.1, sampler = 'Local'):
     print('TorchFFNN is used')
-
     Torch_TFFNN = Torch_FFNN_model(hilbert, alpha)
-
     ma = nk.machine.Torch(Torch_TFFNN, hilbert=hilbert)
-
     # Optimizer
     # Note: there is a mistake in netket/optimizer/torch.py -> change optim to _torch.optim
     if (optimizer == 'Sgd'):
@@ -235,7 +283,6 @@ def TorchFFNN(hilbert, hamiltonian, alpha=2, optimizer='Sgd', lr=0.1, sampler = 
         op = Torch(ma, Adam, lr=lr)
     else:
         op = Torch(ma, Adamax, lr=lr)
-
     # Sampler
     if (sampler == 'Local'):
         sa = nk.sampler.MetropolisLocal(machine=ma)
@@ -244,13 +291,11 @@ def TorchFFNN(hilbert, hamiltonian, alpha=2, optimizer='Sgd', lr=0.1, sampler = 
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     ma.init_random_parameters(seed=12, sigma=0.01)
-
     machine_name = 'TorchFFNN'
-
     return ma, op, sa, machine_name
 
 
-#Can be used with padding=='circular'
+#Should be used with padding=='circular'
 #Should not used for multiple-Layer networks, because it transformes the shape of the input every time anew
 class Torch_Conv1d_Layer(_ConvNd):
     def __init__(
@@ -272,20 +317,15 @@ class Torch_Conv1d_Layer(_ConvNd):
         super(Conv1d, self).__init__(
             in_channels, out_channels, kernel_size, stride, padding, dilation,
             False, _single(0), groups, bias, padding_mode)
-
     def forward(self, input: Tensor) -> Tensor:
-        #usual settings
         if(self.padding_mode == 'zeros'):
             input = input.unsqueeze(1)
             tmp = F.conv1d(input, self.weight, self.bias, self.stride,
                            self.padding, self.dilation, self.groups)
-
             # changes the output-format of a conv-nn to the format of a ff-nn
             tmp = tmp.view(tmp.size(0), -1)
             return tmp
-
         #I implemeted circular padding
-        #TODO Durch das Padding ist der Input verschoben -> das kann ich auch ohne Verschiebung machen
         else:
             input = input.unsqueeze(1)
             length = input.shape[2]
@@ -294,7 +334,6 @@ class Torch_Conv1d_Layer(_ConvNd):
             x[:, :, length:2*length-1] = input[:, :, 0:length-1]
             tmp = F.conv1d(x, self.weight, self.bias, self.stride,
                             self.padding, self.dilation, self.groups)
-
             #changes the output-format of a conv-nn to the format of a ff-nn
             tmp = tmp.view(tmp.size(0), -1)
             return tmp
@@ -309,9 +348,6 @@ class Torch_ConvNN_model(torch.nn.Module):
         self.layer1 = torch.nn.Conv1d(1, alpha, kernel_size=input_size)
         self.layer2 = torch.nn.Linear(alpha*input_size, 2)
         self.padding_mode = 'circular'
-
-
-
     def forward(self, x):
         # Does circular padding
         def _do_padding(input):
@@ -323,31 +359,25 @@ class Torch_ConvNN_model(torch.nn.Module):
         #Converts the Linear to the Conv1d format
         x = x.unsqueeze(1)
         x = F.relu(self.layer1(_do_padding(x)))
-        #now mor convolutional layers could be added
-
+        #now, here, more convolutional layers could be added
         #Converts the Conv1d to the linear format
         x = x.view(x.size(0), -1)
         x = self.layer2(x)
-
         return x
 
 
 def TorchConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('TorchConvNN is used')
-
     Torch_ConvNN = Torch_ConvNN_model(hilbert, alpha)
-
     ma = nk.machine.Torch(Torch_ConvNN, hilbert=hilbert)
-
     # Optimizer
     # Note: there is a mistake in netket/optimizer/torch.py -> change optim to optimizer
     if (optimizer == 'Sgd'):
-        op = op = Torch(ma, SGD, lr=lr)
+        op = Torch(ma, SGD, lr=lr)
     elif (optimizer == 'Adam'):
         op = Torch(ma, Adam, lr=lr)
     else:
         op = Torch(ma, Adamax, lr=lr)
-
     # Sampler
     if (sampler == 'Local'):
         sa = nk.sampler.MetropolisLocal(machine=ma)
@@ -356,11 +386,8 @@ def TorchConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     ma.init_random_parameters(seed=12, sigma=0.01)
-
     machine_name = 'TorchConvNN'
-
     return ma, op, sa, machine_name
-
 
 
 # Only Jax-optimizers are used at the moment -> watch out, if PyTorch is used!
@@ -374,7 +401,6 @@ def load_machine(machine, hamiltonian, optimizer='Sgd', lr=0.1, sampler='Local')
         op = Wrap(ma, AdamJax(lr))
     else:
         op = Wrap(ma, AdaMaxJax(lr))
-
     # Sampler
     if (sampler == 'Local'):
         sa = nk.sampler.MetropolisLocal(machine=ma)
@@ -382,7 +408,6 @@ def load_machine(machine, hamiltonian, optimizer='Sgd', lr=0.1, sampler='Local')
         sa = nk.sampler.ExactSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
-
     return op, sa
 
 
