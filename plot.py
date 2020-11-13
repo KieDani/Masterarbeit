@@ -193,5 +193,10 @@ def plot_startingpoints(dataname, L, fast=True):
 
 #plot_startingpoints('run/startingpoint_superpower/L30_estimate.log', 30, fast=True)
 
-plot('run/symmetric_operator/L50_estimate.log', L=50, symmetric_operator=True)
+L=40
+machine = 'SymRBM'
+
+plot(dataname='run/symmetric_operator_' + machine + '/L' + str(L) + '.log', L=L, observables=False)
+
+plot('run/symmetric_operator_' + machine + '/L' + str(L) + '_estimate.log', L=L, symmetric_operator=True)
 
