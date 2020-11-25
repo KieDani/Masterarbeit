@@ -233,7 +233,7 @@ def plot_operator_both_sides(dataname, L):
 
 #plot_startingpoints('run/startingpoint_superpower/L30_estimate.log', 30, fast=True)
 
-plot_operator_both_sides(dataname='run/operator_both_sides_RBM/L30_estimate.log', L=30)
+plot_operator_both_sides(dataname='run/operator_both_sides_DeepFFNN/L60_estimate.log', L=60)
 
 
 
