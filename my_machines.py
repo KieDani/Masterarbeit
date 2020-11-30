@@ -75,8 +75,15 @@ def InputForConvLayer():
         return output_shape, ()
     @jax.jit
     def apply_fun(params, inputs, **kwargs):
-        outputs = jnp.empty((inputs.shape[0], inputs.shape[1], 1), dtype=jnp.complex128)
-        outputs = jax.ops.index_update(outputs, jax.ops.index[:,:,0], inputs[:,:])
+        if(len(inputs.shape) ==1):
+            second_shape = inputs.shape[0]
+            first_shape = 1
+            outputs = jnp.empty((first_shape, second_shape, 1), dtype=jnp.complex128)
+            outputs = jax.ops.index_update(outputs, jax.ops.index[0, :, 0], inputs[:])
+        else:
+            second_shape = inputs.shape[1]
+            outputs = jnp.empty((inputs.shape[0], second_shape, 1), dtype=jnp.complex128)
+            outputs = jax.ops.index_update(outputs, jax.ops.index[:, :, 0], inputs[:, :])
         return outputs
     return init_fun, apply_fun
 InputForConvLayer = InputForConvLayer()
