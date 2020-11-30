@@ -93,9 +93,7 @@ def FixSrLayer():
             outputs = jnp.empty((first_shape, second_shape), dtype=jnp.complex128)
             outputs = jax.ops.index_update(outputs, jax.ops.index[0, :], inputs[:])
         else:
-            second_shape = inputs.shape[1]
-            outputs = jnp.empty((inputs.shape[0], second_shape), dtype=jnp.complex128)
-            outputs = jax.ops.index_update(outputs, jax.ops.index[:, :], inputs[:, :])
+            outputs = inputs
         return outputs
     return init_fun, apply_fun
 FixSrLayer = FixSrLayer()
