@@ -15,7 +15,7 @@ __alpha__ = 4
 def run(L=__L__, alpha=__alpha__, use_sr = False):
     ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
     ha_orig, hi_orig, g_orig = models.build_Heisenbergchain_S1(L=L)
-    ma, op, sa, machine_name = machines.JaxSymmRBM(hilbert=hi, hamiltonian=ha, alpha=alpha, optimizer='Adamax', lr=0.005, sampler='Local')
+    ma, op, sa, machine_name = machines.JaxFFNN(hilbert=hi, hamiltonian=ha, alpha=alpha, optimizer='Adamax', lr=0.005, sampler='Local')
 
     #TODO: check, why Lanczos does not work for transformed Hamiltonian
     exact_energy = functions.Lanczos(hamilton=ha_orig, L=L)
@@ -28,7 +28,7 @@ def run(L=__L__, alpha=__alpha__, use_sr = False):
 
     #observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr')
     dataname = ''.join(('L', str(L)))
-    dataname = functions.create_path(dataname, path='run/symmetric_operator_SymRBM')
+    dataname = functions.create_path(dataname, path='run')
     print('')
     start = time.time()
 
@@ -44,10 +44,10 @@ def run(L=__L__, alpha=__alpha__, use_sr = False):
 def load(dataname=None , L=__L__, alpha=__alpha__, use_sr = False):
     if (dataname == None):
         dataname = ''.join(('L', str(L)))
-        dataname = functions.create_path(dataname, path='run/symmetric_operator_SymRBM')
+        dataname = functions.create_path(dataname, path='run')
     ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
     print('load the machine: ', dataname)
-    ma, op, sa, machine_name = machines.JaxSymmRBM(hilbert=hi, hamiltonian=ha, alpha=alpha)
+    ma, op, sa, machine_name = machines.JaxFFNN(hilbert=hi, hamiltonian=ha, alpha=alpha)
     ma.load(''.join((dataname, '.wf')))
     op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer='Adamax', lr=0.001, sampler='Local')
     observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr')
@@ -65,7 +65,7 @@ def load(dataname=None , L=__L__, alpha=__alpha__, use_sr = False):
 
 
 
-#run(L=12)
+#run(L=12, alpha=10, use_sr=True)
 #load(L=12)
 
 
