@@ -13,11 +13,11 @@ __number_iterations__ = 500
 __alpha__ = 4
 
 #use Gd, if Sr == None; otherwise, sr is the diag_shift
-def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM'):
+def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local'):
     ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
     ha_orig, hi_orig, g_orig = models.build_Heisenbergchain_S1(L=L)
     generate_machine = machines.get_machine(machine_name)
-    ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha, optimizer='Adamax', lr=0.005, sampler='Local')
+    ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha, optimizer='Adamax', lr=0.005, sampler=sampler)
 
     #TODO: check, why Lanczos does not work for transformed Hamiltonian
     exact_energy = functions.Lanczos(hamilton=ha_orig, L=L)
@@ -44,7 +44,7 @@ def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mach
 
 
 #ensure, that the machine is the same as used before!
-def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM'):
+def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local'):
     if (dataname == None):
         dataname = ''.join(('L', str(L)))
         dataname = functions.create_path(dataname, path=path)
@@ -53,7 +53,7 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
     generate_machine = machines.get_machine(machine_name)
     ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
     ma.load(''.join((dataname, '.wf')))
-    op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer='Adamax', lr=0.001, sampler='Local')
+    op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer='Adamax', lr=0.001, sampler=sampler)
     observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr')
 
     print('Estimated results:')
@@ -69,7 +69,7 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
 
 
 
-run(L=12, alpha=10, sr=None)
-#load(L=12)
+#run(L=12, alpha=10, sr=None)
+#load(L=12, alpha=10)
 
 
