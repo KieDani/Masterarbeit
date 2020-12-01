@@ -13,10 +13,11 @@ __number_iterations__ = 500
 __alpha__ = 4
 
 #use Gd, if Sr == None; otherwise, sr is the diag_shift
-def run(L=__L__, alpha=__alpha__, sr = None):
+def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM'):
     ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
     ha_orig, hi_orig, g_orig = models.build_Heisenbergchain_S1(L=L)
-    ma, op, sa, machine_name = machines.JaxFFNN(hilbert=hi, hamiltonian=ha, alpha=alpha, optimizer='Adamax', lr=0.005, sampler='Local')
+    generate_machine = machines.get_machine(machine_name)
+    ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha, optimizer='Adamax', lr=0.005, sampler='Local')
 
     #TODO: check, why Lanczos does not work for transformed Hamiltonian
     exact_energy = functions.Lanczos(hamilton=ha_orig, L=L)
@@ -28,8 +29,9 @@ def run(L=__L__, alpha=__alpha__, sr = None):
         gs = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=__number_samples__, sr=sr)
 
     #observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr')
-    dataname = ''.join(('L', str(L)))
-    dataname = functions.create_path(dataname, path='run')
+    if(dataname == None):
+        dataname = ''.join(('L', str(L)))
+    dataname = functions.create_path(dataname, path=path)
     print('')
     start = time.time()
 
@@ -42,13 +44,14 @@ def run(L=__L__, alpha=__alpha__, sr = None):
 
 
 #ensure, that the machine is the same as used before!
-def load(dataname=None , L=__L__, alpha=__alpha__, sr = None):
+def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM'):
     if (dataname == None):
         dataname = ''.join(('L', str(L)))
-        dataname = functions.create_path(dataname, path='run')
+        dataname = functions.create_path(dataname, path=path)
     ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
     print('load the machine: ', dataname)
-    ma, op, sa, machine_name = machines.JaxFFNN(hilbert=hi, hamiltonian=ha, alpha=alpha)
+    generate_machine = machines.get_machine(machine_name)
+    ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
     ma.load(''.join((dataname, '.wf')))
     op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer='Adamax', lr=0.001, sampler='Local')
     observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr')
@@ -66,7 +69,7 @@ def load(dataname=None , L=__L__, alpha=__alpha__, sr = None):
 
 
 
-#run(L=12, alpha=10, sr=None)
+run(L=12, alpha=10, sr=None)
 #load(L=12)
 
 

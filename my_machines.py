@@ -430,6 +430,25 @@ def load_machine(machine, hamiltonian, optimizer='Sgd', lr=0.1, sampler='Local')
 
 
 
+#method to simply get the desired machine
+def get_machine(machine_name):
+    if(machine_name == 'JaxRBM'):
+        return JaxRBM
+    elif(machine_name == 'JaxSymRBM' or 'JaxSymmRBM'):
+        return JaxSymmRBM
+    elif(machine_name == 'JaxDeepRBM'):
+        return JaxDeepRBM
+    elif(machine_name == 'JaxFFNN'):
+        return JaxFFNN
+    elif(machine_name == 'JaxDeepFFNN'):
+        return JaxDeepFFNN
+    elif(machine_name == 'TorchFFNN'):
+        return TorchFFNN
+    elif(machine_name == 'TorchConvNN'):
+        return TorchConvNN
+    else:
+        print('The desired machine was spelled wrong!')
+        return None
 
 
 
