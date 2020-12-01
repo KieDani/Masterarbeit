@@ -76,10 +76,28 @@ def InputForConvLayer():
     @jax.jit
     def apply_fun(params, inputs, **kwargs):
         outputs = jnp.empty((inputs.shape[0], inputs.shape[1], 1), dtype=jnp.complex128)
-        outputs = jax.ops.index_update(outputs, jax.ops.index[:,:,0], inputs[:,:])
+        outputs = jax.ops.index_update(outputs, jax.ops.index[:, :, 0], inputs[:, :])
         return outputs
     return init_fun, apply_fun
 InputForConvLayer = InputForConvLayer()
+
+def FixSrLayer():
+    def init_fun(rng, input_shape):
+        output_shape = (input_shape[0], input_shape[1])
+        return output_shape, ()
+    @jax.jit
+    def apply_fun(params, inputs, **kwargs):
+        if(len(inputs.shape) ==1):
+            second_shape = inputs.shape[0]
+            first_shape = 1
+            outputs = jnp.empty((first_shape, second_shape), dtype=jnp.complex128)
+            outputs = jax.ops.index_update(outputs, jax.ops.index[0, :], inputs[:])
+        else:
+            outputs = inputs
+        return outputs
+    return init_fun, apply_fun
+FixSrLayer = FixSrLayer()
+
 
 
 def InputForDenseLayer():
@@ -123,7 +141,7 @@ def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loca
     input_size = hilbert.size
     ma = nk.machine.Jax(
         hilbert,
-        stax.serial(stax.Dense(alpha * input_size), LogCoshLayer, SumLayer),
+        stax.serial(FixSrLayer, stax.Dense(alpha * input_size), LogCoshLayer, SumLayer),
         dtype=complex
     )
     ma.init_random_parameters(seed=12, sigma=0.01)
@@ -150,7 +168,7 @@ def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
     input_size = hilbert.size
     ma = nk.machine.Jax(
         hilbert,
-        stax.serial(InputForConvLayer, PaddingLayer, Conv1d(alpha, (input_size,)), LogCoshLayer, InputForDenseLayer, SumLayer),
+        stax.serial(FixSrLayer, InputForConvLayer, PaddingLayer, Conv1d(alpha, (input_size,)), LogCoshLayer, InputForDenseLayer, SumLayer),
         dtype=complex
     )
     ma.init_random_parameters(seed=12, sigma=0.01)
@@ -202,7 +220,7 @@ def JaxDeepRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler =
 def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxFFNN is used')
     input_size = hilbert.size
-    init_fun, apply_fun = stax.serial(
+    init_fun, apply_fun = stax.serial(FixSrLayer,
         Dense(input_size * alpha), ComplexReLu,
         Dense(1), FormatLayer)
     ma = nk.machine.Jax(
@@ -231,7 +249,7 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
 def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxDeepFFNN is used')
     input_size = hilbert.size
-    init_fun, apply_fun = stax.serial(
+    init_fun, apply_fun = stax.serial(FixSrLayer,
         Dense(input_size * alpha), ComplexReLu, Dense(input_size * alpha), ComplexReLu,
         Dense(1), FormatLayer)
     ma = nk.machine.Jax(
@@ -412,6 +430,25 @@ def load_machine(machine, hamiltonian, optimizer='Sgd', lr=0.1, sampler='Local')
 
 
 
+#method to simply get the desired machine
+def get_machine(machine_name):
+    if(machine_name == 'JaxRBM'):
+        return JaxRBM
+    elif(machine_name == 'JaxSymRBM' or 'JaxSymmRBM'):
+        return JaxSymmRBM
+    elif(machine_name == 'JaxDeepRBM'):
+        return JaxDeepRBM
+    elif(machine_name == 'JaxFFNN'):
+        return JaxFFNN
+    elif(machine_name == 'JaxDeepFFNN'):
+        return JaxDeepFFNN
+    elif(machine_name == 'TorchFFNN'):
+        return TorchFFNN
+    elif(machine_name == 'TorchConvNN'):
+        return TorchConvNN
+    else:
+        print('The desired machine was spelled wrong!')
+        return None
 
 
 

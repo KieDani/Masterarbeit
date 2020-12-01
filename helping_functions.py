@@ -61,7 +61,7 @@ def create_machinefile(machine_name, L, alpha, dataname, use_sr):
         f.write(''.join((machine_name, '\n')))
         f.write(''.join(('L = ', str(L), '\n')))
         f.write(''.join(('Alpha = ', str(alpha), '\n')))
-        f.write(''.join(('Use_machine = ', str(use_sr), '\n')))
+        f.write(''.join(('diag_shift = ', str(use_sr), '\n')))
 
 
 
