@@ -47,7 +47,7 @@ def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mach
 def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local'):
     if (dataname == None):
         dataname = ''.join(('L', str(L)))
-        dataname = functions.create_path(dataname, path=path)
+    dataname = functions.create_path(dataname, path=path)
     ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
     print('load the machine: ', dataname)
     generate_machine = machines.get_machine(machine_name)
