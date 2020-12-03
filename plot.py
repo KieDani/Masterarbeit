@@ -186,6 +186,53 @@ def plot_startingpoints(dataname, L, fast=True):
 
 
 
+def plot_operator_both_sides(dataname, L):
+    data = json.load(open(dataname))
+    # Extract the relevant information
+
+    iters = []
+    energy = []
+
+    for iteration in data["Output"]:
+        iters.append(iteration["Iteration"])
+        energy.append(iteration["Energy"]["Mean"])
+
+    def calcMean(array):
+        length = np.minimum(15, len(array))
+        sum = 0.
+        for i in range(length):
+            sum += array[-i + 0]
+        return sum / float(length)
+
+    def getsf(j, k, mirrored = ''):
+        sf = list()
+        for iteration in data["Output"]:
+            sf.append(iteration[''.join(('Ferro_correlation_function', mirrored, str(k - j)))]["Mean"])
+        return calcMean(sf)
+
+    plt.plot(iters, energy)
+    plt.plot(iters, -np.ones(len(iters)) * (L-1) * 1.4, color = 'red')
+    print(energy +np.ones(len(iters)) * (L-1) * 1.4)
+    plt.title('Energy-iteration')
+    plt.show()
+
+    colors = ['black', 'blue']
+    for index, mirrored in enumerate(['', '_mirrored']):
+        sfs_fast = list()
+        xAxis_fast = list()
+        max_range = L
+        for i in range(1, int(L/2.)):
+            sfs_fast.append(getsf(int(L/2.), int(L/2.) + i, mirrored=mirrored))
+            xAxis_fast.append(i)
+
+        plt.plot(xAxis_fast, sfs_fast, color= colors[index], label=''.join(('operator', mirrored)))
+        plt.plot(xAxis_fast, 0.374 * np.ones(len(xAxis_fast)), color = 'red')
+        plt.legend()
+    plt.title('operator-distance')
+    plt.show()
+
+
+
 #plot(dataname='run/L100.log', L=100)
 #plot(dataname='run/L20_estimate.log', L=20, observables=True)
 
@@ -197,6 +244,24 @@ def plot_startingpoints(dataname, L, fast=True):
 #results operator both sides
 
 
+#RBM
+L=40
+machine = '_RBM'
+#plot(dataname='run/operator_both_sides'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
+#plot_operator_both_sides(dataname='run/operator_both_sides' + machine + '/L' + str(L) + '_estimate.log', L=L)
+
+#SymRBM
+L=40
+machine = '_SymRBM'
+#plot(dataname='run/operator_both_sides'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
+#plot_operator_both_sides(dataname='run/operator_both_sides' + machine + '/L' + str(L) + '_estimate.log', L=L)
+
+
+#DeepFFNN
+L=40
+machine = '_DeepFFNN'
+#plot(dataname='run/operator_both_sides'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
+#plot_operator_both_sides(dataname='run/operator_both_sides' + machine + '/L' + str(L) + '_estimate.log', L=L)
 
 #results with symmetric operator
 
