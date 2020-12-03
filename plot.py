@@ -193,10 +193,14 @@ def plot_startingpoints(dataname, L, fast=True):
 
 #plot_startingpoints('run/startingpoint_superpower/L30_estimate.log', 30, fast=True)
 
-L=45
+L=20
 machine = '_RBM'
+#sampler = 'local'
 
-plot(dataname='run/symmetric_operator' + machine + '/L' + str(L) + '.log', L=L, observables=False)
+#plot(dataname='test_sr/test_sr' + '.log', L=L, observables=False)
+#plot('test_sr/test_sr_estimate' + '.log', L=L, symmetric_operator=True, observables=True)
 
-plot('run/symmetric_operator' + machine + '/L' + str(L) + '_estimate.log', L=L, symmetric_operator=True)
+
+#plot(dataname='run/symmetric_operator_TorchFFNN_' + sampler + '/L' + str(L) + '.log', L=L, observables=False)
+#plot('run/symmetric_operator_TorchFFNN_' + sampler + '/L' + str(L) + '_estimate' + '.log', L=L, symmetric_operator=True, observables=True)
 
