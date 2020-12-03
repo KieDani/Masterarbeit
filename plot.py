@@ -193,14 +193,30 @@ def plot_startingpoints(dataname, L, fast=True):
 
 #plot_startingpoints('run/startingpoint_superpower/L30_estimate.log', 30, fast=True)
 
-L=20
+
+#results operator both sides
+
+
+
+#results with symmetric operator
+
+
+#RBM
+L=40
 machine = '_RBM'
-#sampler = 'local'
-
-#plot(dataname='test_sr/test_sr' + '.log', L=L, observables=False)
-#plot('test_sr/test_sr_estimate' + '.log', L=L, symmetric_operator=True, observables=True)
+#plot(dataname='run/symmetric_operator'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
+#plot('run/symmetric_operator'+ machine + '/L' + str(L) + '_estimate.log', L=L, symmetric_operator=True, observables=True)
 
 
-#plot(dataname='run/symmetric_operator_TorchFFNN_' + sampler + '/L' + str(L) + '.log', L=L, observables=False)
-#plot('run/symmetric_operator_TorchFFNN_' + sampler + '/L' + str(L) + '_estimate' + '.log', L=L, symmetric_operator=True, observables=True)
+#FFNN
+L=45
+machine = '_FFNN'
+#plot(dataname='run/symmetric_operator'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
+#plot('run/symmetric_operator'+ machine + '/L' + str(L) + '_estimate.log', L=L, symmetric_operator=True, observables=True)
 
+
+#DeepFFNN
+L=60
+machine = '_DeepFFNN'
+#plot(dataname='run/symmetric_operator'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
+#plot('run/symmetric_operator'+ machine + '/L' + str(L) + '_estimate.log', L=L, symmetric_operator=True, observables=True)
