@@ -13,8 +13,8 @@ def build_Heisenbergchain_S1(L):
     g = nk.graph.Graph(nodes=list(gnx.nodes), edges=list(gnx.edges))
 
     # Printing out the graph information
-    print('This graph has ' + str(g.n_sites) + ' sites')
-    print('with the following set of edges: ' + str(g.edges))
+    #print('This graph has ' + str(g.n_nodes) + ' sites')
+    #print('with the following set of edges: ' + str(g.n_edges))
 
     if (L%2 == 0):
         hi = nk.hilbert.Spin(s=1, total_sz=0.0, graph=g)
@@ -49,8 +49,8 @@ def build_Heisenbergchain_S1_transformed(L):
     g = nk.graph.Graph(nodes=list(gnx.nodes), edges=list(gnx.edges))
 
     # Printing out the graph information
-    print('This graph has ' + str(g.n_sites) + ' sites')
-    print('with the following set of edges: ' + str(g.edges))
+    #print('This graph has ' + str(g.n_nodes) + ' sites')
+    #print('with the following set of edges: ' + str(g.n_edges))
 
     if (L%2 == 0):
         hi = nk.hilbert.Spin(s=1, total_sz=0.0, graph=g)
