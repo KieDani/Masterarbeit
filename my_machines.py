@@ -434,7 +434,7 @@ def load_machine(machine, hamiltonian, optimizer='Sgd', lr=0.1, sampler='Local')
 def get_machine(machine_name):
     if(machine_name == 'JaxRBM'):
         return JaxRBM
-    elif(machine_name == 'JaxSymRBM' or 'JaxSymmRBM'):
+    elif(machine_name == 'JaxSymRBM' or machine_name == 'JaxSymmRBM'):
         return JaxSymmRBM
     elif(machine_name == 'JaxDeepRBM'):
         return JaxDeepRBM

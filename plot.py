@@ -185,6 +185,63 @@ def plot_startingpoints(dataname, L, fast=True):
     plt.show()
 
 
+def plot_Sr(path, L):
+    def calcMean(array):
+        length = np.minimum(15, len(array))
+        sum = 0.
+        for i in range(length):
+            sum += array[-i + 0]
+        return sum / float(length)
+
+    def getsf(i, data):
+        sf = list()
+        for iteration in data["Output"]:
+            sf.append(iteration['Ferro_correlation_function' + str(i)]["Mean"])
+        return calcMean(sf)
+
+    iterations = list()
+    energies = list()
+    strincorrs = list()
+    xes = list()
+    Sr = [0.01, 0.1, 1, 10, None]
+    for i, sr in enumerate(Sr):
+        sr_string = '_'.join((str(sr).split('.')))
+        dataname = ''.join((path, 'Sr', sr_string, 'L', str(L), '.log'))
+        dataname2 = ''.join((path, 'Sr', sr_string, 'L', str(L), '_estimate.log'))
+        data = json.load(open(dataname))
+        data2 = json.load(open(dataname2))
+        iters = []
+        energy = []
+        for iteration in data["Output"]:
+            iters.append(iteration["Iteration"])
+            energy.append(iteration["Energy"]["Mean"])
+        iterations.append(np.asarray(iters))
+        energies.append(np.asarray(energy))
+
+        sfs_fast = list()
+        xAxis_fast = list()
+        for i in range(1, int(L / 2.)):
+            sfs_fast.append(getsf(2 * i, data2))
+            xAxis_fast.append(2 * i)
+        strincorrs.append(np.asarray(sfs_fast))
+        xes.append(np.asarray(xAxis_fast))
+
+    fig, axes = plt.subplots(2, 3)
+    for i in range(0, len(Sr)):
+        fig.suptitle('Energy - Iterations')
+        axes[int(i / 3), i % 3].plot(iterations[i], energies[i])
+        axes[int(i / 3), i % 3].plot(iters, -np.ones(len(iters)) * (L - 1) * 1.4, color='red')
+        axes[int(i / 3), i % 3].set_title(''.join(('Sr', str(Sr[i]), 'L', str(L), '.log')))
+    plt.show()
+    fig, axes = plt.subplots(2, 3)
+    for i in range(0, len(Sr)):
+        fig.suptitle('Stringcorrelation - distance')
+        print(strincorrs[i])
+        axes[int(i / 3), i % 3].plot(xes[i], strincorrs[i])
+        axes[int(i / 3), i % 3].plot(xes[i], 0.374 * np.ones(len(xes[i])), color = 'red')
+        axes[int(i / 3), i % 3].set_title(''.join(('Sr', str(Sr[i]), 'L', str(L), '.log')))
+    plt.show()
+
 
 def plot_operator_both_sides(dataname, L):
     data = json.load(open(dataname))
@@ -241,6 +298,7 @@ def plot_operator_both_sides(dataname, L):
 #plot_startingpoints('run/startingpoint_superpower/L30_estimate.log', 30, fast=True)
 
 
+
 #results operator both sides
 
 
@@ -263,6 +321,8 @@ machine = '_DeepFFNN'
 #plot(dataname='run/operator_both_sides'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
 #plot_operator_both_sides(dataname='run/operator_both_sides' + machine + '/L' + str(L) + '_estimate.log', L=L)
 
+
+
 #results with symmetric operator
 
 
@@ -280,8 +340,22 @@ machine = '_FFNN'
 #plot('run/symmetric_operator'+ machine + '/L' + str(L) + '_estimate.log', L=L, symmetric_operator=True, observables=True)
 
 
+
 #DeepFFNN
 L=60
 machine = '_DeepFFNN'
 #plot(dataname='run/symmetric_operator'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
 #plot('run/symmetric_operator'+ machine + '/L' + str(L) + '_estimate.log', L=L, symmetric_operator=True, observables=True)
+
+
+
+#results test_sr
+
+
+#Compare Sr RBM
+#plot_Sr(path='run/test_sr/', L=40)
+
+#Compare Sr FFNN
+#plot_Sr(path='run/test_sr_ffnn/', L=40)
+
+
