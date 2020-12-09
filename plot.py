@@ -203,7 +203,7 @@ def plot_Sr(path, L):
     energies = list()
     strincorrs = list()
     xes = list()
-    Sr = [0.01, 0.1, 1, 10, None]
+    Sr = [0.01, 0.1,  1, 10, None]
     for i, sr in enumerate(Sr):
         sr_string = '_'.join((str(sr).split('.')))
         dataname = ''.join((path, 'Sr', sr_string, 'L', str(L), '.log'))
@@ -357,5 +357,6 @@ machine = '_DeepFFNN'
 
 #Compare Sr FFNN
 #plot_Sr(path='run/test_sr_ffnn/', L=40)
+#plot_Sr(path='run/test_sr_FFNN/', L=12)
 
 

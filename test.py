@@ -69,6 +69,6 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
 
 
 
-#run(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=300, n_iterations=50, machine_name='JaxFFNN')
-#load(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=3000, n_iterations=20, machine_name='JaxFFNN')
+#run(L=7, alpha=10, sr=0.01, path='run', dataname='', n_samples=300, n_iterations=250, machine_name='JaxDeepFFNN')
+#load(L=7, alpha=10, sr=0.01, path='run', dataname='', n_samples=3000, n_iterations=50, machine_name='JaxDeepFFNN')
 
