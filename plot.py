@@ -35,7 +35,13 @@ def plot(dataname, L, observables=True, symmetric_operator = False):
         return calcMean(sf)
 
     plt.plot(iters, energy)
-    plt.plot(iters, -np.ones(len(iters)) * (L - 1) * 1.4, color='red')
+    tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
+    if (L <= 12):
+        factor = tmp[L]
+    else:
+        factor = (L - 1) * (-1.4)
+    expected_energy = np.ones_like(np.asarray(iters)) * factor
+    plt.plot(iters, expected_energy, color='red')
     plt.show()
 
     if(observables == True):
@@ -125,7 +131,7 @@ def present(Ls, path):
             sfs_fast.append(getsf(i))
             xAxis_fast.append(i)
 
-        tmp = [None, None, None, None, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
         if(l<=12):
             factor = tmp[l]
         else:
@@ -168,8 +174,14 @@ def plot_startingpoints(dataname, L, fast=True):
         return calcMean(sf)
 
     plt.plot(iters, energy)
-    plt.plot(iters, -np.ones(len(iters)) * (L-1) * 1.4, color = 'red')
-    print(energy +np.ones(len(iters)) * (L-1) * 1.4)
+    tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
+    if (L <= 12):
+        factor = tmp[L]
+    else:
+        factor = (L - 1) * (-1.4)
+    expected_energy = np.ones_like(np.asarray(iters)) * factor
+    plt.plot(iters, expected_energy, color = 'red')
+    #print(energy +np.ones(len(iters)) * (L-1) * 1.4)
     plt.title('Energy-iteration')
     plt.show()
 
@@ -237,7 +249,13 @@ def plot_Sr(path, L):
     for i in range(0, len(Sr)):
         fig.suptitle('Energy - Iterations')
         axes[int(i / 3), i % 3].plot(iterations[i], energies[i])
-        axes[int(i / 3), i % 3].plot(iters, -np.ones(len(iters)) * (L - 1) * 1.4, color='red')
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
+        if (L <= 12):
+            factor = tmp[L]
+        else:
+            factor = (L - 1) * (-1.4)
+        expected_energy = np.ones_like(np.asarray(iters)) * factor
+        axes[int(i / 3), i % 3].plot(iters, expected_energy, color='red')
         axes[int(i / 3), i % 3].set_title(''.join(('Sr', str(Sr[i]), 'L', str(L), '.log')))
     plt.show()
     fig, axes = plt.subplots(2, 3)
@@ -372,6 +390,7 @@ machine = '_DeepFFNN'
 #Compare Sr FFNN
 #plot_Sr(path='run/test_sr_ffnn/', L=40)
 #plot_Sr(path='run/test_sr_FFNN/', L=12)
+
 
 #plot('run/small_FFNN/SrNoneL8_estimate.log', L = 8 ,symmetric_operator=False, observables=True)
 
