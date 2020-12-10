@@ -6,6 +6,10 @@ import helping_functions as functions
 
 import time
 
+import numpy as np
+import gc
+
+
 
 __L__ = 50
 __number_samples__ = 700
@@ -68,7 +72,40 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
     print(gs2.estimate(observables))
 
 
+def exact(L = __L__, symmetric = True, dataname = None, path = 'run'):
+    ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
+    w, v_tmp = np.linalg.eigh(ha.to_dense())
+    print('Energy:', w[0])
+    v = np.empty(3**L, dtype=np.complex128)
+    print(v.shape)
+    for index, i in enumerate(v_tmp[:, 0]):
+        v[index] = i[0, 0]
+    if(symmetric == True):
+        results = np.empty(int(L/2) -1 + L%2, dtype=np.float64)
+        for index, i in enumerate(range(1, int(L / 2.) + L%2)):
+            observable = operators.FerroCorrelationZ(hilbert=hi, j=int(L / 2.) - i, k=int(L / 2.) + i).to_dense()
+            result_l = np.dot(np.dot(v.T, observable), v).real
+            results[index] = result_l[0, 0]
+    else:
+        results = np.empty(L-1, dtype=np.float64)
+        for index, i in enumerate(range(1, L)):
+            observable = operators.FerroCorrelationZ(hilbert=hi, j=0, k=i).to_dense()
+            result_l = np.dot(np.dot(v.T, observable), v).real
+            results[index] = result_l[0, 0]
+    if(dataname == None):
+        dataname = ''.join(('L', str(L), '_exact'))
+    dataname = functions.create_path(dataname, path=path)
+    dataname = ''.join((dataname, '.csv'))
+    # save to csv file
+    np.savetxt(dataname, results, delimiter=';')
+    print(results)
+    return results
 
-#run(L=7, alpha=10, sr=0.01, path='run', dataname='', n_samples=300, n_iterations=250, machine_name='JaxDeepFFNN')
-#load(L=7, alpha=10, sr=0.01, path='run', dataname='', n_samples=3000, n_iterations=50, machine_name='JaxDeepFFNN')
+
+#run(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=300, n_iterations=50, machine_name='JaxFFNN')
+#load(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=3000, n_iterations=20, machine_name='JaxFFNN')
+
+#exact(L=6, symmetric=False)
+
+
 
