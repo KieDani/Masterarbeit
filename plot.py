@@ -35,7 +35,13 @@ def plot(dataname, L, observables=True, symmetric_operator = False):
         return calcMean(sf)
 
     plt.plot(iters, energy)
-    plt.plot(iters, -np.ones(len(iters)) * (L - 1) * 1.4, color='red')
+    tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
+    if (L <= 12):
+        factor = tmp[L]
+    else:
+        factor = (L - 1) * (-1.4)
+    expected_energy = np.ones_like(np.asarray(iters)) * factor
+    plt.plot(iters, expected_energy, color='red')
     plt.show()
 
     if(observables == True):
@@ -49,7 +55,14 @@ def plot(dataname, L, observables=True, symmetric_operator = False):
                 xAxis_fast.append(i)
 
         plt.plot(xAxis_fast, sfs_fast)
-        plt.plot(xAxis_fast, 0.374 * np.ones(len(xAxis_fast)), color='red')
+        try:
+            dataname_operator = ''.join(('run/small/L', str(L), '_exact.csv'))
+            operator = np.loadtxt(dataname_operator)
+            x_operator = np.arange(1, len(operator)+1)
+        except:
+            operator = 0.374 * np.ones(len(xAxis_fast))
+            x_operator = xAxis_fast
+        plt.plot(x_operator, operator, color='red')
         plt.show()
 
 
@@ -118,7 +131,7 @@ def present(Ls, path):
             sfs_fast.append(getsf(i))
             xAxis_fast.append(i)
 
-        tmp = [None, None, None, None, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
         if(l<=12):
             factor = tmp[l]
         else:
@@ -161,8 +174,14 @@ def plot_startingpoints(dataname, L, fast=True):
         return calcMean(sf)
 
     plt.plot(iters, energy)
-    plt.plot(iters, -np.ones(len(iters)) * (L-1) * 1.4, color = 'red')
-    print(energy +np.ones(len(iters)) * (L-1) * 1.4)
+    tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
+    if (L <= 12):
+        factor = tmp[L]
+    else:
+        factor = (L - 1) * (-1.4)
+    expected_energy = np.ones_like(np.asarray(iters)) * factor
+    plt.plot(iters, expected_energy, color = 'red')
+    #print(energy +np.ones(len(iters)) * (L-1) * 1.4)
     plt.title('Energy-iteration')
     plt.show()
 
@@ -185,6 +204,123 @@ def plot_startingpoints(dataname, L, fast=True):
     plt.show()
 
 
+def plot_Sr(path, L):
+    def calcMean(array):
+        length = np.minimum(15, len(array))
+        sum = 0.
+        for i in range(length):
+            sum += array[-i + 0]
+        return sum / float(length)
+
+    def getsf(i, data):
+        sf = list()
+        for iteration in data["Output"]:
+            sf.append(iteration['Ferro_correlation_function' + str(i)]["Mean"])
+        return calcMean(sf)
+
+    iterations = list()
+    energies = list()
+    strincorrs = list()
+    xes = list()
+    Sr = [0.01, 0.1,  1, 10, None]
+    for i, sr in enumerate(Sr):
+        sr_string = '_'.join((str(sr).split('.')))
+        dataname = ''.join((path, 'Sr', sr_string, 'L', str(L), '.log'))
+        dataname2 = ''.join((path, 'Sr', sr_string, 'L', str(L), '_estimate.log'))
+        data = json.load(open(dataname))
+        data2 = json.load(open(dataname2))
+        iters = []
+        energy = []
+        for iteration in data["Output"]:
+            iters.append(iteration["Iteration"])
+            energy.append(iteration["Energy"]["Mean"])
+        iterations.append(np.asarray(iters))
+        energies.append(np.asarray(energy))
+
+        sfs_fast = list()
+        xAxis_fast = list()
+        for i in range(1, int(L / 2.)):
+            sfs_fast.append(getsf(2 * i, data2))
+            xAxis_fast.append(2 * i)
+        strincorrs.append(np.asarray(sfs_fast))
+        xes.append(np.asarray(xAxis_fast))
+
+    fig, axes = plt.subplots(2, 3)
+    for i in range(0, len(Sr)):
+        fig.suptitle('Energy - Iterations')
+        axes[int(i / 3), i % 3].plot(iterations[i], energies[i])
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
+        if (L <= 12):
+            factor = tmp[L]
+        else:
+            factor = (L - 1) * (-1.4)
+        expected_energy = np.ones_like(np.asarray(iters)) * factor
+        axes[int(i / 3), i % 3].plot(iters, expected_energy, color='red')
+        axes[int(i / 3), i % 3].set_title(''.join(('Sr', str(Sr[i]), 'L', str(L), '.log')))
+    plt.show()
+    fig, axes = plt.subplots(2, 3)
+    for i in range(0, len(Sr)):
+        fig.suptitle('Stringcorrelation - distance')
+        print(strincorrs[i])
+        axes[int(i / 3), i % 3].plot(xes[i], strincorrs[i])
+        try:
+            dataname = ''.join(('run/small/L', str(L), '_exact.csv'))
+            operator = np.loadtxt(dataname)
+            x_operator = np.arange(1, len(operator)+1)
+        except:
+            operator = 0.374 * np.ones(len(xAxis_fast))
+            x_operator = xAxis_fast
+        axes[int(i / 3), i % 3].plot(x_operator, operator, color='red')
+        axes[int(i / 3), i % 3].set_title(''.join(('Sr', str(Sr[i]), 'L', str(L), '.log')))
+    plt.show()
+
+
+def plot_operator_both_sides(dataname, L):
+    data = json.load(open(dataname))
+    # Extract the relevant information
+
+    iters = []
+    energy = []
+
+    for iteration in data["Output"]:
+        iters.append(iteration["Iteration"])
+        energy.append(iteration["Energy"]["Mean"])
+
+    def calcMean(array):
+        length = np.minimum(15, len(array))
+        sum = 0.
+        for i in range(length):
+            sum += array[-i + 0]
+        return sum / float(length)
+
+    def getsf(j, k, mirrored = ''):
+        sf = list()
+        for iteration in data["Output"]:
+            sf.append(iteration[''.join(('Ferro_correlation_function', mirrored, str(k - j)))]["Mean"])
+        return calcMean(sf)
+
+    plt.plot(iters, energy)
+    plt.plot(iters, -np.ones(len(iters)) * (L-1) * 1.4, color = 'red')
+    print(energy +np.ones(len(iters)) * (L-1) * 1.4)
+    plt.title('Energy-iteration')
+    plt.show()
+
+    colors = ['black', 'blue']
+    for index, mirrored in enumerate(['', '_mirrored']):
+        sfs_fast = list()
+        xAxis_fast = list()
+        max_range = L
+        for i in range(1, int(L/2.)):
+            sfs_fast.append(getsf(int(L/2.), int(L/2.) + i, mirrored=mirrored))
+            xAxis_fast.append(i)
+
+        plt.plot(xAxis_fast, sfs_fast, color= colors[index], label=''.join(('operator', mirrored)))
+        plt.plot(xAxis_fast, 0.374 * np.ones(len(xAxis_fast)), color = 'red')
+        plt.legend()
+    plt.title('operator-distance')
+    plt.show()
+
+
 
 #plot(dataname='run/L100.log', L=100)
 #plot(dataname='run/L20_estimate.log', L=20, observables=True)
@@ -193,10 +329,69 @@ def plot_startingpoints(dataname, L, fast=True):
 
 #plot_startingpoints('run/startingpoint_superpower/L30_estimate.log', 30, fast=True)
 
-L=45
+
+
+#results operator both sides
+
+
+#RBM
+L=40
 machine = '_RBM'
+#plot(dataname='run/operator_both_sides'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
+#plot_operator_both_sides(dataname='run/operator_both_sides' + machine + '/L' + str(L) + '_estimate.log', L=L)
 
-plot(dataname='run/symmetric_operator' + machine + '/L' + str(L) + '.log', L=L, observables=False)
+#SymRBM
+L=40
+machine = '_SymRBM'
+#plot(dataname='run/operator_both_sides'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
+#plot_operator_both_sides(dataname='run/operator_both_sides' + machine + '/L' + str(L) + '_estimate.log', L=L)
 
-plot('run/symmetric_operator' + machine + '/L' + str(L) + '_estimate.log', L=L, symmetric_operator=True)
+
+#DeepFFNN
+L=40
+machine = '_DeepFFNN'
+#plot(dataname='run/operator_both_sides'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
+#plot_operator_both_sides(dataname='run/operator_both_sides' + machine + '/L' + str(L) + '_estimate.log', L=L)
+
+
+
+#results with symmetric operator
+
+
+#RBM
+L=40
+machine = '_RBM'
+#plot(dataname='run/symmetric_operator'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
+#plot('run/symmetric_operator'+ machine + '/L' + str(L) + '_estimate.log', L=L, symmetric_operator=True, observables=True)
+
+
+#FFNN
+L=45
+machine = '_FFNN'
+#plot(dataname='run/symmetric_operator'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
+#plot('run/symmetric_operator'+ machine + '/L' + str(L) + '_estimate.log', L=L, symmetric_operator=True, observables=True)
+
+
+
+#DeepFFNN
+L=60
+machine = '_DeepFFNN'
+#plot(dataname='run/symmetric_operator'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
+#plot('run/symmetric_operator'+ machine + '/L' + str(L) + '_estimate.log', L=L, symmetric_operator=True, observables=True)
+
+
+
+#results test_sr
+
+
+#Compare Sr RBM
+#plot_Sr(path='run/test_sr/', L=40)
+
+#Compare Sr FFNN
+#plot_Sr(path='run/test_sr_ffnn/', L=40)
+#plot_Sr(path='run/test_sr_FFNN/', L=12)
+
+
+#plot('run/small_FFNN/SrNoneL8_estimate.log', L = 8 ,symmetric_operator=False, observables=True)
+
 
