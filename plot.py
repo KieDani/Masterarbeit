@@ -49,7 +49,12 @@ def plot(dataname, L, observables=True, symmetric_operator = False):
                 xAxis_fast.append(i)
 
         plt.plot(xAxis_fast, sfs_fast)
-        plt.plot(xAxis_fast, 0.374 * np.ones(len(xAxis_fast)), color='red')
+        try:
+            dataname = ''.join(('run/small/L', str(L), '_exact.csv'))
+            operator = np.loadtxt(dataname)
+        except:
+            operator = 0.374 * np.ones(len(xAxis_fast))
+        plt.plot(xAxis_fast, operator, color='red')
         plt.show()
 
 
@@ -358,5 +363,7 @@ machine = '_DeepFFNN'
 #Compare Sr FFNN
 #plot_Sr(path='run/test_sr_ffnn/', L=40)
 #plot_Sr(path='run/test_sr_FFNN/', L=12)
+
+plot('run/small_FFNN/SrNoneL8_estimate.log', L = 8 ,symmetric_operator=False, observables=True)
 
 
