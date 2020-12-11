@@ -111,7 +111,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run'):
 #run(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=300, n_iterations=50, machine_name='JaxFFNN')
 #load(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=3000, n_iterations=20, machine_name='JaxFFNN')
 
-exact(L=6, symmetric=False)
+#exact(L=6, symmetric=False)
 
 
 
