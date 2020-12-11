@@ -8,6 +8,7 @@ import time
 
 import numpy as np
 import gc
+import scipy as sp
 
 
 
@@ -74,12 +75,14 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
 
 def exact(L = __L__, symmetric = True, dataname = None, path = 'run'):
     ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
-    w, v_tmp = np.linalg.eigh(ha.to_dense())
-    print('Energy:', w[0])
+    w, v_tmp = sp.sparse.linalg.eigsh(ha.to_sparse(), k=1, which='SA', return_eigenvectors=True)
+    print(v_tmp.shape)
+    #w, v_tmp = np.linalg.eigh(ha.to_dense())
+    print('Energy:', w[0], 'Lattice size:', L)
     v = np.empty(3**L, dtype=np.complex128)
     print(v.shape)
     for index, i in enumerate(v_tmp[:, 0]):
-        v[index] = i[0, 0]
+        v[index] = i
     if(symmetric == True):
         results = np.empty(int(L/2) -1 + L%2, dtype=np.float64)
         for index, i in enumerate(range(1, int(L / 2.) + L%2)):
@@ -89,9 +92,12 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run'):
     else:
         results = np.empty(L-1, dtype=np.float64)
         for index, i in enumerate(range(1, L)):
-            observable = operators.FerroCorrelationZ(hilbert=hi, j=0, k=i).to_dense()
-            result_l = np.dot(np.dot(v.T, observable), v).real
-            results[index] = result_l[0, 0]
+            observable = operators.FerroCorrelationZ(hilbert=hi, j=0, k=i).to_sparse()
+            #observable2 = operators.FerroCorrelationZ(hilbert=hi, j=0, k=i).to_dense()
+            #result_l2 = np.dot(np.dot(v, observable2), v).real
+            result_l = observable.dot(v).dot(v).real
+            #print(result_l, '; ', result_l2)
+            results[index] = result_l
     if(dataname == None):
         dataname = ''.join(('L', str(L), '_exact'))
     dataname = functions.create_path(dataname, path=path)
@@ -105,7 +111,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run'):
 #run(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=300, n_iterations=50, machine_name='JaxFFNN')
 #load(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=3000, n_iterations=20, machine_name='JaxFFNN')
 
-#exact(L=6, symmetric=False)
+exact(L=6, symmetric=False)
 
 
 
