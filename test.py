@@ -73,8 +73,11 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
     print(gs2.estimate(observables))
 
 
-def exact(L = __L__, symmetric = True, dataname = None, path = 'run'):
-    ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
+def exact(L = __L__, symmetric = True, dataname = None, path = 'run', transformed = True):
+    if(transformed == True):
+        ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
+    else:
+        ha, hi, g = models.build_Heisenbergchain_S1(L=L)
     #w, v_tmp = sp.sparse.linalg.eigsh(ha.to_sparse(), k=1, which='SA', return_eigenvectors=True)
     #w, v_tmp = sp.sparse.linalg.eigs(ha.to_sparse(), k=1, return_eigenvectors=True)
     w, v_tmp = sp.linalg.eigh(ha.to_dense())
@@ -87,14 +90,22 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run'):
     if(symmetric == True):
         results = np.empty(int(L/2) -1 + L%2, dtype=np.float64)
         for index, i in enumerate(range(1, int(L / 2.) + L%2)):
-            observable = operators.FerroCorrelationZ(hilbert=hi, j=int(L / 2.) - i, k=int(L / 2.) + i).to_sparse()
+            if (transformed == True):
+                observable = operators.FerroCorrelationZ(hilbert=hi, j=int(L / 2.) - i, k=int(L / 2.) + i).to_sparse()
+            else:
+                print('Not implemented yet. Do not use the symmetric operator!')
+                observable = None
             result_l = observable.dot(v).dot(v).real
             results[index] = result_l
     else:
         results = np.empty(L-1, dtype=np.float64)
         for index, i in enumerate(range(1, L)):
-            observable = operators.FerroCorrelationZ(hilbert=hi, j=0, k=i).to_sparse()
-            #observable = operators.FerroCorrelationZ(hilbert=hi, j=0, k=i).to_dense()
+            if (transformed == True):
+                observable = operators.FerroCorrelationZ(hilbert=hi, j=0, k=i).to_sparse()
+            else:
+                observable = operators.StringCorrelation(hilbert=hi, l=i).to_sparse()
+            print(observable.shape)
+            print(v.shape)
             #result_l = np.dot(np.dot(v, observable), v).real
             result_l = observable.dot(v).dot(v).real
             #print(result_l, '; ', result_l2)
@@ -112,7 +123,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run'):
 #run(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=300, n_iterations=50, machine_name='JaxFFNN')
 #load(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=3000, n_iterations=20, machine_name='JaxFFNN')
 
-exact(L=4, symmetric=False)
+#exact(L=6, symmetric=False, transformed=True)
 
 
 
