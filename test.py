@@ -11,6 +11,13 @@ import gc
 import scipy as sp
 
 
+from scipy.sparse.linalg import lobpcg
+import matplotlib.pyplot as plt
+
+from pyamg import smoothed_aggregation_solver
+from pyamg.gallery import poisson
+
+
 
 __L__ = 50
 __number_samples__ = 700
@@ -78,8 +85,15 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', transforme
         ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
     else:
         ha, hi, g = models.build_Heisenbergchain_S1(L=L)
-    #w, v_tmp = sp.sparse.linalg.eigsh(ha.to_sparse(), k=1, which='SA', return_eigenvectors=True)
-    #w, v_tmp = sp.sparse.linalg.eigs(ha.to_sparse(), k=1, return_eigenvectors=True)
+
+    # ml = smoothed_aggregation_solver(ha.to_sparse())
+    # K = 1
+    # X = sp.rand(ha.to_sparse().shape[0], K)
+    # M = ml.aspreconditioner()
+    # w, v_tmp = lobpcg(ha.to_sparse(), X, M=M, tol=1e-8, largest=False)
+
+    #w, v_tmp = sp.sparse.linalg.eigsh(ha.to_sparse(), k=1, which='SR', return_eigenvectors=True)
+    #w, v_tmp = sp.sparse.linalg.eigs(ha.to_sparse(), k=1, which='SR', return_eigenvectors=True)
     w, v_tmp = sp.linalg.eigh(ha.to_dense())
     print(v_tmp.shape)
     print('Energy:', w[0], 'Lattice size:', L)
