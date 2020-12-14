@@ -9,6 +9,7 @@ import time
 import numpy as np
 import gc
 import scipy as sp
+import primme
 
 
 from scipy.sparse.linalg import lobpcg
@@ -95,6 +96,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', transforme
     #w, v_tmp = sp.sparse.linalg.eigsh(ha.to_sparse(), k=1, which='SR', return_eigenvectors=True)
     #w, v_tmp = sp.sparse.linalg.eigs(ha.to_sparse(), k=1, which='SR', return_eigenvectors=True)
     w, v_tmp = sp.linalg.eigh(ha.to_dense())
+    #w, v_tmp = primme.eigsh(ha.to_sparse(), k=1, which='SA')
     print(v_tmp.shape)
     print('Energy:', w[0], 'Lattice size:', L)
     v = np.empty(3**L, dtype=np.complex128)
@@ -137,7 +139,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', transforme
 #run(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=300, n_iterations=50, machine_name='JaxFFNN')
 #load(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=3000, n_iterations=20, machine_name='JaxFFNN')
 
-#exact(L=8, symmetric=False, transformed=True)
+exact(L=8, symmetric=False, transformed=True)
 
 
 
