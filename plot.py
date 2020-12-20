@@ -56,7 +56,7 @@ def plot(dataname, L, observables=True, symmetric_operator = False):
 
         plt.plot(xAxis_fast, sfs_fast)
         try:
-            dataname_operator = ''.join(('run/small/L', str(L), '_exact.csv'))
+            dataname_operator = ''.join(('run/exact_transformed/L', str(L), '_exact.csv'))
             operator = np.loadtxt(dataname_operator)
             x_operator = np.arange(1, len(operator)+1)
         except:
@@ -264,7 +264,7 @@ def plot_Sr(path, L):
         print(strincorrs[i])
         axes[int(i / 3), i % 3].plot(xes[i], strincorrs[i])
         try:
-            dataname = ''.join(('run/small/L', str(L), '_exact.csv'))
+            dataname = ''.join(('run/exact_transformed/L', str(L), '_exact.csv'))
             operator = np.loadtxt(dataname)
             x_operator = np.arange(1, len(operator)+1)
         except:
@@ -392,6 +392,6 @@ machine = '_DeepFFNN'
 #plot_Sr(path='run/test_sr_FFNN/', L=12)
 
 
-#plot('run/small_FFNN/SrNoneL8_estimate.log', L = 8 ,symmetric_operator=False, observables=True)
+#plot('run/small_RBM/SrNoneL14_estimate.log', L = 14 ,symmetric_operator=False, observables=True)
 
 

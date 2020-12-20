@@ -332,3 +332,30 @@ def FerroCorrelationZ_slow(hilbert, j, k):
     string_correlation_function = nk.operator.LocalOperator(hi, sf, sites)
     return string_correlation_function
 
+
+def StringCorrelation_slow(hilbert, j, k):
+    hi = hilbert
+    # We need to specify the local operators as a matrix acting on a local Hilbert space
+    sf = []
+    sites = []
+    sigmaz = _np.asarray([[1, 0, 0], [0, 0, 0], [0, 0, -1]])
+    expSz = _np.asarray([[-1, 0, 0], [0, 1, 0], [0, 0, -1]])
+    helper = []
+    mszs = _np.kron(sigmaz, expSz)
+    if ((k - j) == 1):
+        mszs = _np.kron(sigmaz, sigmaz)
+        helper = [j, k]
+    else:
+        for i in range(j + 1, k - 1):
+            mszs = _np.kron(mszs, expSz)
+        mszs = _np.kron(mszs, sigmaz)
+        for i in range(j, k + 1):
+            helper.append(i)
+    sf.append((mszs).tolist())
+    print(k, ' ', j, ' ', k - j)
+    print(helper)
+    print('Size of Observable:')
+    print(mszs.shape)
+    sites.append(helper)
+    string_correlation_function = nk.operator.LocalOperator(hi, sf, sites)
+    return string_correlation_function
