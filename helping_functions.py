@@ -3,6 +3,7 @@ import scipy
 import numpy as np
 import my_operators as operators
 import os
+import sys
 
 
 #TODO check, why transformed Hamiltonian does not work!
@@ -92,3 +93,33 @@ def test_operator_both_sides(hilbert, L):
         observables[name_fast] = observ_fast
         observables[name_fast_mirrored] = observ_fast_mirrored
     return observables
+
+
+#hamiltonian has to be a sparse matrix
+def power_method(hamiltonian, L, eigenvalue_lanczos):
+    def normalize(vector):
+        return vector / np.linalg.norm(vector)
+
+    #generate starting vector
+    #ToDo find out, why I need a real vector!!!
+    x = np.random.random_sample(3**L) - 0.5 #+ np.random.random_sample(3**L) * 1j - 0.5j
+    x = x / np.linalg.norm(x)
+    #find the eigenvector
+    for i in range(1, 50000):
+        x = hamiltonian.dot(x)
+        eigval = np.linalg.norm(x)
+        if (i % 250 == 0):
+            print('guess of eigenvalue', eigval)
+            sys.stdout.flush()
+        x = x / np.linalg.norm(x)
+        if (np.abs(np.abs(eigenvalue_lanczos) - np.abs(eigval)) < 0.000001):
+            print('Found solution', eigval)
+            sys.stdout.flush()
+            print('Needed steps:', i)
+            sys.stdout.flush()
+            return x
+    print('Did not find a proper solution. Found', eigval)
+    sys.stdout.flush()
+    return x
+
+

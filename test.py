@@ -7,9 +7,10 @@ import helping_functions as functions
 import time
 
 import numpy as np
-import gc
+#import gc
 import scipy as sp
-import primme
+#import primme
+import sys
 
 
 from scipy.sparse.linalg import lobpcg
@@ -53,7 +54,7 @@ def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mach
     gs.run(n_iter=int(n_iterations), out=dataname)#, obs=observables)
 
     end = time.time()
-    print(end - start)
+    print('Time', end - start)
 
 
 #ensure, that the machine is the same as used before!
@@ -87,22 +88,18 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', transforme
     else:
         ha, hi, g = models.build_Heisenbergchain_S1(L=L)
 
-    # ml = smoothed_aggregation_solver(ha.to_sparse())
-    # K = 1
-    # X = sp.rand(ha.to_sparse().shape[0], K)
-    # M = ml.aspreconditioner()
-    # w, v_tmp = lobpcg(ha.to_sparse(), X, M=M, tol=1e-8, largest=False)
-
-    #w, v_tmp = sp.sparse.linalg.eigsh(ha.to_sparse(), k=1, which='SR', return_eigenvectors=True)
-    #w, v_tmp = sp.sparse.linalg.eigs(ha.to_sparse(), k=1, which='SR', return_eigenvectors=True)
-    w, v_tmp = sp.linalg.eigh(ha.to_dense())
-    #w, v_tmp = primme.eigsh(ha.to_sparse(), k=1, which='SA')
+    w, v_tmp = sp.sparse.linalg.eigsh(ha.to_sparse(), k=1, which='SR', return_eigenvectors=True)
+    #w, v_tmp = sp.linalg.eigh(ha.to_dense())
     print(v_tmp.shape)
     print('Energy:', w[0], 'Lattice size:', L)
-    v = np.empty(3**L, dtype=np.complex128)
-    print(v.shape)
-    for index, i in enumerate(v_tmp[:, 0]):
-        v[index] = i
+    sys.stdout.flush()
+    # v = np.empty(3**L, dtype=np.complex128)
+    # print(v.shape)
+    # for index, i in enumerate(v_tmp[:, 0]):
+    #     v[index] = i
+
+    v = functions.power_method(ha.to_sparse(), L, w[0])
+
     if(symmetric == True):
         results = np.empty(int(L/2) -1 + L%2, dtype=np.float64)
         for index, i in enumerate(range(1, int(L / 2.) + L%2)):
@@ -110,6 +107,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', transforme
                 observable = operators.FerroCorrelationZ(hilbert=hi, j=int(L / 2.) - i, k=int(L / 2.) + i).to_sparse()
             else:
                 print('Not implemented yet. Do not use the symmetric operator!')
+                sys.stdout.flush()
                 observable = None
             result_l = observable.dot(v).dot(v).real
             results[index] = result_l
@@ -120,8 +118,8 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', transforme
                 observable = operators.FerroCorrelationZ(hilbert=hi, j=0, k=i).to_sparse()
             else:
                 observable = operators.StringCorrelation(hilbert=hi, l=i).to_sparse()
-            print(observable.shape)
-            print(v.shape)
+            #print(observable.shape)
+            #print(v.shape)
             #result_l = np.dot(np.dot(v, observable), v).real
             result_l = observable.dot(v).dot(v).real
             #print(result_l, '; ', result_l2)
@@ -133,13 +131,14 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', transforme
     # save to csv file
     np.savetxt(dataname, results, delimiter=';')
     print(results)
+    sys.stdout.flush()
     return results
 
 
 #run(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=300, n_iterations=50, machine_name='JaxFFNN')
 #load(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=3000, n_iterations=20, machine_name='JaxFFNN')
 
-exact(L=8, symmetric=False, transformed=True)
+#exact(L=10, symmetric=False, transformed=True)
 
 
 
