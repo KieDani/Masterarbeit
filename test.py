@@ -5,19 +5,12 @@ import my_operators as operators
 import helping_functions as functions
 
 import time
-
 import numpy as np
-#import gc
 import scipy as sp
-#import primme
 import sys
 
 
-from scipy.sparse.linalg import lobpcg
-import matplotlib.pyplot as plt
 
-from pyamg import smoothed_aggregation_solver
-from pyamg.gallery import poisson
 
 
 

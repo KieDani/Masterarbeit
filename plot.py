@@ -392,6 +392,6 @@ machine = '_DeepFFNN'
 #plot_Sr(path='run/test_sr_FFNN/', L=12)
 
 
-plot('run/small_RBM/SrNoneL14_estimate.log', L = 14 ,symmetric_operator=False, observables=True)
+#plot('run/small_RBM/SrNoneL14_estimate.log', L = 14 ,symmetric_operator=False, observables=True)
 
 
