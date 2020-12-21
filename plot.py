@@ -35,8 +35,8 @@ def plot(dataname, L, observables=True, symmetric_operator = False):
         return calcMean(sf)
 
     plt.plot(iters, energy)
-    tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
-    if (L <= 12):
+    tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+    if (L < len(tmp)):
         factor = tmp[L]
     else:
         factor = (L - 1) * (-1.4)
@@ -131,8 +131,8 @@ def present(Ls, path):
             sfs_fast.append(getsf(i))
             xAxis_fast.append(i)
 
-        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
-        if(l<=12):
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+        if(l < len(tmp)):
             factor = tmp[l]
         else:
             factor = (l-1) * (-1.4)
@@ -174,8 +174,8 @@ def plot_startingpoints(dataname, L, fast=True):
         return calcMean(sf)
 
     plt.plot(iters, energy)
-    tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
-    if (L <= 12):
+    tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+    if (L < len(tmp)):
         factor = tmp[L]
     else:
         factor = (L - 1) * (-1.4)
@@ -249,8 +249,8 @@ def plot_Sr(path, L):
     for i in range(0, len(Sr)):
         fig.suptitle('Energy - Iterations')
         axes[int(i / 3), i % 3].plot(iterations[i], energies[i])
-        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
-        if (L <= 12):
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+        if (L < len(tmp)):
             factor = tmp[L]
         else:
             factor = (L - 1) * (-1.4)
