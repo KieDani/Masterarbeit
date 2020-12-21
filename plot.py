@@ -56,8 +56,8 @@ def plot(dataname, L, observables=True, symmetric_operator = False):
 
         plt.plot(xAxis_fast, sfs_fast)
         try:
-            dataname_operator = ''.join(('run/exact_transformed/L', str(L), '_exact.csv'))
-            operator = np.loadtxt(dataname_operator)
+            dataname_operator = ''.join(('run/exact_original/L', str(L), '_exact.csv'))
+            operator = -1 * np.loadtxt(dataname_operator)
             x_operator = np.arange(1, len(operator)+1)
         except:
             operator = 0.374 * np.ones(len(xAxis_fast))
@@ -264,8 +264,8 @@ def plot_Sr(path, L):
         print(strincorrs[i])
         axes[int(i / 3), i % 3].plot(xes[i], strincorrs[i])
         try:
-            dataname = ''.join(('run/exact_transformed/L', str(L), '_exact.csv'))
-            operator = np.loadtxt(dataname)
+            dataname = ''.join(('run/exact_original/L', str(L), '_exact.csv'))
+            operator = -1 * np.loadtxt(dataname)
             x_operator = np.arange(1, len(operator)+1)
         except:
             operator = 0.374 * np.ones(len(xAxis_fast))
