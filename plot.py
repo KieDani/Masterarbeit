@@ -6,7 +6,7 @@ import helping_functions as functions
 
 
 
-def plot(dataname, L, observables=True, symmetric_operator = False, periodic=False):
+def plot(dataname, L, observables=True, symmetric_operator = False, periodic=False, transformed_or_original = 'transformed'):
     data=json.load(open(dataname))
     # Extract the relevant information
 
@@ -35,7 +35,15 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
         return calcMean(sf)
 
     plt.plot(iters, energy)
-    tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+    if(periodic == False):
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+    else:
+        if(transformed_or_original == 'transformed'):
+            #energy of transformed hamiltonian
+            tmp = [None, None, None, None, -6.000, -7.096, -8.617, -9.863, -11.337, -12.647, -14.094, -15.438, -16.870, -18.234, -19.655, -21.032, -22.447, -23.832 ]
+        else:
+            #energy of the normal hamiltonian
+            tmp = [None, None, None, None, -5.999, -6.531, -8.617, -9.572, -11.337, -12.480, -14.094, -15.337, -16.870, -18.170, -19.655, -20.991, -22.447 ]
     if (L < len(tmp)):
         factor = tmp[L]
     else:
@@ -45,7 +53,6 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
     plt.show()
 
     if(observables == True):
-        transformed_or_original = 'transformed'
         if(symmetric_operator == True):
             for i in range(1, int(L / 2.)):
                 sfs_fast.append(getsf(2*i))
