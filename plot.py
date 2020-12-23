@@ -49,14 +49,15 @@ def plot(dataname, L, observables=True, symmetric_operator = False):
             for i in range(1, int(L / 2.)):
                 sfs_fast.append(getsf(2*i))
                 xAxis_fast.append(2*i)
+                dataname_operator = ''.join(('run/exact_symmetricOperator_transformed/L', str(L), '_exact.csv'))
         else:
             for i in range(1, length):
                 sfs_fast.append(getsf(i))
                 xAxis_fast.append(i)
+                dataname_operator = ''.join(('run/exact_original/L', str(L), '_exact.csv'))
 
         plt.plot(xAxis_fast, sfs_fast)
         try:
-            dataname_operator = ''.join(('run/exact_original/L', str(L), '_exact.csv'))
             operator = -1 * np.loadtxt(dataname_operator)
             x_operator = np.arange(1, len(operator)+1)
         except:
