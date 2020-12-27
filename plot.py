@@ -81,6 +81,28 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
         plt.show()
 
 
+def compare_original_transformed(L, periodic=False):
+    if(periodic==True):
+        dataname = ''.join(('run/exact_periodic_original/L', str(L), '_exact.csv'))
+        dataname2 = ''.join(('run/exact_periodic_transformed/L', str(L), '_exact.csv'))
+    else:
+        dataname = ''.join(('run/exact_original/L', str(L), '_exact.csv'))
+        dataname2 = ''.join(('run/exact_transformed/L', str(L), '_exact.csv'))
+    try:
+        operator_orig = -1 * np.loadtxt(dataname)
+        x_operator_orig = np.arange(1, len(operator_orig) + 1)
+        operator_trans = +1 * np.loadtxt(dataname2)
+        x_operator_trans = np.arange(1, len(operator_trans) + 1)
+        operator_inf = 0.374 * np.ones(len(x_operator_orig))
+    except:
+        print('L is too large')
+    plt.plot(x_operator_orig, operator_orig, color='green', label='original Hamiltonian')
+    plt.plot(x_operator_trans, operator_trans, color='blue', label='transformed Hamiltonian')
+    plt.plot(x_operator_orig, operator_inf, color='red', label='expected infinity value')
+    plt.title('Compare observable for periodic lattice')
+    plt.legend()
+    plt.show()
+
 
 # Ls should be an array with 4 Elements
 def present(Ls, path):
@@ -409,4 +431,5 @@ machine = '_DeepFFNN'
 
 #plot('run/small_RBM/SrNoneL14_estimate.log', L = 14 ,symmetric_operator=False, observables=True)
 
+#compare_original_transformed(L=16, periodic=True)
 
