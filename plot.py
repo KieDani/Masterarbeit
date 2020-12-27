@@ -73,8 +73,13 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
         plt.plot(xAxis_fast, sfs_fast)
         try:
             operator = -1 * np.loadtxt(dataname_operator)
-            x_operator = np.arange(1, len(operator)+1)
+            if(transformed_or_original == 'transformed'): operator = operator * -1
+            if(symmetric_operator == True):
+                x_operator = np.arange(2, 2*len(operator)+1, 2)
+            else:
+                x_operator = np.arange(1, len(operator)+1)
         except:
+            print(dataname_operator)
             operator = 0.374 * np.ones(len(xAxis_fast))
             x_operator = xAxis_fast
         plt.plot(x_operator, operator, color='red')
@@ -432,4 +437,11 @@ machine = '_DeepFFNN'
 #plot('run/small_RBM/SrNoneL14_estimate.log', L = 14 ,symmetric_operator=False, observables=True)
 
 #compare_original_transformed(L=16, periodic=True)
+
+#plot('run/small_FFNN_periodic/SrNoneL8_estimate.log', L = 8 ,symmetric_operator=False, observables=True, periodic=True, transformed_or_original='original')
+
+#plot('run/small_FFNN/SrNoneL30_estimate.log', L = 30 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
+
+#plot('run/small_symmetricOperator_FFNN/SrNoneL16_estimate.log', L = 16 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original='transformed')
+
 
