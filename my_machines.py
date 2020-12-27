@@ -190,33 +190,6 @@ def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
     return ma, op, sa, machine_name
 
 
-def JaxDeepRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler = 'Local'):
-    print('JaxDeepRBM is used')
-    input_size = hilbert.size
-    ma = nk.machine.Jax(
-        hilbert,
-        stax.serial(stax.Dense(alpha * input_size), LogCoshLayer, stax.Dense(alpha * input_size), LogCoshLayer, SumLayer),
-        dtype=complex
-    )
-    ma.init_random_parameters(seed=12, sigma=0.01)
-    # Optimizer
-    if (optimizer == 'Sgd'):
-        op = Wrap(ma, SgdJax(lr))
-    elif (optimizer == 'Adam'):
-        op = Wrap(ma, AdamJax(lr))
-    else:
-        op = Wrap(ma, AdaMaxJax(lr))
-    # Sampler
-    if (sampler == 'Local'):
-        sa = nk.sampler.MetropolisLocal(machine=ma)
-    elif (sampler == 'Exact'):
-        sa = nk.sampler.ExactSampler(machine=ma)
-    else:
-        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
-    machine_name = 'JaxDeepRBM'
-    return ma, op, sa, machine_name
-
-
 def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxFFNN is used')
     input_size = hilbert.size
