@@ -99,7 +99,6 @@ def FixSrLayer():
 FixSrLayer = FixSrLayer()
 
 
-
 def InputForDenseLayer():
     def init_fun(rng, input_shape):
         output_shape = (input_shape[0], input_shape[1]*input_shape[2])
@@ -131,6 +130,37 @@ def PaddingLayer():
         return outputs
     return init_fun, apply_fun
 PaddingLayer = PaddingLayer()
+
+
+def UnaryLayer():
+    def init_fun(rng, input_shape):
+        output_shape = (input_shape[0], 3 * input_shape[1])
+        return output_shape, ()
+
+    @jax.jit
+    def apply_fun(params, inputs, **kwargs):
+        def input_to_unary(input):
+            unary_output = jnp.empty((input.shape[0], 3), dtype=jnp.int64)
+            input1 = input[:]
+            input2 = input[:]
+            input3 = input[:]
+            jnp.where(input1 <= 1, 1, 0 )
+            jnp.where(input3 >= 1, 1, 0)
+            jnp.where(input2 == 0, 1, 0)
+            unary_output = jax.ops.index_update(unary_output, jax.ops.index[:, 0], input1[:])
+            unary_output = jax.ops.index_update(unary_output, jax.ops.index[:, 1], input2[:])
+            unary_output = jax.ops.index_update(unary_output, jax.ops.index[:, 2], input3[:])
+            return unary_output
+
+        input_size = inputs.shape[1]
+        outputs = jnp.empty((inputs.shape[0], 3 * input_size), dtype=jnp.complex128)
+        for i in range(input_size):
+            unary_output = input_to_unary(inputs[:, i])
+            outputs = jax.ops.index_update(outputs, jax.ops.index[:, 3*i:3*(i+1)], unary_output[:, :])
+        return outputs
+
+    return init_fun, apply_fun
+UnaryLayer = UnaryLayer()
 
 
 Conv1d = functools.partial(stax.GeneralConv, ('NHC', 'HIO', 'NHC'))
@@ -187,6 +217,33 @@ def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxSymmRBM'
+    return ma, op, sa, machine_name
+
+
+def JaxUnaryRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    print('JaxUnaryRBM is used')
+    input_size = hilbert.size
+    ma = nk.machine.Jax(
+        hilbert,
+        stax.serial(FixSrLayer, UnaryLayer, stax.Dense(alpha * input_size), LogCoshLayer, SumLayer),
+        dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+    # Optimizer
+    if(optimizer == 'Sgd'):
+        op = Wrap(ma, SgdJax(lr))
+    elif(optimizer == 'Adam'):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+    # Sampler
+    if(sampler == 'Local'):
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    machine_name = 'JaxUnaryRBM'
     return ma, op, sa, machine_name
 
 
@@ -449,6 +506,8 @@ def get_machine(machine_name):
         return TorchConvNN
     elif (machine_name == 'JaxSymFFNN' or machine_name == 'JaxSymmFFNN'):
         return JaxSymmFFNN
+    elif(machine_name == 'JaxUnaryRBM'):
+        return JaxUnaryRBM
     else:
         print('The desired machine was spelled wrong!')
         return None
