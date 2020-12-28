@@ -219,6 +219,34 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
     return ma, op, sa, machine_name
 
 
+def JaxSymmFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    print('JaxSymmFFNN is used')
+    input_size = hilbert.size
+    init_fun, apply_fun = stax.serial(FixSrLayer, InputForConvLayer, PaddingLayer, Conv1d(alpha, (input_size,)), InputForDenseLayer, InputForDenseLayer,
+                                      Dense(1), FormatLayer)
+    ma = nk.machine.Jax(
+        hilbert,
+        (init_fun, apply_fun), dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+    # Optimizer
+    if (optimizer == 'Sgd'):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == 'Adam'):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+    # Sampler
+    if (sampler == 'Local'):
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    machine_name = 'JaxSymmFFNN'
+    return ma, op, sa, machine_name
+
+
 def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxDeepFFNN is used')
     input_size = hilbert.size
@@ -419,6 +447,8 @@ def get_machine(machine_name):
         return TorchFFNN
     elif(machine_name == 'TorchConvNN'):
         return TorchConvNN
+    elif (machine_name == 'JaxSymFFNN' or machine_name == 'JaxSymmFFNN'):
+        return JaxSymmFFNN
     else:
         print('The desired machine was spelled wrong!')
         return None
