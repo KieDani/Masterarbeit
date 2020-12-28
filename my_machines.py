@@ -220,6 +220,7 @@ def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
     return ma, op, sa, machine_name
 
 
+#https://journals.aps.org/prb/abstract/10.1103/PhysRevB.99.155136
 def JaxUnaryRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxUnaryRBM is used')
     input_size = hilbert.size
@@ -273,6 +274,35 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxFFNN'
+    return ma, op, sa, machine_name
+
+
+def JaxUnaryFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    print('JaxUnaryFFNN is used')
+    input_size = hilbert.size
+    init_fun, apply_fun = stax.serial(FixSrLayer, UnaryLayer,
+        Dense(input_size * alpha), ComplexReLu,
+        Dense(1), FormatLayer)
+    ma = nk.machine.Jax(
+        hilbert,
+        (init_fun, apply_fun), dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+    # Optimizer
+    if (optimizer == 'Sgd'):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == 'Adam'):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+    # Sampler
+    if (sampler == 'Local'):
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    machine_name = 'JaxUnaryFFNN'
     return ma, op, sa, machine_name
 
 
@@ -508,6 +538,8 @@ def get_machine(machine_name):
         return JaxSymmFFNN
     elif(machine_name == 'JaxUnaryRBM'):
         return JaxUnaryRBM
+    elif (machine_name == 'JaxUnaryFFNN'):
+        return JaxUnaryFFNN
     else:
         print('The desired machine was spelled wrong!')
         return None
