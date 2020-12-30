@@ -135,16 +135,20 @@ PaddingLayer = PaddingLayer()
 def ResLayer(W_init=jax.nn.initializers.glorot_normal(), b_init=jax.nn.initializers.normal()):
     def init_fun(rng, input_shape):
         output_shape = (input_shape[0], input_shape[1])
-        k1, k2 = jax.random.split(rng)
-        W, b = W_init(k1, (input_shape[-1], input_shape[1])), b_init(k2, (input_shape[1],))
-        return output_shape, (W, b)
+        k1, k2, k3, k4 = jax.random.split(rng, num=4)
+        W, W2, b, b2 = W_init(k1, (input_shape[-1], input_shape[1])), W_init(k2, (input_shape[-1], input_shape[1])), b_init(k3, (input_shape[1],)), b_init(k4, (input_shape[1],))
+        return output_shape, (W, W2, b, b2)
 
     def apply_fun(params, inputs, **kwargs):
-        W, b = params
+        W, W2, b, b2 = params
         # inputs_rightShape = jnp.empty((inputs.shape[0], alpha*inputs.shape[1]), dtype=jnp.complex128)
         # for i in range(alpha):
         #     inputs_rightShape = jax.ops.index_update(inputs_rightShape, jax.ops.index[:, alpha*inputs.shape[1]:(alpha+1)*inputs.shape[1]], inputs[:, :])
-        return jax.vmap(complexrelu)((jnp.dot(inputs, W) + b) + inputs)
+        outputs = jnp.dot(inputs, W) + b
+        outputs = jax.vmap(complexrelu)(outputs)
+        outputs = jnp.dot(outputs, W2) + b2 + inputs
+        outputs = jax.vmap(complexrelu)(outputs)
+        return outputs
 
     return init_fun, apply_fun
 
@@ -298,7 +302,7 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
 def JaxResNet(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxResNet is used')
     input_size = hilbert.size
-    init_fun, apply_fun = stax.serial(FixSrLayer, Dense(input_size*alpha), ResLayer(), ResLayer(), ResLayer(), ComplexReLu, Dense(1), FormatLayer)
+    init_fun, apply_fun = stax.serial(FixSrLayer, Dense(input_size*alpha), ComplexReLu, ResLayer(), ResLayer(), Dense(1), FormatLayer)
     ma = nk.machine.Jax(
         hilbert,
         (init_fun, apply_fun), dtype=complex
@@ -376,6 +380,33 @@ def JaxSymmFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxSymmFFNN'
+    return ma, op, sa, machine_name
+
+def JaxConv3NN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    print('JaxConv3NN is used')
+    input_size = hilbert.size
+    init_fun, apply_fun = stax.serial(FixSrLayer, InputForConvLayer, Conv1d(alpha, (3,)), ComplexReLu, Conv1d(alpha, (3,)), ComplexReLu, stax.Flatten,
+                                      Dense(1), FormatLayer)
+    ma = nk.machine.Jax(
+        hilbert,
+        (init_fun, apply_fun), dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+    # Optimizer
+    if (optimizer == 'Sgd'):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == 'Adam'):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+    # Sampler
+    if (sampler == 'Local'):
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    machine_name = 'JaxConv3NN'
     return ma, op, sa, machine_name
 
 
@@ -587,6 +618,8 @@ def get_machine(machine_name):
         return JaxUnaryFFNN
     elif (machine_name == 'JaxResNet'):
         return JaxResNet
+    elif (machine_name == 'JaxConv3NN'):
+        return JaxConv3NN
     else:
         print('The desired machine was spelled wrong!')
         return None
