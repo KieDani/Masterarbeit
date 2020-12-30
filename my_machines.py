@@ -17,6 +17,7 @@ from torch import Tensor
 from torch.nn.modules.utils import _single
 from torch.nn.common_types import _size_1_t
 import functools
+import sys
 
 
 
@@ -421,6 +422,7 @@ def get_machine(machine_name):
         return TorchConvNN
     else:
         print('The desired machine was spelled wrong!')
+        sys.stdout.flush()
         return None
 
 
