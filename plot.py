@@ -31,7 +31,14 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
     def getsf(i):
         sf = list()
         for iteration in data["Output"]:
-            sf.append(iteration['Ferro_correlation_function' + str(i)]["Mean"])
+            if(symmetric_operator == True):
+                try:
+                    sf.append(iteration['Symmetric_Ferro_correlation_function' + str(i)]["Mean"])
+                except:
+                    print('Symmetric operator is plotted. If I do not plot old data, I probably made a mistake!')
+                    sf.append(iteration['Ferro_correlation_function' + str(i)]["Mean"])
+            else:
+                sf.append(iteration['Ferro_correlation_function' + str(i)]["Mean"])
         return calcMean(sf)
 
     plt.plot(iters, energy)
@@ -442,6 +449,6 @@ machine = '_DeepFFNN'
 
 #plot('run/small_FFNN/SrNoneL30_estimate.log', L = 30 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
 
-#plot('run/small_symmetricOperator_FFNN/SrNoneL16_estimate.log', L = 16 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original='transformed')
+plot('run/small_symmetricOperator_FFNN/SrNoneL16_estimate.log', L = 16 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original='transformed')
 
 

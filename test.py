@@ -58,7 +58,8 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
     ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
     ma.load(''.join((dataname, '.wf')))
     op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer='Adamax', lr=0.001, sampler=sampler)
-    observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)
+    #observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)
+    observables = {**functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=False), **functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)}
 
     print('Estimated results:')
     if(sr == None):
