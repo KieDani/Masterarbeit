@@ -6,7 +6,7 @@ import helping_functions as functions
 
 
 
-def plot(dataname, L, observables=True, symmetric_operator = False):
+def plot(dataname, L, observables=True, symmetric_operator = False, periodic=False, transformed_or_original = 'transformed'):
     data=json.load(open(dataname))
     # Extract the relevant information
 
@@ -35,8 +35,16 @@ def plot(dataname, L, observables=True, symmetric_operator = False):
         return calcMean(sf)
 
     plt.plot(iters, energy)
-    tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
-    if (L <= 12):
+    if(periodic == False):
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+    else:
+        if(transformed_or_original == 'transformed'):
+            #energy of transformed hamiltonian
+            tmp = [None, None, None, None, -6.000, -7.096, -8.617, -9.863, -11.337, -12.647, -14.094, -15.438, -16.870, -18.234, -19.655, -21.032, -22.447, -23.832 ]
+        else:
+            #energy of the normal hamiltonian
+            tmp = [None, None, None, None, -5.999, -6.531, -8.617, -9.572, -11.337, -12.480, -14.094, -15.337, -16.870, -18.170, -19.655, -20.991, -22.447 ]
+    if (L < len(tmp)):
         factor = tmp[L]
     else:
         factor = (L - 1) * (-1.4)
@@ -49,22 +57,56 @@ def plot(dataname, L, observables=True, symmetric_operator = False):
             for i in range(1, int(L / 2.)):
                 sfs_fast.append(getsf(2*i))
                 xAxis_fast.append(2*i)
+                if(periodic == False):
+                    dataname_operator = ''.join(('run/exact_symmetricOperator_', transformed_or_original , '/L', str(L), '_exact.csv'))
+                else:
+                    dataname_operator = ''.join(('run/exact_periodic_symmetricOperator_', transformed_or_original , '/L', str(L), '_exact.csv'))
         else:
             for i in range(1, length):
                 sfs_fast.append(getsf(i))
                 xAxis_fast.append(i)
+                if(periodic == False):
+                    dataname_operator = ''.join(('run/exact_', transformed_or_original , '/L', str(L), '_exact.csv'))
+                else:
+                    dataname_operator = ''.join(('run/exact_periodic_', transformed_or_original , '/L', str(L), '_exact.csv'))
 
         plt.plot(xAxis_fast, sfs_fast)
         try:
-            dataname_operator = ''.join(('run/exact_transformed/L', str(L), '_exact.csv'))
-            operator = np.loadtxt(dataname_operator)
-            x_operator = np.arange(1, len(operator)+1)
+            operator = -1 * np.loadtxt(dataname_operator)
+            if(transformed_or_original == 'transformed'): operator = operator * -1
+            if(symmetric_operator == True):
+                x_operator = np.arange(2, 2*len(operator)+1, 2)
+            else:
+                x_operator = np.arange(1, len(operator)+1)
         except:
+            print(dataname_operator)
             operator = 0.374 * np.ones(len(xAxis_fast))
             x_operator = xAxis_fast
         plt.plot(x_operator, operator, color='red')
         plt.show()
 
+
+def compare_original_transformed(L, periodic=False):
+    if(periodic==True):
+        dataname = ''.join(('run/exact_periodic_original/L', str(L), '_exact.csv'))
+        dataname2 = ''.join(('run/exact_periodic_transformed/L', str(L), '_exact.csv'))
+    else:
+        dataname = ''.join(('run/exact_original/L', str(L), '_exact.csv'))
+        dataname2 = ''.join(('run/exact_transformed/L', str(L), '_exact.csv'))
+    try:
+        operator_orig = -1 * np.loadtxt(dataname)
+        x_operator_orig = np.arange(1, len(operator_orig) + 1)
+        operator_trans = +1 * np.loadtxt(dataname2)
+        x_operator_trans = np.arange(1, len(operator_trans) + 1)
+        operator_inf = 0.374 * np.ones(len(x_operator_orig))
+    except:
+        print('L is too large')
+    plt.plot(x_operator_orig, operator_orig, color='green', label='original Hamiltonian')
+    plt.plot(x_operator_trans, operator_trans, color='blue', label='transformed Hamiltonian')
+    plt.plot(x_operator_orig, operator_inf, color='red', label='expected infinity value')
+    plt.title('Compare observable for periodic lattice')
+    plt.legend()
+    plt.show()
 
 
 # Ls should be an array with 4 Elements
@@ -131,8 +173,8 @@ def present(Ls, path):
             sfs_fast.append(getsf(i))
             xAxis_fast.append(i)
 
-        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
-        if(l<=12):
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+        if(l < len(tmp)):
             factor = tmp[l]
         else:
             factor = (l-1) * (-1.4)
@@ -174,8 +216,8 @@ def plot_startingpoints(dataname, L, fast=True):
         return calcMean(sf)
 
     plt.plot(iters, energy)
-    tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
-    if (L <= 12):
+    tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+    if (L < len(tmp)):
         factor = tmp[L]
     else:
         factor = (L - 1) * (-1.4)
@@ -249,8 +291,8 @@ def plot_Sr(path, L):
     for i in range(0, len(Sr)):
         fig.suptitle('Energy - Iterations')
         axes[int(i / 3), i % 3].plot(iterations[i], energies[i])
-        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674]
-        if (L <= 12):
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+        if (L < len(tmp)):
             factor = tmp[L]
         else:
             factor = (L - 1) * (-1.4)
@@ -264,8 +306,8 @@ def plot_Sr(path, L):
         print(strincorrs[i])
         axes[int(i / 3), i % 3].plot(xes[i], strincorrs[i])
         try:
-            dataname = ''.join(('run/exact_transformed/L', str(L), '_exact.csv'))
-            operator = np.loadtxt(dataname)
+            dataname = ''.join(('run/exact_original/L', str(L), '_exact.csv'))
+            operator = -1 * np.loadtxt(dataname)
             x_operator = np.arange(1, len(operator)+1)
         except:
             operator = 0.374 * np.ones(len(xAxis_fast))
@@ -393,5 +435,13 @@ machine = '_DeepFFNN'
 
 
 #plot('run/small_RBM/SrNoneL14_estimate.log', L = 14 ,symmetric_operator=False, observables=True)
+
+#compare_original_transformed(L=16, periodic=True)
+
+#plot('run/small_FFNN_periodic/SrNoneL8_estimate.log', L = 8 ,symmetric_operator=False, observables=True, periodic=True, transformed_or_original='original')
+
+#plot('run/small_FFNN/SrNoneL30_estimate.log', L = 30 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
+
+#plot('run/small_symmetricOperator_FFNN/SrNoneL16_estimate.log', L = 16 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original='transformed')
 
 

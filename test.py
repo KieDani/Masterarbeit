@@ -26,9 +26,6 @@ def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mach
     generate_machine = machines.get_machine(machine_name)
     ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha, optimizer='Adamax', lr=0.005, sampler=sampler)
 
-    #TODO: check, why Lanczos does not work for transformed Hamiltonian
-    exact_energy = functions.Lanczos(hamilton=ha_orig, L=L)
-
     if(sr == None):
         gs = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=n_samples)
     else:
@@ -40,14 +37,14 @@ def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mach
         dataname = ''.join(('L', str(L)))
     dataname = functions.create_path(dataname, path=path)
     print('')
-    start = time.time()
-
     functions.create_machinefile(machine_name, L, alpha, dataname, sr)
-
+    start = time.time()
     gs.run(n_iter=int(n_iterations), out=dataname)#, obs=observables)
-
     end = time.time()
+    with open(''.join((dataname, '.time')), 'w') as reader:
+        reader.write(str(end - start))
     print('Time', end - start)
+    sys.stdout.flush()
 
 
 #ensure, that the machine is the same as used before!
@@ -71,8 +68,14 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
         gs2 = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=n_samples, sr=sr)#, n_discard=5000)
 
     functions.create_machinefile(machine_name, L, alpha, dataname, sr)
+    start = time.time()
     gs2.run(n_iter=n_iterations, out=''.join((dataname, '_estimate')), obs=observables, write_every=4, save_params_every=4)
+    end = time.time()
+    with open(''.join((dataname, '_estimate', '.time')), 'w') as reader:
+        reader.write(str(end - start))
     print(gs2.estimate(observables))
+    print('Time', end - start)
+    sys.stdout.flush()
 
 
 def exact(L = __L__, symmetric = True, dataname = None, path = 'run', transformed = True):

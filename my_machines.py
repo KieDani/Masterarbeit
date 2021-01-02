@@ -17,6 +17,7 @@ from torch import Tensor
 from torch.nn.modules.utils import _single
 from torch.nn.common_types import _size_1_t
 import functools
+import sys
 
 
 
@@ -99,7 +100,6 @@ def FixSrLayer():
 FixSrLayer = FixSrLayer()
 
 
-
 def InputForDenseLayer():
     def init_fun(rng, input_shape):
         output_shape = (input_shape[0], input_shape[1]*input_shape[2])
@@ -131,6 +131,59 @@ def PaddingLayer():
         return outputs
     return init_fun, apply_fun
 PaddingLayer = PaddingLayer()
+
+
+def ResLayer(W_init=jax.nn.initializers.glorot_normal(), b_init=jax.nn.initializers.normal()):
+    def init_fun(rng, input_shape):
+        output_shape = (input_shape[0], input_shape[1])
+        k1, k2, k3, k4 = jax.random.split(rng, num=4)
+        W, W2, b, b2 = W_init(k1, (input_shape[-1], input_shape[1])), W_init(k2, (input_shape[-1], input_shape[1])), b_init(k3, (input_shape[1],)), b_init(k4, (input_shape[1],))
+        return output_shape, (W, W2, b, b2)
+
+    def apply_fun(params, inputs, **kwargs):
+        W, W2, b, b2 = params
+        # inputs_rightShape = jnp.empty((inputs.shape[0], alpha*inputs.shape[1]), dtype=jnp.complex128)
+        # for i in range(alpha):
+        #     inputs_rightShape = jax.ops.index_update(inputs_rightShape, jax.ops.index[:, alpha*inputs.shape[1]:(alpha+1)*inputs.shape[1]], inputs[:, :])
+        outputs = jnp.dot(inputs, W) + b
+        outputs = jax.vmap(complexrelu)(outputs)
+        outputs = jnp.dot(outputs, W2) + b2 + inputs
+        outputs = jax.vmap(complexrelu)(outputs)
+        return outputs
+
+    return init_fun, apply_fun
+
+
+
+def UnaryLayer():
+    def init_fun(rng, input_shape):
+        output_shape = (input_shape[0], 3 * input_shape[1])
+        return output_shape, ()
+
+    @jax.jit
+    def apply_fun(params, inputs, **kwargs):
+        def input_to_unary(input):
+            unary_output = jnp.empty((input.shape[0], 3), dtype=jnp.int64)
+            input1 = input[:]
+            input2 = input[:]
+            input3 = input[:]
+            jnp.where(input1 <= 1, 1, 0 )
+            jnp.where(input3 >= 1, 1, 0)
+            jnp.where(input2 == 0, 1, 0)
+            unary_output = jax.ops.index_update(unary_output, jax.ops.index[:, 0], input1[:])
+            unary_output = jax.ops.index_update(unary_output, jax.ops.index[:, 1], input2[:])
+            unary_output = jax.ops.index_update(unary_output, jax.ops.index[:, 2], input3[:])
+            return unary_output
+
+        input_size = inputs.shape[1]
+        outputs = jnp.empty((inputs.shape[0], 3 * input_size), dtype=jnp.complex128)
+        for i in range(input_size):
+            unary_output = input_to_unary(inputs[:, i])
+            outputs = jax.ops.index_update(outputs, jax.ops.index[:, 3*i:3*(i+1)], unary_output[:, :])
+        return outputs
+
+    return init_fun, apply_fun
+UnaryLayer = UnaryLayer()
 
 
 Conv1d = functools.partial(stax.GeneralConv, ('NHC', 'HIO', 'NHC'))
@@ -190,30 +243,31 @@ def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
     return ma, op, sa, machine_name
 
 
-def JaxDeepRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler = 'Local'):
-    print('JaxDeepRBM is used')
+#https://journals.aps.org/prb/abstract/10.1103/PhysRevB.99.155136
+def JaxUnaryRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    print('JaxUnaryRBM is used')
     input_size = hilbert.size
     ma = nk.machine.Jax(
         hilbert,
-        stax.serial(stax.Dense(alpha * input_size), LogCoshLayer, stax.Dense(alpha * input_size), LogCoshLayer, SumLayer),
+        stax.serial(FixSrLayer, UnaryLayer, stax.Dense(alpha * input_size), LogCoshLayer, SumLayer),
         dtype=complex
     )
     ma.init_random_parameters(seed=12, sigma=0.01)
     # Optimizer
-    if (optimizer == 'Sgd'):
+    if(optimizer == 'Sgd'):
         op = Wrap(ma, SgdJax(lr))
-    elif (optimizer == 'Adam'):
+    elif(optimizer == 'Adam'):
         op = Wrap(ma, AdamJax(lr))
     else:
         op = Wrap(ma, AdaMaxJax(lr))
     # Sampler
-    if (sampler == 'Local'):
+    if(sampler == 'Local'):
         sa = nk.sampler.MetropolisLocal(machine=ma)
     elif (sampler == 'Exact'):
         sa = nk.sampler.ExactSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
-    machine_name = 'JaxDeepRBM'
+    machine_name = 'JaxUnaryRBM'
     return ma, op, sa, machine_name
 
 
@@ -243,6 +297,117 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxFFNN'
+    return ma, op, sa, machine_name
+
+
+def JaxResNet(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    print('JaxResNet is used')
+    input_size = hilbert.size
+    init_fun, apply_fun = stax.serial(FixSrLayer, Dense(input_size*alpha), ComplexReLu, ResLayer(), ResLayer(), Dense(1), FormatLayer)
+    ma = nk.machine.Jax(
+        hilbert,
+        (init_fun, apply_fun), dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+    # Optimizer
+    if (optimizer == 'Sgd'):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == 'Adam'):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+    # Sampler
+    if (sampler == 'Local'):
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    machine_name = 'JaxResNet'
+    return ma, op, sa, machine_name
+
+
+def JaxUnaryFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    print('JaxUnaryFFNN is used')
+    input_size = hilbert.size
+    init_fun, apply_fun = stax.serial(FixSrLayer, UnaryLayer,
+        Dense(input_size * alpha), ComplexReLu,
+        Dense(1), FormatLayer)
+    ma = nk.machine.Jax(
+        hilbert,
+        (init_fun, apply_fun), dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+    # Optimizer
+    if (optimizer == 'Sgd'):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == 'Adam'):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+    # Sampler
+    if (sampler == 'Local'):
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    machine_name = 'JaxUnaryFFNN'
+    return ma, op, sa, machine_name
+
+
+def JaxSymmFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    print('JaxSymmFFNN is used')
+    input_size = hilbert.size
+    init_fun, apply_fun = stax.serial(FixSrLayer, InputForConvLayer, PaddingLayer, Conv1d(alpha, (input_size,)), ComplexReLu, InputForDenseLayer,
+                                      Dense(1), FormatLayer)
+    ma = nk.machine.Jax(
+        hilbert,
+        (init_fun, apply_fun), dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+    # Optimizer
+    if (optimizer == 'Sgd'):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == 'Adam'):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+    # Sampler
+    if (sampler == 'Local'):
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    machine_name = 'JaxSymmFFNN'
+    return ma, op, sa, machine_name
+
+def JaxConv3NN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    print('JaxConv3NN is used')
+    input_size = hilbert.size
+    init_fun, apply_fun = stax.serial(FixSrLayer, InputForConvLayer, Conv1d(alpha, (3,)), ComplexReLu, Dense(input_size * alpha), ComplexReLu, stax.Flatten,
+                                      Dense(1), FormatLayer)
+    ma = nk.machine.Jax(
+        hilbert,
+        (init_fun, apply_fun), dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+    # Optimizer
+    if (optimizer == 'Sgd'):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == 'Adam'):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+    # Sampler
+    if (sampler == 'Local'):
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    machine_name = 'JaxConv3NN'
     return ma, op, sa, machine_name
 
 
@@ -446,8 +611,19 @@ def get_machine(machine_name):
         return TorchFFNN
     elif(machine_name == 'TorchConvNN'):
         return TorchConvNN
+    elif (machine_name == 'JaxSymFFNN' or machine_name == 'JaxSymmFFNN'):
+        return JaxSymmFFNN
+    elif(machine_name == 'JaxUnaryRBM'):
+        return JaxUnaryRBM
+    elif (machine_name == 'JaxUnaryFFNN'):
+        return JaxUnaryFFNN
+    elif (machine_name == 'JaxResNet'):
+        return JaxResNet
+    elif (machine_name == 'JaxConv3NN'):
+        return JaxConv3NN
     else:
         print('The desired machine was spelled wrong!')
+        sys.stdout.flush()
         return None
 
 
