@@ -8,6 +8,7 @@ import time
 import numpy as np
 import scipy as sp
 import sys
+import jax
 
 
 
@@ -136,6 +137,9 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', transforme
 #load(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=3000, n_iterations=20, machine_name='JaxFFNN')
 
 #exact(L=10, symmetric=False, transformed=True)
+
+#jax.config.update('jax_disable_jit', True)
+#run(L=4, alpha=2, n_samples=300, n_iterations=300, machine_name='JaxFFNN', sampler='VBS')
 
 
 
