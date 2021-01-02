@@ -18,7 +18,7 @@ from torch.nn.modules.utils import _single
 from torch.nn.common_types import _size_1_t
 import functools
 import sys
-import my_sampler as sampler
+import my_sampler
 
 
 
@@ -296,7 +296,7 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
     elif (sampler == 'Exact'):
         sa = nk.sampler.ExactSampler(machine=ma)
     elif(sampler == 'VBS'):
-        sa = sampler.
+        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxFFNN'
