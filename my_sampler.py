@@ -1,5 +1,6 @@
 import jax
 import jax.numpy as jnp
+import netket as nk
 
 
 class _JaxVBSKernel:
@@ -68,3 +69,6 @@ class _JaxVBSKernel:
 
 
         return keys[0], state
+
+    def getVBSSampler(self, machine):
+        sa = nk.sampler.jax._JaxMetropolisHastings(machine=machine, kernel= )
