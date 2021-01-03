@@ -21,9 +21,17 @@ __number_iterations__ = 500
 __alpha__ = 4
 
 #use Gd, if Sr == None; otherwise, sr is the diag_shift
-def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', n_samples = __number_samples__, n_iterations = __number_iterations__):
-    ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
-    ha_orig, hi_orig, g_orig = models.build_Heisenbergchain_S1(L=L)
+def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples = __number_samples__, n_iterations = __number_iterations__):
+    if(hamiltonian_name == 'transformed_Heisenberg'):
+        ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
+        print('uses', hamiltonian_name, 'hamiltonian')
+    elif(hamiltonian_name == 'original_Heisenberg'):
+        ha, hi, g = models.build_Heisenbergchain_S1(L=L)
+        print('uses', hamiltonian_name, 'hamiltonian')
+    else:
+        ha, hi, g = None
+        print('hamiltonian_name was spelled wrong')
+    sys.stdout.flush()
     generate_machine = machines.get_machine(machine_name)
     ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha, optimizer='Adamax', lr=0.005, sampler=sampler)
 
@@ -49,11 +57,20 @@ def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mach
 
 
 #ensure, that the machine is the same as used before!
-def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', n_samples =10000, n_iterations = 20):
+def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples =10000, n_iterations = 20):
     if (dataname == None):
         dataname = ''.join(('L', str(L)))
     dataname = functions.create_path(dataname, path=path)
-    ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
+    if (hamiltonian_name == 'transformed_Heisenberg'):
+        ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
+        print('uses', hamiltonian_name, 'hamiltonian')
+    elif (hamiltonian_name == 'original_Heisenberg'):
+        ha, hi, g = models.build_Heisenbergchain_S1(L=L)
+        print('uses', hamiltonian_name, 'hamiltonian')
+    else:
+        ha, hi, g = None
+        print('hamiltonian_name was spelled wrong')
+    sys.stdout.flush()
     print('load the machine: ', dataname)
     generate_machine = machines.get_machine(machine_name)
     ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
@@ -80,11 +97,17 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
     sys.stdout.flush()
 
 
-def exact(L = __L__, symmetric = True, dataname = None, path = 'run', transformed = True):
-    if(transformed == True):
+def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonian_name = 'transformed_Heisenberg'):
+    if (hamiltonian_name == 'transformed_Heisenberg'):
         ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
-    else:
+        print('uses', hamiltonian_name, 'hamiltonian')
+    elif (hamiltonian_name == 'original_Heisenberg'):
         ha, hi, g = models.build_Heisenbergchain_S1(L=L)
+        print('uses', hamiltonian_name, 'hamiltonian')
+    else:
+        ha, hi, g = None
+        print('hamiltonian_name was spelled wrong')
+    sys.stdout.flush()
 
     w, v_tmp = sp.sparse.linalg.eigsh(ha.to_sparse(), k=1, which='SR', return_eigenvectors=True)
     #w, v_tmp = sp.linalg.eigh(ha.to_dense())
@@ -101,7 +124,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', transforme
     if(symmetric == True):
         results = np.empty(int(L/2) -1 + L%2, dtype=np.float64)
         for index, i in enumerate(range(1, int(L / 2.) + L%2)):
-            if (transformed == True):
+            if (hamiltonian_name == 'transformed_Heisenberg'):
                 observable = operators.FerroCorrelationZ(hilbert=hi, j=int(L / 2.) - i, k=int(L / 2.) + i).to_sparse()
             else:
                 print('Not implemented yet. Do not use the symmetric operator!')
@@ -112,7 +135,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', transforme
     else:
         results = np.empty(L-1, dtype=np.float64)
         for index, i in enumerate(range(1, L)):
-            if (transformed == True):
+            if (hamiltonian_name == 'transformed_Heisenberg' == True):
                 observable = operators.FerroCorrelationZ(hilbert=hi, j=0, k=i).to_sparse()
             else:
                 observable = operators.StringCorrelation(hilbert=hi, l=i).to_sparse()
