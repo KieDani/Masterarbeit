@@ -164,5 +164,8 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 #jax.config.update('jax_disable_jit', True)
 #run(L=4, alpha=2, n_samples=300, n_iterations=300, machine_name='JaxFFNN', sampler='VBS')
 
+#exact(L=6, symmetric=False, hamiltonian_name='original_Heisenberg')
+#run(L=6, alpha=4, machine_name='JaxResNet', sampler='VBS', hamiltonian_name='original_Heisenberg', n_samples=500, n_iterations=3000)
+
 
 
