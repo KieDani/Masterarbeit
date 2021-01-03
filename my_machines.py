@@ -204,8 +204,6 @@ def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loca
         op = Wrap(ma, SgdJax(lr))
     elif(optimizer == 'Adam'):
         op = Wrap(ma, AdamJax(lr))
-    elif (sampler == 'VBS'):
-        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         op = Wrap(ma, AdaMaxJax(lr))
     # Sampler
@@ -213,6 +211,8 @@ def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loca
         sa = nk.sampler.MetropolisLocal(machine=ma)
     elif (sampler == 'Exact'):
         sa = nk.sampler.ExactSampler(machine=ma)
+    elif (sampler == 'VBS'):
+        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxRBM'
@@ -233,8 +233,6 @@ def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
         op = Wrap(ma, SgdJax(lr))
     elif (optimizer == 'Adam'):
         op = Wrap(ma, AdamJax(lr))
-    elif (sampler == 'VBS'):
-        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         op = Wrap(ma, AdaMaxJax(lr))
     # Sampler
@@ -242,6 +240,8 @@ def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
         sa = nk.sampler.MetropolisLocal(machine=ma)
     elif (sampler == 'Exact'):
         sa = nk.sampler.ExactSampler(machine=ma)
+    elif (sampler == 'VBS'):
+        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxSymmRBM'
@@ -263,8 +263,6 @@ def JaxUnaryRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         op = Wrap(ma, SgdJax(lr))
     elif(optimizer == 'Adam'):
         op = Wrap(ma, AdamJax(lr))
-    elif (sampler == 'VBS'):
-        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         op = Wrap(ma, AdaMaxJax(lr))
     # Sampler
@@ -272,6 +270,8 @@ def JaxUnaryRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         sa = nk.sampler.MetropolisLocal(machine=ma)
     elif (sampler == 'Exact'):
         sa = nk.sampler.ExactSampler(machine=ma)
+    elif (sampler == 'VBS'):
+        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxUnaryRBM'
@@ -294,8 +294,6 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
         op = Wrap(ma, SgdJax(lr))
     elif (optimizer == 'Adam'):
         op = Wrap(ma, AdamJax(lr))
-    elif (sampler == 'VBS'):
-        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         op = Wrap(ma, AdaMaxJax(lr))
     # Sampler
@@ -325,8 +323,6 @@ def JaxResNet(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='L
         op = Wrap(ma, SgdJax(lr))
     elif (optimizer == 'Adam'):
         op = Wrap(ma, AdamJax(lr))
-    elif (sampler == 'VBS'):
-        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         op = Wrap(ma, AdaMaxJax(lr))
     # Sampler
@@ -334,6 +330,8 @@ def JaxResNet(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='L
         sa = nk.sampler.MetropolisLocal(machine=ma)
     elif (sampler == 'Exact'):
         sa = nk.sampler.ExactSampler(machine=ma)
+    elif (sampler == 'VBS'):
+        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxResNet'
@@ -356,8 +354,6 @@ def JaxUnaryFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler
         op = Wrap(ma, SgdJax(lr))
     elif (optimizer == 'Adam'):
         op = Wrap(ma, AdamJax(lr))
-    elif (sampler == 'VBS'):
-        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         op = Wrap(ma, AdaMaxJax(lr))
     # Sampler
@@ -365,6 +361,8 @@ def JaxUnaryFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler
         sa = nk.sampler.MetropolisLocal(machine=ma)
     elif (sampler == 'Exact'):
         sa = nk.sampler.ExactSampler(machine=ma)
+    elif (sampler == 'VBS'):
+        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxUnaryFFNN'
@@ -386,8 +384,6 @@ def JaxSymmFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         op = Wrap(ma, SgdJax(lr))
     elif (optimizer == 'Adam'):
         op = Wrap(ma, AdamJax(lr))
-    elif (sampler == 'VBS'):
-        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         op = Wrap(ma, AdaMaxJax(lr))
     # Sampler
@@ -395,6 +391,8 @@ def JaxSymmFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         sa = nk.sampler.MetropolisLocal(machine=ma)
     elif (sampler == 'Exact'):
         sa = nk.sampler.ExactSampler(machine=ma)
+    elif (sampler == 'VBS'):
+        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxSymmFFNN'
@@ -415,8 +413,6 @@ def JaxConv3NN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
         op = Wrap(ma, SgdJax(lr))
     elif (optimizer == 'Adam'):
         op = Wrap(ma, AdamJax(lr))
-    elif (sampler == 'VBS'):
-        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         op = Wrap(ma, AdaMaxJax(lr))
     # Sampler
@@ -424,6 +420,8 @@ def JaxConv3NN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
         sa = nk.sampler.MetropolisLocal(machine=ma)
     elif (sampler == 'Exact'):
         sa = nk.sampler.ExactSampler(machine=ma)
+    elif (sampler == 'VBS'):
+        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxConv3NN'
@@ -446,8 +444,6 @@ def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         op = Wrap(ma, SgdJax(lr))
     elif (optimizer == 'Adam'):
         op = Wrap(ma, AdamJax(lr))
-    elif (sampler == 'VBS'):
-        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         op = Wrap(ma, AdaMaxJax(lr))
     # Sampler
@@ -455,6 +451,8 @@ def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         sa = nk.sampler.MetropolisLocal(machine=ma)
     elif (sampler == 'Exact'):
         sa = nk.sampler.ExactSampler(machine=ma)
+    elif (sampler == 'VBS'):
+        sa = my_sampler.getVBSSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxDeepFFNN'
