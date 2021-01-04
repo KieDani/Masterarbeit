@@ -1,3 +1,21 @@
+"""Easy usage of Netket + my custom code
+
+This script allows the user to train a machine using the run-method. A machine can also be loaded with the load method.
+In the load method an observable is evaluated additionally.
+Furthermore, exact results can be computed with the method exact.
+It is recommended to use few samples plus many iterations with the run method and many samples plus few iterations with the load method.
+The supported machines are defined in my_machines.py, the supported hamiltonians are defined in my_models.py, and the observables are defined in my_operators.py.
+To use this file, you have to import it and use its functions.
+
+This project requires the following libraries:
+netket, numpy, scipy, jax, jaxlib, networkx, torch
+
+This file contains the following functions:
+
+    * run
+    * load
+    * exact
+"""
 import netket as nk
 import my_models as models
 import my_machines as machines
@@ -22,6 +40,37 @@ __alpha__ = 4
 
 #use Gd, if Sr == None; otherwise, sr is the diag_shift
 def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples = __number_samples__, n_iterations = __number_iterations__):
+    """Method to train a machine.
+
+            A hamiltonian and sampler can be chosen. The machine is defined and trained for the hamiltonian.
+
+            Parameters
+            ----------
+            L : int
+                The number of sites of the lattice
+            alpha : int
+                A factor to define the size of different machines
+            sr : float
+                The parameter for stochastic reconfiguration method. If it is None, stochastic reconfiguration is not used
+            dataname : str
+                The dataname. If None, an automatic dataname is chosen
+            path : str
+                The directory, where the results are saved. If None, the directory is 'run'
+            machine_name : str
+                A string to choose the machine. Possible inputs: See get_machine in my_machines.py
+            sampler : str
+                A string to choose the sampler: Recommended: 'Local' (this works with every machine)
+            hamiltonian_name : str
+                A string to choose the hamiltonian. Possible inputs: 'transformed_Heisenberg', 'original_Heisenberg'
+            n_samples: int
+                The number of samples used in every iteration step
+            n_iterations: int
+                The number of iterations (training steps)
+
+            Raises
+            ------
+
+            """
     if(hamiltonian_name == 'transformed_Heisenberg'):
         ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
         print('uses', hamiltonian_name, 'hamiltonian')
@@ -58,6 +107,37 @@ def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mach
 
 #ensure, that the machine is the same as used before!
 def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples =10000, n_iterations = 20):
+    """Method to load a pretrained machine and measure some observables.
+
+                A hamiltonian and sampler can be chosen. The machine is defined and trained for the hamiltonian.
+
+                Parameters
+                ----------
+                L : int
+                    The number of sites of the lattice
+                alpha : int
+                    A factor to define the size of different machines
+                sr : float
+                    The parameter for stochastic reconfiguration method. If it is None, stochastic reconfiguration is not used
+                dataname : str
+                    The dataname. If None, an automatic dataname is chosen
+                path : str
+                    The directory, where the results are saved. If None, the directory is 'run'
+                machine_name : str
+                    A string to choose the machine. Possible inputs: See get_machine in my_machines.py
+                sampler : str
+                    A string to choose the sampler: Recommended: 'Local' (this works with every machine)
+                hamiltonian_name : str
+                    A string to choose the hamiltonian. Possible inputs: 'transformed_Heisenberg', 'original_Heisenberg'
+                n_samples: int
+                    The number of samples used in every iteration step
+                n_iterations: int
+                    The number of iterations (training steps)
+
+                Raises
+                ------
+
+                """
     if (dataname == None):
         dataname = ''.join(('L', str(L)))
     dataname = functions.create_path(dataname, path=path)
@@ -98,6 +178,30 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
 
 
 def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonian_name = 'transformed_Heisenberg'):
+    """Method to solve a hamiltonian exactly.
+
+                A hamiltonian can be chosen. The energy is evaluated using the lanczos method
+                and a observable is evaluated with the power method.
+                Use this only for small lattices, because it needs an awful lot of RAM.
+
+                Parameters
+                ----------
+                L : int
+                    The number of sites of the lattice
+                symmetric : bool
+                    If True, the evaluated observable is symmetric to the center of the lattice.
+                    If false, it starts at one end of the lattice.
+                dataname : str
+                    The dataname. If None, an automatic dataname is chosen
+                path : str
+                    The directory, where the results are saved. If None, the directory is 'run'
+                hamiltonian_name : str
+                    A string to choose the hamiltonian. Possible inputs: 'transformed_Heisenberg', 'original_Heisenberg'
+
+                Raises
+                ------
+
+                """
     if (hamiltonian_name == 'transformed_Heisenberg'):
         ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
         print('uses', hamiltonian_name, 'hamiltonian')
