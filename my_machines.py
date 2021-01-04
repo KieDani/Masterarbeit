@@ -372,7 +372,7 @@ def JaxUnaryFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler
 def JaxSymmFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxSymmFFNN is used')
     input_size = hilbert.size
-    init_fun, apply_fun = stax.serial(FixSrLayer, InputForConvLayer, PaddingLayer, Conv1d(alpha, (input_size,)), ComplexReLu, InputForDenseLayer,
+    init_fun, apply_fun = stax.serial(FixSrLayer, InputForConvLayer, PaddingLayer, Conv1d(alpha, (input_size,)), ComplexReLu, InputForDenseLayer, Dense(input_size * alpha),
                                       Dense(1), FormatLayer)
     ma = nk.machine.Jax(
         hilbert,
@@ -401,7 +401,7 @@ def JaxSymmFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
 def JaxConv3NN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxConv3NN is used')
     input_size = hilbert.size
-    init_fun, apply_fun = stax.serial(FixSrLayer, InputForConvLayer, Conv1d(alpha, (3,)), ComplexReLu, Dense(input_size * alpha), ComplexReLu, stax.Flatten,
+    init_fun, apply_fun = stax.serial(FixSrLayer, InputForConvLayer, Conv1d(alpha, (3,)), ComplexReLu, stax.Flatten, Dense(input_size * alpha), ComplexReLu,
                                       Dense(1), FormatLayer)
     ma = nk.machine.Jax(
         hilbert,
