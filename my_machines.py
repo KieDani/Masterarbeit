@@ -1,3 +1,47 @@
+"""Implementation of different Neural Networks
+
+Some (parts of) Neural Networks are implemented. The Networks (and the optimizer and sampler) can be easily loaded
+using the function get_machine.
+If a pretrained machine is loaded, you get an optimizer and sampler using the function load_machine
+
+This project requires the following libraries:
+netket, numpy, scipy, jax, jaxlib, networkx, torch
+
+This file contains the following functions:
+
+    * get_machine
+    * load_machine
+    * JaxRBM
+    * JaxSymmRBM
+    * JaxUnaryRBM
+    * JaxFFNN
+    * JaxResFFNN
+    * JaxUnaryFFNN
+    * JaxSymmFFNN
+    * JaxConv3NN
+    * JaxResConvNN
+    * JaxDeepFFNN
+    * TorchFFNN
+    * TorchConvNN
+    * logcosh
+    * modrelu
+    * complexrelu
+    * SumLayer
+    * FormatLayer
+    * InputForConvLayer
+    * FixSrLayer
+    * InputForDenseLayer
+    * PaddingLayer
+    * ResFFLayer
+    * ResConvLayer
+    * UnaryLayer
+
+This file contains the following classes:
+
+    * Torch_FFNN_model
+    * Torch_ConvNN_model
+    * Torch_Conv1d_Layer
+"""
 import netket as nk
 import numpy as np
 import torch
