@@ -269,68 +269,75 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 #run(L=4, alpha=2, n_samples=300, n_iterations=300, machine_name='JaxFFNN', sampler='VBS')
 
 #exact(L=6, symmetric=False, hamiltonian_name='original_Heisenberg')
-#run(L=6, alpha=4, machine_name='JaxResNet', sampler='VBS', hamiltonian_name='original_Heisenberg', n_samples=500, n_iterations=3000)
+#run(L=12, alpha=4, machine_name='JaxResConvNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=500, n_iterations=300)
 
 
 
 
-# L=16
-# alpha0 = 100
-# ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
-#
-# alpha = alpha0
-# print(alpha)
-# machine_name = 'JaxRBM'
-# generate_machine = machines.get_machine(machine_name)
-# ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
-# compare = ma.n_par
-# print(machine_name, ma.n_par)
-#
-# alpha = 16*alpha0
-# print(alpha)
-# machine_name = 'JaxSymmRBM'
-# generate_machine = machines.get_machine(machine_name)
-# ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
-# print(machine_name, ma.n_par, compare/ma.n_par)
-#
-# alpha = int(0.94 * alpha0)
-# print(alpha)
-# machine_name = 'JaxFFNN'
-# generate_machine = machines.get_machine(machine_name)
-# ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
-# print(machine_name, ma.n_par, compare/ma.n_par)
-#
-# alpha = int(alpha0 * 0.1)
-# print(alpha)
-# machine_name = 'JaxDeepFFNN'
-# generate_machine = machines.get_machine(machine_name)
-# ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
-# print(machine_name, ma.n_par, compare/ma.n_par)
-#
-# alpha = int(0.1*alpha0)
-# print(alpha)
-# machine_name = 'JaxSymmFFNN'
-# generate_machine = machines.get_machine(machine_name)
-# ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
-# print(machine_name, ma.n_par, compare/ma.n_par)
-#
-# alpha = int(alpha0 * 0.35)
-# print(alpha)
-# machine_name = 'JaxUnaryFFNN'
-# generate_machine = machines.get_machine(machine_name)
-# ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
-# print(machine_name, ma.n_par, compare/ma.n_par)
-#
-# alpha = int(alpha0 * 0.1)
-# print(alpha)
-# machine_name = 'JaxConv3NN'
-# generate_machine = machines.get_machine(machine_name)
-# ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
-# print(machine_name, ma.n_par, compare/ma.n_par)
-#
-# alpha = 5
-# print(alpha)
-# machine_name = 'JaxResNet'
-# generate_machine = machines.get_machine(machine_name)
-# ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
-# print(machine_name, ma.n_par, compare/ma.n_par)
+L=16
+alpha0 = 100
+ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
+
+alpha = alpha0
+print(alpha)
+machine_name = 'JaxRBM'
+generate_machine = machines.get_machine(machine_name)
+ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+compare = ma.n_par
+print(machine_name, ma.n_par)
+
+alpha = 16*alpha0
+print(alpha)
+machine_name = 'JaxSymmRBM'
+generate_machine = machines.get_machine(machine_name)
+ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+print(machine_name, ma.n_par, compare/ma.n_par)
+
+alpha = int(0.94 * alpha0)
+print(alpha)
+machine_name = 'JaxFFNN'
+generate_machine = machines.get_machine(machine_name)
+ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+print(machine_name, ma.n_par, compare/ma.n_par)
+
+alpha = int(alpha0 * 0.1)
+print(alpha)
+machine_name = 'JaxDeepFFNN'
+generate_machine = machines.get_machine(machine_name)
+ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+print(machine_name, ma.n_par, compare/ma.n_par)
+
+alpha = int(0.1*alpha0)
+print(alpha)
+machine_name = 'JaxSymmFFNN'
+generate_machine = machines.get_machine(machine_name)
+ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+print(machine_name, ma.n_par, compare/ma.n_par)
+
+alpha = int(alpha0 * 0.35)
+print(alpha)
+machine_name = 'JaxUnaryFFNN'
+generate_machine = machines.get_machine(machine_name)
+ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+print(machine_name, ma.n_par, compare/ma.n_par)
+
+alpha = int(alpha0 * 0.11)
+print(alpha)
+machine_name = 'JaxConv3NN'
+generate_machine = machines.get_machine(machine_name)
+ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+print(machine_name, ma.n_par, compare/ma.n_par)
+
+alpha = int(alpha0 * 0.05)
+print(alpha)
+machine_name = 'JaxResFFNN'
+generate_machine = machines.get_machine(machine_name)
+ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+print(machine_name, ma.n_par, compare/ma.n_par)
+
+alpha = int(alpha0 * 0.33)
+print(alpha)
+machine_name = 'JaxResConvNN'
+generate_machine = machines.get_machine(machine_name)
+ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+print(machine_name, ma.n_par, compare/ma.n_par)
