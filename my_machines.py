@@ -346,7 +346,7 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
 def JaxResFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxResFFNN is used')
     input_size = hilbert.size
-    init_fun, apply_fun = stax.serial(FixSrLayer, Dense(input_size*alpha), ComplexReLu, ResFFLayer(), ResFFLayer(), Dense(1), FormatLayer)
+    init_fun, apply_fun = stax.serial(FixSrLayer, Dense(input_size*alpha), ComplexReLu, ResFFLayer(), ComplexReLu, ResFFLayer(), ComplexReLu, Dense(1), FormatLayer)
     ma = nk.machine.Jax(
         hilbert,
         (init_fun, apply_fun), dtype=complex
