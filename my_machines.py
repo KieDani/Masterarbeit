@@ -134,7 +134,7 @@ def PaddingLayer():
 PaddingLayer = PaddingLayer()
 
 
-def ResLayer(W_init=jax.nn.initializers.glorot_normal(), b_init=jax.nn.initializers.normal()):
+def ResFFLayer(W_init=jax.nn.initializers.glorot_normal(), b_init=jax.nn.initializers.normal()):
     def init_fun(rng, input_shape):
         output_shape = (input_shape[0], input_shape[1])
         k1, k2, k3, k4 = jax.random.split(rng, num=4)
@@ -309,10 +309,10 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
     return ma, op, sa, machine_name
 
 
-def JaxResNet(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
-    print('JaxResNet is used')
+def JaxResFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    print('JaxResFFNN is used')
     input_size = hilbert.size
-    init_fun, apply_fun = stax.serial(FixSrLayer, Dense(input_size*alpha), ComplexReLu, ResLayer(), ResLayer(), Dense(1), FormatLayer)
+    init_fun, apply_fun = stax.serial(FixSrLayer, Dense(input_size*alpha), ComplexReLu, ResFFLayer(), ResFFLayer(), Dense(1), FormatLayer)
     ma = nk.machine.Jax(
         hilbert,
         (init_fun, apply_fun), dtype=complex
@@ -334,7 +334,7 @@ def JaxResNet(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='L
         sa = my_sampler.getVBSSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
-    machine_name = 'JaxResNet'
+    machine_name = 'JaxResFFNN'
     return ma, op, sa, machine_name
 
 
@@ -636,8 +636,8 @@ def get_machine(machine_name):
         return JaxUnaryRBM
     elif (machine_name == 'JaxUnaryFFNN'):
         return JaxUnaryFFNN
-    elif (machine_name == 'JaxResNet'):
-        return JaxResNet
+    elif (machine_name == 'JaxResNet' or machine_name == 'JaxResFFNN'):
+        return JaxResFFNN
     elif (machine_name == 'JaxConv3NN'):
         return JaxConv3NN
     else:
