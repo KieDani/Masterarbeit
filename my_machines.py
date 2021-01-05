@@ -149,7 +149,7 @@ def ResFFLayer(W_init=jax.nn.initializers.glorot_normal(), b_init=jax.nn.initial
         outputs = jnp.dot(inputs, W) + b
         outputs = jax.vmap(complexrelu)(outputs)
         outputs = jnp.dot(outputs, W2) + b2 + inputs
-        outputs = jax.vmap(complexrelu)(outputs)
+        #outputs = jax.vmap(complexrelu)(outputs)
         return outputs
 
     return init_fun, apply_fun
