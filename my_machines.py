@@ -154,7 +154,7 @@ def ResFFLayer(W_init=jax.nn.initializers.glorot_normal(), b_init=jax.nn.initial
 
     return init_fun, apply_fun
 
-def ResConvLayer(out_chan, filter_shape, strides=None, W_init=None, b_init=jax.nn.initializers.normal(1e-6)):
+def ResConvLayer(out_chan, filter_shape = (3,), strides=None, W_init=None, b_init=jax.nn.initializers.normal(1e-6)):
     #1 dimensional Convolution
     dimension_numbers = ('NHC', 'HIO', 'NHC')
     #I need padding to ensure, that I can add the input and output dimension
@@ -180,7 +180,7 @@ def ResConvLayer(out_chan, filter_shape, strides=None, W_init=None, b_init=jax.n
         outputs = jax.lax.conv_general_dilated(inputs, W, strides, padding, one, one,
                                         dimension_numbers=dimension_numbers) + b
         outputs = jax.vmap(complexrelu)(outputs)
-        outputs = jax.lax.conv_general_dilated(inputs, W2, strides, padding, one, one,
+        outputs = jax.lax.conv_general_dilated(outputs, W2, strides, padding, one, one,
                                                dimension_numbers=dimension_numbers) + b2
         outputs += inputs
         return outputs
