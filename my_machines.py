@@ -186,9 +186,6 @@ def ResConvLayer(out_chan, filter_shape = (3,), strides=None, W_init=None, b_ini
         return outputs
     return init_fun, apply_fun
 
-#Conv = functools.partial(GeneralConv, ('NHWC', 'HWIO', 'NHWC'))
-
-
 
 def UnaryLayer():
     def init_fun(rng, input_shape):
@@ -462,6 +459,37 @@ def JaxConv3NN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
     return ma, op, sa, machine_name
 
 
+def JaxResConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    print('JaxResConvNN is used')
+    input_size = hilbert.size
+    init_fun, apply_fun = stax.serial(FixSrLayer, InputForConvLayer, Conv1d(alpha, (3,)), ComplexReLu, ResConvLayer(alpha),
+                                      ComplexReLu, ResConvLayer(alpha), ComplexReLu, ResConvLayer(alpha), ComplexReLu,
+                                      ResConvLayer(alpha), ComplexReLu, stax.Flatten, Dense(1), FormatLayer)
+    ma = nk.machine.Jax(
+        hilbert,
+        (init_fun, apply_fun), dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+    # Optimizer
+    if (optimizer == 'Sgd'):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == 'Adam'):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+    # Sampler
+    if (sampler == 'Local'):
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
+    elif (sampler == 'VBS'):
+        sa = my_sampler.getVBSSampler(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    machine_name = 'JaxResConvNN'
+    return ma, op, sa, machine_name
+
+
 def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     print('JaxDeepFFNN is used')
     input_size = hilbert.size
@@ -674,6 +702,8 @@ def get_machine(machine_name):
         return JaxResFFNN
     elif (machine_name == 'JaxConv3NN'):
         return JaxConv3NN
+    elif (machine_name == 'JaxResConvNN'):
+        return JaxResConvNN
     else:
         print('The desired machine was spelled wrong!')
         sys.stdout.flush()
