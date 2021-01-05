@@ -154,6 +154,40 @@ def ResFFLayer(W_init=jax.nn.initializers.glorot_normal(), b_init=jax.nn.initial
 
     return init_fun, apply_fun
 
+def ResConvLayer(out_chan, filter_shape, strides=None, W_init=None, b_init=jax.nn.initializers.normal(1e-6)):
+    #1 dimensional Convolution
+    dimension_numbers = ('NHC', 'HIO', 'NHC')
+    #I need padding to ensure, that I can add the input and output dimension
+    padding = 'Same'
+    lhs_spec, rhs_spec, out_spec = dimension_numbers
+    one = (1,) * len(filter_shape)
+    strides = strides or one
+    W_init = W_init or jax.nn.initializers.glorot_normal(rhs_spec.index('I'), rhs_spec.index('O'))
+    def init_fun(rng, input_shape):
+        filter_shape_iter = iter(filter_shape)
+        kernel_shape = [out_chan if c == 'O' else
+                        input_shape[lhs_spec.index('C')] if c == 'I' else
+                        next(filter_shape_iter) for c in rhs_spec]
+        output_shape = jax.lax.conv_general_shape_tuple(
+            input_shape, kernel_shape, strides, padding, dimension_numbers)
+        bias_shape = [out_chan if c == 'C' else 1 for c in out_spec]
+        k1, k2, k3, k4 = jax.random.split(rng, 4)
+        W, b = W_init(k1, kernel_shape), b_init(k2, bias_shape)
+        W2, b2 = W_init(k3, kernel_shape), b_init(k4, bias_shape)
+        return output_shape, (W, W2, b, b2)
+    def apply_fun(params, inputs, **kwargs):
+        W, W2, b, b2 = params
+        outputs = jax.lax.conv_general_dilated(inputs, W, strides, padding, one, one,
+                                        dimension_numbers=dimension_numbers) + b
+        outputs = jax.vmap(complexrelu)(outputs)
+        outputs = jax.lax.conv_general_dilated(inputs, W2, strides, padding, one, one,
+                                               dimension_numbers=dimension_numbers) + b2
+        outputs += inputs
+        return outputs
+    return init_fun, apply_fun
+
+#Conv = functools.partial(GeneralConv, ('NHWC', 'HWIO', 'NHWC'))
+
 
 
 def UnaryLayer():
