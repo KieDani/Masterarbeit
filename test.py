@@ -71,15 +71,8 @@ def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mach
             ------
 
             """
-    if(hamiltonian_name == 'transformed_Heisenberg'):
-        ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
-        print('uses', hamiltonian_name, 'hamiltonian')
-    elif(hamiltonian_name == 'original_Heisenberg'):
-        ha, hi, g = models.build_Heisenbergchain_S1(L=L)
-        print('uses', hamiltonian_name, 'hamiltonian')
-    else:
-        ha, hi, g = None
-        print('hamiltonian_name was spelled wrong')
+    ha, hi, g = models.get_hamiltonian(hamiltonian_name, L)
+    print('uses', hamiltonian_name, 'hamiltonian')
     sys.stdout.flush()
     generate_machine = machines.get_machine(machine_name)
     ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha, optimizer='Adamax', lr=0.005, sampler=sampler)
@@ -141,15 +134,8 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
     if (dataname == None):
         dataname = ''.join(('L', str(L)))
     dataname = functions.create_path(dataname, path=path)
-    if (hamiltonian_name == 'transformed_Heisenberg'):
-        ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
-        print('uses', hamiltonian_name, 'hamiltonian')
-    elif (hamiltonian_name == 'original_Heisenberg'):
-        ha, hi, g = models.build_Heisenbergchain_S1(L=L)
-        print('uses', hamiltonian_name, 'hamiltonian')
-    else:
-        ha, hi, g = None
-        print('hamiltonian_name was spelled wrong')
+    ha, hi, g = models.get_hamiltonian(hamiltonian_name, L)
+    print('uses', hamiltonian_name, 'hamiltonian')
     sys.stdout.flush()
     print('load the machine: ', dataname)
     generate_machine = machines.get_machine(machine_name)
@@ -202,15 +188,8 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
                 ------
 
                 """
-    if (hamiltonian_name == 'transformed_Heisenberg'):
-        ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
-        print('uses', hamiltonian_name, 'hamiltonian')
-    elif (hamiltonian_name == 'original_Heisenberg'):
-        ha, hi, g = models.build_Heisenbergchain_S1(L=L)
-        print('uses', hamiltonian_name, 'hamiltonian')
-    else:
-        ha, hi, g = None
-        print('hamiltonian_name was spelled wrong')
+    ha, hi, g = models.get_hamiltonian(hamiltonian_name, L)
+    print('uses', hamiltonian_name, 'hamiltonian')
     sys.stdout.flush()
 
     w, v_tmp = sp.sparse.linalg.eigsh(ha.to_sparse(), k=1, which='SR', return_eigenvectors=True)
@@ -228,7 +207,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
     if(symmetric == True):
         results = np.empty(int(L/2) -1 + L%2, dtype=np.float64)
         for index, i in enumerate(range(1, int(L / 2.) + L%2)):
-            if (hamiltonian_name == 'transformed_Heisenberg'):
+            if (hamiltonian_name == 'transformed_Heisenberg' or hamiltonian_name == 'transformed_AKLT'):
                 observable = operators.FerroCorrelationZ(hilbert=hi, j=int(L / 2.) - i, k=int(L / 2.) + i).to_sparse()
             else:
                 print('Not implemented yet. Do not use the symmetric operator!')
@@ -239,7 +218,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
     else:
         results = np.empty(L-1, dtype=np.float64)
         for index, i in enumerate(range(1, L)):
-            if (hamiltonian_name == 'transformed_Heisenberg' == True):
+            if (hamiltonian_name == 'transformed_Heisenberg' or hamiltonian_name == 'transformed_AKLT'):
                 observable = operators.FerroCorrelationZ(hilbert=hi, j=0, k=i).to_sparse()
             else:
                 observable = operators.StringCorrelation(hilbert=hi, l=i).to_sparse()
@@ -268,8 +247,8 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 #jax.config.update('jax_disable_jit', True)
 #run(L=4, alpha=2, n_samples=300, n_iterations=300, machine_name='JaxFFNN', sampler='VBS')
 
-#exact(L=6, symmetric=False, hamiltonian_name='original_Heisenberg')
-#run(L=12, alpha=4, machine_name='JaxResConvNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=500, n_iterations=300)
+#exact(L=6, symmetric=False, hamiltonian_name='original_AKLT')
+#run(L=6, alpha=4, machine_name='JaxResConvNN', sampler='Local', hamiltonian_name='transformed_AKLT', n_samples=500, n_iterations=300)
 
 
 
