@@ -1,3 +1,19 @@
+"""Definition of some hamiltonians and the correspondending graphs and hilbert spaces
+
+Here, some hamiltonians can be loaded together with the graph and hilbert space.
+So far, the Heisnbergchain and the AKLT model are implemented.
+Use the method get_hamiltonian to create hamiltonian, graph and hilbert space.
+
+This project requires the following libraries:
+netket, numpy, scipy, jax, jaxlib, networkx, torch
+This file contains the following functions:
+
+    * build_Heisenbergchain_S1
+    * build_Heisenbergchain_S1_transformed
+    * build_AKLTchain
+    * build_AKLTchain_transformed
+    * get_hamiltonian
+"""
 import netket as nk
 import numpy as np
 import scipy
@@ -6,6 +22,13 @@ import sys
 
 
 def build_Heisenbergchain_S1(L):
+    """Loading the Heisenberg chain
+
+                Parameters
+                ----------
+                L : int
+                    The number of sites of the lattice
+                """
     print('Building the normal S=1 Heisenberg chain')
     J = [1]
     gnx = nx.Graph()
@@ -39,6 +62,13 @@ def build_Heisenbergchain_S1(L):
 
 #TODO check, if the results are correct
 def build_AKLTchain(L):
+    """Loading the AKLT chain
+
+                Parameters
+                ----------
+                L : int
+                    The number of sites of the lattice
+                """
     print('Building the normal AKLT chain')
     J = [1]
     gnx = nx.Graph()
@@ -73,6 +103,15 @@ def build_AKLTchain(L):
 
 
 def build_Heisenbergchain_S1_transformed(L):
+    """Loading the transformed Heisenberg chain. See https://doi.org/10.1007/BF02097239
+
+        The transformed model is easier to solve with NetKet.
+
+                Parameters
+                ----------
+                L : int
+                    The number of sites of the lattice
+                """
     print('Building the transformed S=1 Heisenberg chain')
     J = [1]
     gnx = nx.Graph()
@@ -103,6 +142,15 @@ def build_Heisenbergchain_S1_transformed(L):
 
 #TODO check, if the results are correct
 def build_AKLTchain_transformed(L):
+    """Loading the transformed Heisenberg chain. See https://doi.org/10.1007/BF02097239
+
+        The transformed model is easier to solve with NetKet.
+
+                Parameters
+                ----------
+                L : int
+                    The number of sites of the lattice
+                """
     print('Building the normal AKLT chain')
     J = [1]
     gnx = nx.Graph()
@@ -139,6 +187,16 @@ def build_AKLTchain_transformed(L):
 
 
 def get_hamiltonian(hamiltonian_name, L):
+    """Method to choose the desired model.
+
+                Parameters
+                ----------
+                hamiltonian_name : str
+                    Possible Inputs are 'transformed_Heisenberg', 'original_heisenberg', 'transformed_AKLT',
+                    'original_AKLT'
+                L : int
+                    The number of sites of the lattice
+                """
     if(hamiltonian_name == 'transformed_Heisenberg'):
         return build_Heisenbergchain_S1_transformed(L)
     elif(hamiltonian_name == 'original_heisenberg'):
