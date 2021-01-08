@@ -21,18 +21,24 @@ import networkx as nx
 import sys
 
 
-def build_Heisenbergchain_S1(L):
+def build_Heisenbergchain_S1(L, periodic = False):
     """Loading the Heisenberg chain
 
                 Parameters
                 ----------
                 L : int
                     The number of sites of the lattice
+                periodic : bool
+                    True, if we have a periodic lattice. False, if we have an open lattice.
                 """
     print('Building the normal S=1 Heisenberg chain')
     J = [1]
     gnx = nx.Graph()
-    for i in range(L - 1):
+    if(periodic == False):
+        tmp = -1
+    else:
+        tmp = 0
+    for i in range(L + tmp):
         gnx.add_edge(i, (i + 1) % L)
     g = nk.graph.Graph(nodes=list(gnx.nodes), edges=list(gnx.edges))
 
@@ -61,18 +67,24 @@ def build_Heisenbergchain_S1(L):
 
 
 #TODO check, if the results are correct
-def build_AKLTchain(L):
+def build_AKLTchain(L, periodic = False):
     """Loading the AKLT chain
 
                 Parameters
                 ----------
                 L : int
                     The number of sites of the lattice
+                periodic : bool
+                    True, if we have a periodic lattice. False, if we have an open lattice.
                 """
     print('Building the normal AKLT chain')
     J = [1]
     gnx = nx.Graph()
-    for i in range(L - 1):
+    if (periodic == False):
+        tmp = -1
+    else:
+        tmp = 0
+    for i in range(L + tmp):
         gnx.add_edge(i, (i + 1) % L)
     g = nk.graph.Graph(nodes=list(gnx.nodes), edges=list(gnx.edges))
 
@@ -102,7 +114,7 @@ def build_AKLTchain(L):
     return ha, hi, g
 
 
-def build_Heisenbergchain_S1_transformed(L):
+def build_Heisenbergchain_S1_transformed(L, periodic = False):
     """Loading the transformed Heisenberg chain. See https://doi.org/10.1007/BF02097239
 
         The transformed model is easier to solve with NetKet.
@@ -111,11 +123,17 @@ def build_Heisenbergchain_S1_transformed(L):
                 ----------
                 L : int
                     The number of sites of the lattice
+                periodic : bool
+                    True, if we have a periodic lattice. False, if we have an open lattice.
                 """
     print('Building the transformed S=1 Heisenberg chain')
     J = [1]
     gnx = nx.Graph()
-    for i in range(L - 1):
+    if (periodic == False):
+        tmp = -1
+    else:
+        tmp = 0
+    for i in range(L + tmp):
         gnx.add_edge(i, (i + 1) % L)
         print(str(i) + ' ' + str(i + 1))
     g = nk.graph.Graph(nodes=list(gnx.nodes), edges=list(gnx.edges))
@@ -141,7 +159,7 @@ def build_Heisenbergchain_S1_transformed(L):
 
 
 #TODO check, if the results are correct
-def build_AKLTchain_transformed(L):
+def build_AKLTchain_transformed(L, periodic = False):
     """Loading the transformed Heisenberg chain. See https://doi.org/10.1007/BF02097239
 
         The transformed model is easier to solve with NetKet.
@@ -150,11 +168,17 @@ def build_AKLTchain_transformed(L):
                 ----------
                 L : int
                     The number of sites of the lattice
+                periodic : bool
+                    True, if we have a periodic lattice. False, if we have an open lattice.
                 """
     print('Building the normal AKLT chain')
     J = [1]
     gnx = nx.Graph()
-    for i in range(L - 1):
+    if (periodic == False):
+        tmp = -1
+    else:
+        tmp = 0
+    for i in range(L + tmp):
         gnx.add_edge(i, (i + 1) % L)
     g = nk.graph.Graph(nodes=list(gnx.nodes), edges=list(gnx.edges))
 
@@ -186,7 +210,7 @@ def build_AKLTchain_transformed(L):
     return ha, hi, g
 
 
-def get_hamiltonian(hamiltonian_name, L):
+def get_hamiltonian(hamiltonian_name, L, periodic = False):
     """Method to choose the desired model.
 
                 Parameters
@@ -196,15 +220,17 @@ def get_hamiltonian(hamiltonian_name, L):
                     'original_AKLT'
                 L : int
                     The number of sites of the lattice
+                periodic : bool
+                    True, if we have a periodic lattice. False, if we have an open lattice.
                 """
     if(hamiltonian_name == 'transformed_Heisenberg'):
-        return build_Heisenbergchain_S1_transformed(L)
+        return build_Heisenbergchain_S1_transformed(L, periodic)
     elif(hamiltonian_name == 'original_heisenberg'):
-        return build_Heisenbergchain_S1(L)
+        return build_Heisenbergchain_S1(L, periodic)
     elif(hamiltonian_name == 'transformed_AKLT'):
-        return build_AKLTchain_transformed(L)
+        return build_AKLTchain_transformed(L, periodic)
     elif(hamiltonian_name == 'original_AKLT'):
-        return build_AKLTchain(L)
+        return build_AKLTchain(L, periodic)
     else:
         print('The desired hamiltonian was spelled wrong!')
         sys.stdout.flush()
