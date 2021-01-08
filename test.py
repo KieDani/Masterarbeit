@@ -61,7 +61,7 @@ def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mach
             sampler : str
                 A string to choose the sampler: Recommended: 'Local' (this works with every machine)
             hamiltonian_name : str
-                A string to choose the hamiltonian. Possible inputs: 'transformed_Heisenberg', 'original_Heisenberg'
+                A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
             n_samples: int
                 The number of samples used in every iteration step
             n_iterations: int
