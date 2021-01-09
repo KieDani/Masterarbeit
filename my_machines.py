@@ -70,6 +70,8 @@ import my_sampler
 
 @jax.jit
 def logcosh(x):
+    """logcosh activation function. To use this function as layer, use LogCoshLayer.
+    """
     x = x * jax.numpy.sign(x.real)
     return x + jax.numpy.log(1.0 + jax.numpy.exp(-2.0 * x)) - jax.numpy.log(2.0)
 LogCoshLayer = stax.elementwise(logcosh)
@@ -78,6 +80,10 @@ LogCoshLayer = stax.elementwise(logcosh)
 #complex activation function, see https://arxiv.org/pdf/1802.08026.pdf
 @jax.jit
 def modrelu(x):
+    """modrelu activation function. To use this function as layer, use ModReLu.
+
+        See https://arxiv.org/pdf/1705.09792.pdf
+        """
     return jnp.maximum(1, jnp.abs(x)) * x/jnp.abs(x)
 ModReLu = stax.elementwise(modrelu)
 
@@ -85,11 +91,19 @@ ModReLu = stax.elementwise(modrelu)
 #complex activation function, see https://arxiv.org/pdf/1802.08026.pdf
 @jax.jit
 def complexrelu(x):
+    """complexrelu activation function. To use this function as layer, use ComplexReLu.
+
+            See https://arxiv.org/pdf/1705.09792.pdf
+            """
     return jnp.maximum(0, x.real) + 1j* jnp.maximum(0, x.imag)
 ComplexReLu = stax.elementwise(complexrelu)
 
 
 def SumLayer():
+    """Layer to sum the input. output_shape = (..., 1).
+        This is terribly slow, especially with GPU (but it does not need so much RAM).
+        If possible, try to use another implementation.
+                """
     def init_fun(rng, input_shape):
         output_shape = (-1, 1)
         return output_shape, ()
@@ -103,6 +117,9 @@ SumLayer = SumLayer()
 
 
 def FormatLayer():
+    """Ensures the correct dimension of the output of a network.
+        It was needed in an old version of NetKet. I do not know, if this is still needed
+                    """
     def init_fun(rng, input_shape):
         output_shape = (-1, 1)
         return output_shape, ()
@@ -116,6 +133,8 @@ FormatLayer = FormatLayer()
 
 
 def InputForConvLayer():
+    """Adds an additional dimension to the data. Use this Layer before the first convolutional layer.
+                        """
     def init_fun(rng, input_shape):
         output_shape = (input_shape[0], input_shape[1], 1)
         return output_shape, ()
@@ -146,6 +165,9 @@ FixSrLayer = FixSrLayer()
 
 
 def InputForDenseLayer():
+    """Flattens the data. Use this Layer after the last convolutional layer.
+        You can use stax. Flatten instead.
+                            """
     def init_fun(rng, input_shape):
         output_shape = (input_shape[0], input_shape[1]*input_shape[2])
         return output_shape, ()
@@ -163,6 +185,9 @@ InputForDenseLayer = InputForDenseLayer()
 
 #periodic padding
 def PaddingLayer():
+    """Periodic padding. Input dimension L -> Output dimension 2*L-1.
+        This is especially useful for lattices with periodic boundary conditions.
+                                """
     def init_fun(rng, input_shape):
         output_shape = (input_shape[0], 2*input_shape[1]-1, input_shape[2])
         return output_shape, ()
@@ -179,6 +204,8 @@ PaddingLayer = PaddingLayer()
 
 
 def ResFFLayer(W_init=jax.nn.initializers.glorot_normal(), b_init=jax.nn.initializers.normal()):
+    """Fully connected layer with residual connection. Dense, complex ReLU, Dense, Add input data.
+                                    """
     def init_fun(rng, input_shape):
         output_shape = (input_shape[0], input_shape[1])
         k1, k2, k3, k4 = jax.random.split(rng, num=4)
@@ -199,6 +226,12 @@ def ResFFLayer(W_init=jax.nn.initializers.glorot_normal(), b_init=jax.nn.initial
     return init_fun, apply_fun
 
 def ResConvLayer(out_chan, filter_shape = (3,), strides=None, W_init=None, b_init=jax.nn.initializers.normal(1e-6)):
+    """Convolutional layer with residual connection. Conv1D, complex ReLU, Conv1D, Add input data.
+
+    Args:
+        out_chan (int) : number of output channels
+        filter_shape (int) : shape of the filter. Recommended: (3,)
+                                        """
     #1 dimensional Convolution
     dimension_numbers = ('NHC', 'HIO', 'NHC')
     #I need padding to ensure, that I can add the input and output dimension
@@ -232,6 +265,10 @@ def ResConvLayer(out_chan, filter_shape = (3,), strides=None, W_init=None, b_ini
 
 
 def UnaryLayer():
+    """Reformats the data.
+    Input: A spin is represented by one neuron as -2., 0., or 2.
+    Output: A spin is represented by three neurons. Two are zero and one neuron is 1.
+                                            """
     def init_fun(rng, input_shape):
         output_shape = (input_shape[0], 3 * input_shape[1])
         return output_shape, ()
@@ -261,11 +298,22 @@ def UnaryLayer():
     return init_fun, apply_fun
 UnaryLayer = UnaryLayer()
 
-
+"""One dimensional convolutional layer. Conv1d                                     """
 Conv1d = functools.partial(stax.GeneralConv, ('NHC', 'HIO', 'NHC'))
 
 
 def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    """Complex Restricted Boltzmann Machine implemented in Jax.
+        Dense, LogCosh, Sum
+
+    Args:
+        hilbert (netket.hilbert) : hilbert space
+        hamiltonian (netket.hamiltonian) : hamiltonian
+        alpha (int) : hidden layer density
+        optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+        lr (float) : learning rate
+        sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                                            """
     print('JaxRBM is used')
     input_size = hilbert.size
     ma = nk.machine.Jax(
@@ -295,6 +343,17 @@ def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loca
 
 
 def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    """Complex symmetric Restricted Boltzmann Machine implemented in Jax.
+        Conv1d, LogCosh, Sum
+
+    Args:
+        hilbert (netket.hilbert) : hilbert space
+        hamiltonian (netket.hamiltonian) : hamiltonian
+        alpha (int) : hidden layer density
+        optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+        lr (float) : learning rate
+        sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                                                """
     print('JaxSymmRBM is used')
     input_size = hilbert.size
     ma = nk.machine.Jax(
@@ -325,6 +384,17 @@ def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
 
 #https://journals.aps.org/prb/abstract/10.1103/PhysRevB.99.155136
 def JaxUnaryRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    """Complex unary Restricted Boltzmann Machine implemented in Jax.
+        UnaryLayer, Dense, LogCosh, Sum
+
+    Args:
+        hilbert (netket.hilbert) : hilbert space
+        hamiltonian (netket.hamiltonian) : hamiltonian
+        alpha (int) : hidden layer density
+        optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+        lr (float) : learning rate
+        sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                                                """
     print('JaxUnaryRBM is used')
     input_size = hilbert.size
     ma = nk.machine.Jax(
@@ -354,6 +424,17 @@ def JaxUnaryRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
 
 
 def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    """Complex Feed Forward Neural Network (fully connected) Machine implemented in Jax. One hidden layer.
+        Dense, ComplexReLU, Dense
+
+    Args:
+        hilbert (netket.hilbert) : hilbert space
+        hamiltonian (netket.hamiltonian) : hamiltonian
+        alpha (int) : hidden layer density
+        optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+        lr (float) : learning rate
+        sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                                                """
     print('JaxFFNN is used')
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(FixSrLayer,
@@ -385,6 +466,17 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
 
 
 def JaxResFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    """Complex deep residual Feed Forward Neural Network Machine implemented in Jax.
+        Dense, ReLU, ResFF, ReLU, ResFF, Relu, Dense
+
+    Args:
+        hilbert (netket.hilbert) : hilbert space
+        hamiltonian (netket.hamiltonian) : hamiltonian
+        alpha (int) : hidden layer density
+        optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+        lr (float) : learning rate
+        sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                                                """
     print('JaxResFFNN is used')
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(FixSrLayer, Dense(input_size*alpha), ComplexReLu, ResFFLayer(), ComplexReLu, ResFFLayer(), ComplexReLu, Dense(1), FormatLayer)
@@ -414,6 +506,17 @@ def JaxResFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
 
 
 def JaxUnaryFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    """Complex dunary Feed Forward Neural Network Machine implemented in Jax.
+            UnaryLayer, Dense, ReLU, Dense
+
+    Args:
+        hilbert (netket.hilbert) : hilbert space
+        hamiltonian (netket.hamiltonian) : hamiltonian
+        alpha (int) : hidden layer density
+        optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+        lr (float) : learning rate
+        sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                                                    """
     print('JaxUnaryFFNN is used')
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(FixSrLayer, UnaryLayer,
@@ -445,6 +548,17 @@ def JaxUnaryFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler
 
 
 def JaxSymmFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    """Complex symmetric Feed Forward Neural Network Machine implemented in Jax.
+            PaddingLayer, Conv1d, ComplexReLU, Dense
+
+    Args:
+        hilbert (netket.hilbert) : hilbert space
+        hamiltonian (netket.hamiltonian) : hamiltonian
+        alpha (int) : hidden layer density
+        optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+        lr (float) : learning rate
+        sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                                                    """
     print('JaxSymmFFNN is used')
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(FixSrLayer, InputForConvLayer, PaddingLayer, Conv1d(alpha, (input_size,)), ComplexReLu, InputForDenseLayer, Dense(input_size * alpha),
@@ -474,6 +588,17 @@ def JaxSymmFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
     return ma, op, sa, machine_name
 
 def JaxConv3NN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    """Complex Neural Network Machine with one convolutional filter implemented in Jax.
+            Conv1d, complex ReLU, Dense, complex ReLU, Dense
+
+    Args:
+        hilbert (netket.hilbert) : hilbert space
+        hamiltonian (netket.hamiltonian) : hamiltonian
+        alpha (int) : hidden layer density
+        optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+        lr (float) : learning rate
+        sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                                                    """
     print('JaxConv3NN is used')
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(FixSrLayer, InputForConvLayer, Conv1d(alpha, (3,)), ComplexReLu, stax.Flatten, Dense(input_size * alpha), ComplexReLu,
@@ -504,6 +629,17 @@ def JaxConv3NN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
 
 
 def JaxResConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    """Complex deep residual convolutional Neural Network Machine implemented in Jax.
+            Conv1d, complexReLU, ResConv, complexReLU, ResConv, complexReLU, ResConv, complexReLU, ResConv, Dense
+
+    Args:
+        hilbert (netket.hilbert) : hilbert space
+        hamiltonian (netket.hamiltonian) : hamiltonian
+        alpha (int) : hidden layer density
+        optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+        lr (float) : learning rate
+        sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                                                    """
     print('JaxResConvNN is used')
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(FixSrLayer, InputForConvLayer, Conv1d(alpha, (3,)), ComplexReLu, ResConvLayer(alpha),
@@ -535,6 +671,17 @@ def JaxResConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler
 
 
 def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    """Complex deep Feed Forward Neural Network Machine implemented in Jax with two hidden layer.
+                Dense, complexReLU, Dense, complex ReLU, Dense
+
+    Args:
+        hilbert (netket.hilbert) : hilbert space
+        hamiltonian (netket.hamiltonian) : hamiltonian
+        alpha (int) : hidden layer density
+        optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+        lr (float) : learning rate
+        sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                """
     print('JaxDeepFFNN is used')
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(FixSrLayer,
@@ -566,6 +713,7 @@ def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
 
 
 class Torch_FFNN_model(torch.nn.Module):
+    """Class for a real Feed Forward Neural Network implemented in PyTorch."""
     def __init__(self, hilbert, alpha):
         super(Torch_FFNN_model, self).__init__()
         input_size = hilbert.size
@@ -580,6 +728,17 @@ class Torch_FFNN_model(torch.nn.Module):
 
 #alpha should be twice as high as used with Jax, because PyTorch deals with real numbers!
 def TorchFFNN(hilbert, hamiltonian, alpha=2, optimizer='Sgd', lr=0.1, sampler = 'Local'):
+    """Real Feed Forward Neural Network Machine implemented in Pytorch with one hidden layer.
+                Dense, ReLU, Dense, ReLU, Dense
+
+    Args:
+        hilbert (netket.hilbert) : hilbert space
+        hamiltonian (netket.hamiltonian) : hamiltonian
+        alpha (int) : hidden layer density
+        optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+        lr (float) : learning rate
+        sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                """
     print('TorchFFNN is used')
     Torch_TFFNN = Torch_FFNN_model(hilbert, alpha)
     ma = nk.machine.Torch(Torch_TFFNN, hilbert=hilbert)
@@ -606,6 +765,7 @@ def TorchFFNN(hilbert, hamiltonian, alpha=2, optimizer='Sgd', lr=0.1, sampler = 
 #Should be used with padding=='circular'
 #Should not used for multiple-Layer networks, because it transformes the shape of the input every time anew
 class Torch_Conv1d_Layer(_ConvNd):
+    """Real 1d convolutional Layer implemented with PyTorch. Can be used with periodic padding."""
     def __init__(
         self,
         in_channels: int,
@@ -650,6 +810,7 @@ class Torch_Conv1d_Layer(_ConvNd):
 # uses circular padding
 #alpha is the number filters used per Conv1d layer
 class Torch_ConvNN_model(torch.nn.Module):
+    """Class for a real convolutional Neural Network implemented in PyTorch."""
     def __init__(self, hilbert, alpha=1):
         super(Torch_ConvNN_model, self).__init__()
         input_size = hilbert.size
@@ -675,6 +836,17 @@ class Torch_ConvNN_model(torch.nn.Module):
 
 
 def TorchConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    """Real symmetric Neural Network Machine implemented in Pytorch with one hidden layer.
+                    Conv1d, ReLU, Dense, ReLU, Dense
+
+    Args:
+        hilbert (netket.hilbert) : hilbert space
+        hamiltonian (netket.hamiltonian) : hamiltonian
+        alpha (int) : hidden layer density
+        optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+        lr (float) : learning rate
+        sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                    """
     print('TorchConvNN is used')
     Torch_ConvNN = Torch_ConvNN_model(hilbert, alpha)
     ma = nk.machine.Torch(Torch_ConvNN, hilbert=hilbert)
@@ -701,6 +873,15 @@ def TorchConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
 # Only Jax-optimizers are used at the moment -> watch out, if PyTorch is used!
 # Input: machine with already loaded parameters. Here, only optimizer and sampler are updated
 def load_machine(machine, hamiltonian, optimizer='Sgd', lr=0.1, sampler='Local'):
+    """Method to get an operator and sampler for a loaded machine. The machine is not loaded in this method!
+
+    Args:
+        machine (netket.machine) : loaded machine
+        hamiltonian (netket.hamiltonian) : hamiltonian
+        optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+        lr (float) : learning rate
+        sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+    """
     ma = machine
     # Optimizer
     if (optimizer == 'Sgd'):
@@ -722,6 +903,13 @@ def load_machine(machine, hamiltonian, optimizer='Sgd', lr=0.1, sampler='Local')
 
 #method to simply get the desired machine
 def get_machine(machine_name):
+    """Method to easily get the desired machine
+
+    Args:
+        * machine_name (str) : possible choices are 'JaxRBM', 'JaxSymmRBM', 'JaxFFNN', 'JaxDeepFFNN', 'TorchFFNN',
+           'TorchConvNN', 'JaxSymmFFNN', 'JaxUnaryRBM', 'JaxUnaryFFNN', 'JaxResFFNN', 'JaxConv3NN', or
+           'JaxResConvNN'
+    """
     if(machine_name == 'JaxRBM'):
         return JaxRBM
     elif(machine_name == 'JaxSymRBM' or machine_name == 'JaxSymmRBM'):
