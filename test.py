@@ -42,34 +42,19 @@ __alpha__ = 4
 def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples = __number_samples__, n_iterations = __number_iterations__):
     """Method to train a machine.
 
-            A hamiltonian and sampler can be chosen. The machine is defined and trained for the hamiltonian.
+    A hamiltonian and sampler can be chosen. The machine is defined and trained for the hamiltonian.
 
-            Parameters
-            ----------
-            L : int
-                The number of sites of the lattice
-            alpha : int
-                A factor to define the size of different machines
-            sr : float
-                The parameter for stochastic reconfiguration method. If it is None, stochastic reconfiguration is not used
-            dataname : str
-                The dataname. If None, an automatic dataname is chosen
-            path : str
-                The directory, where the results are saved. If None, the directory is 'run'
-            machine_name : str
-                A string to choose the machine. Possible inputs: See get_machine in my_machines.py
-            sampler : str
-                A string to choose the sampler: Recommended: 'Local' (this works with every machine)
-            hamiltonian_name : str
-                A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
-            n_samples: int
-                The number of samples used in every iteration step
-            n_iterations: int
-                The number of iterations (training steps)
-
-            Raises
-            ------
-
+    Args:
+        L (int) : The number of sites of the lattice
+        alpha (int) : A factor to define the size of different machines
+        sr (float) : The parameter for stochastic reconfiguration method. If it is None, stochastic reconfiguration is not used
+        dataname (str) : The dataname. If None, an automatic dataname is chosen
+        path (str) : The directory, where the results are saved. If None, the directory is 'run'
+        machine_name (str) A string to choose the machine. Possible inputs: See get_machine in my_machines.py
+        sampler (str) : A string to choose the sampler: Recommended: 'Local' (this works with every machine)
+        hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
+        n_samples (int) : The number of samples used in every iteration step
+        n_iterations (int) : The number of iterations (training steps)
             """
     ha, hi, g = models.get_hamiltonian(hamiltonian_name, L)
     print('uses', hamiltonian_name, 'hamiltonian')
@@ -102,33 +87,19 @@ def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mach
 def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples =10000, n_iterations = 20):
     """Method to load a pretrained machine and measure some observables.
 
-                A hamiltonian and sampler can be chosen. The machine is defined and trained for the hamiltonian.
+        A hamiltonian and sampler can be chosen. The machine is defined and trained for the hamiltonian.
 
-                Parameters
-                ----------
-                L : int
-                    The number of sites of the lattice
-                alpha : int
-                    A factor to define the size of different machines
-                sr : float
-                    The parameter for stochastic reconfiguration method. If it is None, stochastic reconfiguration is not used
-                dataname : str
-                    The dataname. If None, an automatic dataname is chosen
-                path : str
-                    The directory, where the results are saved. If None, the directory is 'run'
-                machine_name : str
-                    A string to choose the machine. Possible inputs: See get_machine in my_machines.py
-                sampler : str
-                    A string to choose the sampler: Recommended: 'Local' (this works with every machine)
-                hamiltonian_name : str
-                    A string to choose the hamiltonian. Possible inputs: 'transformed_Heisenberg', 'original_Heisenberg'
-                n_samples: int
-                    The number of samples used in every iteration step
-                n_iterations: int
-                    The number of iterations (training steps)
-
-                Raises
-                ------
+    Args:
+        L (int) : The number of sites of the lattice
+        alpha (int) : A factor to define the size of different machines
+        sr (float) : The parameter for stochastic reconfiguration method. If it is None, stochastic reconfiguration is not used
+        dataname (str) : The dataname. If None, an automatic dataname is chosen
+        path (str) : The directory, where the results are saved. If None, the directory is 'run'
+        machine_name (str) A string to choose the machine. Possible inputs: See get_machine in my_machines.py
+        sampler (str) : A string to choose the sampler: Recommended: 'Local' (this works with every machine)
+        hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
+        n_samples (int) : The number of samples used in every iteration step
+        n_iterations (int) : The number of iterations (training steps)
 
                 """
     if (dataname == None):
@@ -166,26 +137,18 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
 def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonian_name = 'transformed_Heisenberg'):
     """Method to solve a hamiltonian exactly.
 
-                A hamiltonian can be chosen. The energy is evaluated using the lanczos method
-                and a observable is evaluated with the power method.
-                Use this only for small lattices, because it needs an awful lot of RAM.
+        A hamiltonian can be chosen. The energy is evaluated using the lanczos method
+        and a observable is evaluated with the power method.
+        Use this only for small lattices, because it needs an awful lot of RAM.
 
-                Parameters
-                ----------
-                L : int
-                    The number of sites of the lattice
-                symmetric : bool
-                    If True, the evaluated observable is symmetric to the center of the lattice.
-                    If false, it starts at one end of the lattice.
-                dataname : str
-                    The dataname. If None, an automatic dataname is chosen
-                path : str
-                    The directory, where the results are saved. If None, the directory is 'run'
-                hamiltonian_name : str
-                    A string to choose the hamiltonian. Possible inputs: 'transformed_Heisenberg', 'original_Heisenberg'
-
-                Raises
-                ------
+    Args:
+        L (int): The number of sites of the lattice
+        symmetric (bool) :
+            If True, the evaluated observable is symmetric to the center of the lattice.
+            If false, it starts at one end of the lattice.
+        dataname (str) : The dataname. If None, an automatic dataname is chosen
+        path (str) : The directory, where the results are saved. If None, the directory is 'run'
+        hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: 'transformed_Heisenberg', 'original_Heisenberg'
 
                 """
     ha, hi, g = models.get_hamiltonian(hamiltonian_name, L)

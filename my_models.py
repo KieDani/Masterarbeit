@@ -24,12 +24,9 @@ import sys
 def build_Heisenbergchain_S1(L, periodic = False):
     """Loading the Heisenberg chain
 
-                Parameters
-                ----------
-                L : int
-                    The number of sites of the lattice
-                periodic : bool
-                    True, if we have a periodic lattice. False, if we have an open lattice.
+     Args:
+        L (int) : The number of sites of the lattice
+        periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
                 """
     print('Building the normal S=1 Heisenberg chain')
     J = [1]
@@ -70,12 +67,9 @@ def build_Heisenbergchain_S1(L, periodic = False):
 def build_AKLTchain(L, periodic = False):
     """Loading the AKLT chain
 
-                Parameters
-                ----------
-                L : int
-                    The number of sites of the lattice
-                periodic : bool
-                    True, if we have a periodic lattice. False, if we have an open lattice.
+    Args:
+        L (int) : The number of sites of the lattice
+        periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
                 """
     print('Building the normal AKLT chain')
     J = [1]
@@ -119,12 +113,9 @@ def build_Heisenbergchain_S1_transformed(L, periodic = False):
 
         The transformed model is easier to solve with NetKet.
 
-                Parameters
-                ----------
-                L : int
-                    The number of sites of the lattice
-                periodic : bool
-                    True, if we have a periodic lattice. False, if we have an open lattice.
+    Args:
+            L (int) : The number of sites of the lattice
+            periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
                 """
     print('Building the transformed S=1 Heisenberg chain')
     J = [1]
@@ -164,12 +155,9 @@ def build_AKLTchain_transformed(L, periodic = False):
 
         The transformed model is easier to solve with NetKet.
 
-                Parameters
-                ----------
-                L : int
-                    The number of sites of the lattice
-                periodic : bool
-                    True, if we have a periodic lattice. False, if we have an open lattice.
+    Args:
+            L (int) : The number of sites of the lattice
+            periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
                 """
     print('Building the normal AKLT chain')
     J = [1]
@@ -213,15 +201,11 @@ def build_AKLTchain_transformed(L, periodic = False):
 def get_hamiltonian(hamiltonian_name, L, periodic = False):
     """Method to choose the desired model.
 
-                Parameters
-                ----------
-                hamiltonian_name : str
-                    Possible Inputs are 'transformed_Heisenberg', 'original_heisenberg', 'transformed_AKLT',
-                    'original_AKLT'
-                L : int
-                    The number of sites of the lattice
-                periodic : bool
-                    True, if we have a periodic lattice. False, if we have an open lattice.
+    Args:
+        L (int) : The number of sites of the lattice
+        periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
+        hamiltonian_name (str) : Possible Inputs are 'transformed_Heisenberg', 'original_heisenberg',
+            'transformed_AKLT', 'original_AKLT'
                 """
     if(hamiltonian_name == 'transformed_Heisenberg'):
         return build_Heisenbergchain_S1_transformed(L, periodic)
