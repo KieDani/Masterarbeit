@@ -1,3 +1,23 @@
+"""Implementation of some observables
+
+The stringcorrelation operator and the ferromagnetic correlation operator are implemented. There is also a slow
+implementation to check, if I did any mistakes. I do not recommend to use the slow version of the operator.
+To use the operators easily, you can use the method get_operator in helping_functions.py.
+To implement the observables, I mainly used the code of NetKets BoseHubbard hamiltonian.
+
+This project requires the following libraries:
+netket, numpy, scipy, jax, jaxlib, networkx, torch
+
+This file contains the following classes:
+
+    * StringCorrelation
+    * FerroCorrelationZ
+
+This file contains the following functions:
+
+    * FerroCorrelationZ_slow
+    * StringCorrelation_slow
+"""
 import netket as nk
 from netket.operator._abstract_operator import AbstractOperator
 
@@ -7,7 +27,7 @@ from numba import jit
 
 class StringCorrelation(AbstractOperator):
     r"""
-    The string-correlation-operator going from site 0 to site l.
+    The string-correlation-operator going from site j to site k.
     """
 
     def __init__(self, hilbert, j, k):
@@ -159,7 +179,7 @@ class StringCorrelation(AbstractOperator):
 
 class FerroCorrelationZ(AbstractOperator):
     r"""
-    The ferromagnetic correlation-operator between site j and k in z-direction.
+    The ferromagnetic correlation-operator between site j and k. Spins in z-direction.
     """
 
     def __init__(self, hilbert, j, k):
@@ -168,8 +188,8 @@ class FerroCorrelationZ(AbstractOperator):
 
         Args:
            hilbert (netket.hilbert.Boson): Hilbert space the operator acts on.
-           j (float): The first Spin is at site j.
-           k (float): The last Spin is at site k.
+           j (int): The first spin is at site j.
+           k (int): The last spin is at site k.
 
         """
         self._j = j
@@ -308,6 +328,9 @@ class FerroCorrelationZ(AbstractOperator):
 
 #copied from my old code. Maybe I can make the code look nicer. But I only needed it to compare it to the fast version.
 def FerroCorrelationZ_slow(hilbert, j, k):
+    r"""
+        Slow implementation of the FerroCorrelationZ operator. I do not recommend to use this.
+        """
     hi = hilbert
     # We need to specify the local operators as a matrix acting on a local Hilbert space
     sf = []
@@ -336,6 +359,9 @@ def FerroCorrelationZ_slow(hilbert, j, k):
 
 
 def StringCorrelation_slow(hilbert, j, k):
+    r"""
+            Slow implementation of the StringCorrelation operator. I do not recommend to use this.
+            """
     hi = hilbert
     # We need to specify the local operators as a matrix acting on a local Hilbert space
     sf = []
