@@ -313,6 +313,12 @@ def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loca
         optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
         lr (float) : learning rate
         sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+
+    Returns:
+        ma (netket.machine) : machine
+        op (netket.optimizer) : optimizer
+        sa (netket.sampler) : sampler
+        machine_name (str) : name of the machine, see get_operator
                                             """
     print('JaxRBM is used')
     input_size = hilbert.size
@@ -353,6 +359,12 @@ def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
         optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
         lr (float) : learning rate
         sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+
+    Returns:
+        ma (netket.machine) : machine
+        op (netket.optimizer) : optimizer
+        sa (netket.sampler) : sampler
+        machine_name (str) : name of the machine, see get_operator
                                                 """
     print('JaxSymmRBM is used')
     input_size = hilbert.size
@@ -394,6 +406,13 @@ def JaxUnaryRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
         lr (float) : learning rate
         sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+
+    Returns:
+        ma (netket.machine) : machine
+        op (netket.optimizer) : optimizer
+        sa (netket.sampler) : sampler
+        machine_name (str) : name of the machine, see get_operator
+
                                                 """
     print('JaxUnaryRBM is used')
     input_size = hilbert.size
@@ -434,6 +453,12 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
         optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
         lr (float) : learning rate
         sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+
+    Returns:
+        ma (netket.machine) : machine
+        op (netket.optimizer) : optimizer
+        sa (netket.sampler) : sampler
+        machine_name (str) : name of the machine, see get_operator
                                                 """
     print('JaxFFNN is used')
     input_size = hilbert.size
@@ -476,6 +501,12 @@ def JaxResFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
         optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
         lr (float) : learning rate
         sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+
+    Returns:
+        ma (netket.machine) : machine
+        op (netket.optimizer) : optimizer
+        sa (netket.sampler) : sampler
+        machine_name (str) : name of the machine, see get_operator
                                                 """
     print('JaxResFFNN is used')
     input_size = hilbert.size
@@ -516,6 +547,12 @@ def JaxUnaryFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler
         optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
         lr (float) : learning rate
         sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+
+    Returns:
+        ma (netket.machine) : machine
+        op (netket.optimizer) : optimizer
+        sa (netket.sampler) : sampler
+        machine_name (str) : name of the machine, see get_operator
                                                     """
     print('JaxUnaryFFNN is used')
     input_size = hilbert.size
@@ -558,6 +595,12 @@ def JaxSymmFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
         lr (float) : learning rate
         sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+
+    Returns:
+        ma (netket.machine) : machine
+        op (netket.optimizer) : optimizer
+        sa (netket.sampler) : sampler
+        machine_name (str) : name of the machine, see get_operator
                                                     """
     print('JaxSymmFFNN is used')
     input_size = hilbert.size
@@ -598,6 +641,12 @@ def JaxConv3NN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
         optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
         lr (float) : learning rate
         sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+
+    Returns:
+        ma (netket.machine) : machine
+        op (netket.optimizer) : optimizer
+        sa (netket.sampler) : sampler
+        machine_name (str) : name of the machine, see get_operator
                                                     """
     print('JaxConv3NN is used')
     input_size = hilbert.size
@@ -639,6 +688,12 @@ def JaxResConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler
         optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
         lr (float) : learning rate
         sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+
+    Returns:
+        ma (netket.machine) : machine
+        op (netket.optimizer) : optimizer
+        sa (netket.sampler) : sampler
+        machine_name (str) : name of the machine, see get_operator
                                                     """
     print('JaxResConvNN is used')
     input_size = hilbert.size
@@ -681,6 +736,12 @@ def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
         lr (float) : learning rate
         sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+
+    Returns:
+        ma (netket.machine) : machine
+        op (netket.optimizer) : optimizer
+        sa (netket.sampler) : sampler
+        machine_name (str) : name of the machine, see get_operator
                 """
     print('JaxDeepFFNN is used')
     input_size = hilbert.size
@@ -738,6 +799,12 @@ def TorchFFNN(hilbert, hamiltonian, alpha=2, optimizer='Sgd', lr=0.1, sampler = 
         optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
         lr (float) : learning rate
         sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+
+    Returns:
+        ma (netket.machine) : machine
+        op (netket.optimizer) : optimizer
+        sa (netket.sampler) : sampler
+        machine_name (str) : name of the machine, see get_operator
                 """
     print('TorchFFNN is used')
     Torch_TFFNN = Torch_FFNN_model(hilbert, alpha)
@@ -846,6 +913,12 @@ def TorchConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
         lr (float) : learning rate
         sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+
+    Returns:
+        ma (netket.machine) : machine
+        op (netket.optimizer) : optimizer
+        sa (netket.sampler) : sampler
+        machine_name (str) : name of the machine, see get_operator
                     """
     print('TorchConvNN is used')
     Torch_ConvNN = Torch_ConvNN_model(hilbert, alpha)
@@ -881,6 +954,10 @@ def load_machine(machine, hamiltonian, optimizer='Sgd', lr=0.1, sampler='Local')
         optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
         lr (float) : learning rate
         sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+
+    Returns:
+        op (netket.optimizer) : optimizer
+        sa (netket.sampler) : sampler
     """
     ma = machine
     # Optimizer
@@ -906,7 +983,7 @@ def get_machine(machine_name):
     """Method to easily get the desired machine
 
     Args:
-        * machine_name (str) : possible choices are 'JaxRBM', 'JaxSymmRBM', 'JaxFFNN', 'JaxDeepFFNN', 'TorchFFNN',
+        machine_name (str) : possible choices are 'JaxRBM', 'JaxSymmRBM', 'JaxFFNN', 'JaxDeepFFNN', 'TorchFFNN',
            'TorchConvNN', 'JaxSymmFFNN', 'JaxUnaryRBM', 'JaxUnaryFFNN', 'JaxResFFNN', 'JaxConv3NN', or
            'JaxResConvNN'
     """
