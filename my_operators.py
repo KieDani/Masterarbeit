@@ -10,16 +10,18 @@ class StringCorrelation(AbstractOperator):
     The string-correlation-operator going from site 0 to site l.
     """
 
-    def __init__(self, hilbert, l):
+    def __init__(self, hilbert, j, k):
         r"""
         Constructs a new stringcorrelationoperator.
 
         Args:
            hilbert (netket.hilbert.Boson): Hilbert space the operator acts on.
-           l (float): The Operator goes from site 0 to site l.
+           j (int): The Operator starts at site j.
+           k (int) : The Operator ends at site k.
 
         """
-        self._l = l
+        self._j = j
+        self._k = k
         self._hilbert = hilbert
         self._n_sites = hilbert.size
         self._section = hilbert.size + 1
@@ -74,12 +76,12 @@ class StringCorrelation(AbstractOperator):
 
         """
         return self._flattened_kernel(
-            x.reshape((1, -1)), _np.ones(1), self._edges, self._l,
+            x.reshape((1, -1)), _np.ones(1), self._edges, self._j, self._k,
         )
 
     @staticmethod
     @jit(nopython=True)
-    def _flattened_kernel(x, sections, edges, l):
+    def _flattened_kernel(x, sections, edges, j, k):
         n_sites = x.shape[1]
         n_conn = n_sites + 1
         # n_conn = 1
@@ -92,24 +94,24 @@ class StringCorrelation(AbstractOperator):
         for i in range(x.shape[0]):
 
             mels[diag_ind] = 1.0
-            if (x[i, 0] >= 1):
+            if (x[i, j] >= 1):
                 mels[diag_ind] *= 1.
-            elif (x[i, 0] <= -1):
+            elif (x[i, j] <= -1):
                 mels[diag_ind] *= -1.
             else:
                 mels[diag_ind] *= 0.
 
-            for j in range(1, l):
-                if (x[i, j] >= 1):
+            for i2 in range(j + 1, k):
+                if (x[i, i2] >= 1):
                     mels[diag_ind] *= -1.
-                elif (x[i, j] <= -1):
+                elif (x[i, i2] <= -1):
                     mels[diag_ind] *= -1.
                 else:
                     mels[diag_ind] *= 1.
 
-            if (x[i, l] >= 1):
+            if (x[i, k] >= 1):
                 mels[diag_ind] *= 1.
-            elif (x[i, l] <= -1):
+            elif (x[i, k] <= -1):
                 mels[diag_ind] *= -1.
             else:
                 mels[diag_ind] *= 0.
@@ -152,7 +154,7 @@ class StringCorrelation(AbstractOperator):
 
         """
 
-        return self._flattened_kernel(x, sections, self._edges, self._l)
+        return self._flattened_kernel(x, sections, self._edges, self._j, self._k)
 
 
 class FerroCorrelationZ(AbstractOperator):

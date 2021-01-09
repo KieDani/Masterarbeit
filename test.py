@@ -221,7 +221,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
             if (hamiltonian_name == 'transformed_Heisenberg' or hamiltonian_name == 'transformed_AKLT'):
                 observable = operators.FerroCorrelationZ(hilbert=hi, j=0, k=i).to_sparse()
             else:
-                observable = operators.StringCorrelation(hilbert=hi, l=i).to_sparse()
+                observable = operators.StringCorrelation(hilbert=hi, j=0, k=i).to_sparse()
             #print(observable.shape)
             #print(v.shape)
             #result_l = np.dot(np.dot(v, observable), v).real
@@ -247,7 +247,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 #jax.config.update('jax_disable_jit', True)
 #run(L=4, alpha=2, n_samples=300, n_iterations=300, machine_name='JaxFFNN', sampler='VBS')
 
-#exact(L=6, symmetric=False, hamiltonian_name='original_AKLT')
+exact(L=6, symmetric=False, hamiltonian_name='original_Heisenberg')
 #run(L=6, alpha=4, machine_name='JaxResConvNN', sampler='Local', hamiltonian_name='transformed_AKLT', n_samples=500, n_iterations=300)
 
 
