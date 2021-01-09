@@ -3,6 +3,7 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 import helping_functions as functions
+from multiprocessing import Pool
 
 
 
@@ -461,7 +462,10 @@ machine = '_DeepFFNN'
 
 #plot('run/firstResults_FFNN/L32_estimate.log', L = 32 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
 
-machine_names = ['JaxRBM', 'JaxSymmRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
-plot('run/compareArchitectures/CPU/Iterations/' + machine_names[6] + '/L16.log', L = 16 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed')
+def wrapper(i):
+    machine_names = ['JaxRBM', 'JaxSymmRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
+    plot('run/compareArchitectures/CPU/Iterations/' + machine_names[i] + '/L16.log', L = 16 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed')
 
+# with Pool(8) as p:
+#     p.map(wrapper, [0, 2, 3, 4, 5, 6, 7, 8])
 
