@@ -225,7 +225,7 @@ def get_hamiltonian(hamiltonian_name, L, periodic = False):
                 """
     if(hamiltonian_name == 'transformed_Heisenberg'):
         return build_Heisenbergchain_S1_transformed(L, periodic)
-    elif(hamiltonian_name == 'original_heisenberg'):
+    elif(hamiltonian_name == 'original_Heisenberg'):
         return build_Heisenbergchain_S1(L, periodic)
     elif(hamiltonian_name == 'transformed_AKLT'):
         return build_AKLTchain_transformed(L, periodic)
