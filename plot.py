@@ -56,7 +56,11 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
     else:
         factor = (L - 1) * (-1.4)
     expected_energy = np.ones_like(np.asarray(iters)) * factor
+    print(dataname + '; (E_exact - E)/E_exact = ' + str((factor - np.mean(energy[-int(1./3 * len(energy)):])) / factor))
     plt.plot(iters, expected_energy, color='red')
+    plt.title(dataname)
+    plt.xlabel('Iteration')
+    plt.ylabel('Energy')
     plt.show()
 
     if(observables == True):
@@ -90,6 +94,7 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
             operator = 0.374 * np.ones(len(xAxis_fast))
             x_operator = xAxis_fast
         plt.plot(x_operator, operator, color='red')
+        plt.title(dataname)
         plt.show()
 
 
@@ -112,6 +117,8 @@ def compare_original_transformed(L, periodic=False):
     plt.plot(x_operator_trans, operator_trans, color='blue', label='transformed Hamiltonian')
     plt.plot(x_operator_orig, operator_inf, color='red', label='expected infinity value')
     plt.title('Compare observable for periodic lattice')
+    plt.xlabel('distance between sites')
+    plt.ylabel('Observable')
     plt.legend()
     plt.show()
 
@@ -449,6 +456,12 @@ machine = '_DeepFFNN'
 
 #plot('run/small_FFNN/SrNoneL30_estimate.log', L = 30 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
 
-plot('run/small_symmetricOperator_FFNN/SrNoneL16_estimate.log', L = 16 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original='transformed')
+
+
+
+#plot('run/firstResults_FFNN/L32_estimate.log', L = 32 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
+
+machine_names = ['JaxRBM', 'JaxSymmRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
+plot('run/compareArchitectures/CPU/Iterations/' + machine_names[6] + '/L16.log', L = 16 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed')
 
 
