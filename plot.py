@@ -469,3 +469,4 @@ def wrapper(i):
 # with Pool(8) as p:
 #     p.map(wrapper, [0, 2, 3, 4, 5, 6, 7, 8])
 
+#plot('run/L16_estimate.log', L = 16 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')

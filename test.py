@@ -211,7 +211,8 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 #run(L=4, alpha=2, n_samples=300, n_iterations=300, machine_name='JaxFFNN', sampler='VBS')
 
 #exact(L=6, symmetric=False, hamiltonian_name='original_Heisenberg')
-#run(L=12, alpha=12, machine_name='JaxRBM', sampler='Local', hamiltonian_name='transformed_AKLT', n_samples=500, n_iterations=300)
+#run(L=16, alpha=16, machine_name='JaxDeepConvNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=500, n_iterations=300)
+#load(L=16, alpha=16, machine_name='JaxDeepConvNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=2000, n_iterations=30)
 
 
 
