@@ -101,8 +101,7 @@ ComplexReLu = stax.elementwise(complexrelu)
 
 def SumLayer():
     """Layer to sum the input. output_shape = (..., 1).
-        This is terribly slow, especially with GPU (but it does not need so much RAM).
-        If possible, try to use another implementation.
+        I use an other implementation than NetKet. Maybe this will be faster for GPU training.
                 """
     def init_fun(rng, input_shape):
         output_shape = (-1, 1)
@@ -110,7 +109,9 @@ def SumLayer():
 
     @jax.jit
     def apply_fun(params, inputs, **kwargs):
-        return inputs.sum(axis=-1)
+        #return inputs.sum(axis=-1)
+        W = jnp.ones((inputs.shape[1], 1), dtype=jnp.int64)
+        return jnp.dot(inputs, W).T
 
     return init_fun, apply_fun
 SumLayer = SumLayer()
