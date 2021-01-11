@@ -1,3 +1,23 @@
+"""Implementation of some observables
+
+The stringcorrelation operator and the ferromagnetic correlation operator are implemented. There is also a slow
+implementation to check, if I did any mistakes. I do not recommend to use the slow version of the operator.
+To use the operators easily, you can use the method get_operator in helping_functions.py.
+To implement the observables, I mainly used the code of NetKets BoseHubbard hamiltonian.
+
+This project requires the following libraries:
+netket, numpy, scipy, jax, jaxlib, networkx, torch
+
+This file contains the following classes:
+
+    * StringCorrelation
+    * FerroCorrelationZ
+
+This file contains the following functions:
+
+    * FerroCorrelationZ_slow
+    * StringCorrelation_slow
+"""
 import netket as nk
 from netket.operator._abstract_operator import AbstractOperator
 
@@ -7,19 +27,21 @@ from numba import jit
 
 class StringCorrelation(AbstractOperator):
     r"""
-    The string-correlation-operator going from site 0 to site l.
+    The string-correlation-operator going from site j to site k.
     """
 
-    def __init__(self, hilbert, l):
+    def __init__(self, hilbert, j, k):
         r"""
         Constructs a new stringcorrelationoperator.
 
         Args:
            hilbert (netket.hilbert.Boson): Hilbert space the operator acts on.
-           l (float): The Operator goes from site 0 to site l.
+           j (int): The Operator starts at site j.
+           k (int) : The Operator ends at site k.
 
         """
-        self._l = l
+        self._j = j
+        self._k = k
         self._hilbert = hilbert
         self._n_sites = hilbert.size
         self._section = hilbert.size + 1
@@ -74,12 +96,12 @@ class StringCorrelation(AbstractOperator):
 
         """
         return self._flattened_kernel(
-            x.reshape((1, -1)), _np.ones(1), self._edges, self._l,
+            x.reshape((1, -1)), _np.ones(1), self._edges, self._j, self._k,
         )
 
     @staticmethod
     @jit(nopython=True)
-    def _flattened_kernel(x, sections, edges, l):
+    def _flattened_kernel(x, sections, edges, j, k):
         n_sites = x.shape[1]
         n_conn = n_sites + 1
         # n_conn = 1
@@ -92,24 +114,24 @@ class StringCorrelation(AbstractOperator):
         for i in range(x.shape[0]):
 
             mels[diag_ind] = 1.0
-            if (x[i, 0] >= 1):
+            if (x[i, j] >= 1):
                 mels[diag_ind] *= 1.
-            elif (x[i, 0] <= -1):
+            elif (x[i, j] <= -1):
                 mels[diag_ind] *= -1.
             else:
                 mels[diag_ind] *= 0.
 
-            for j in range(1, l):
-                if (x[i, j] >= 1):
+            for i2 in range(j + 1, k):
+                if (x[i, i2] >= 1):
                     mels[diag_ind] *= -1.
-                elif (x[i, j] <= -1):
+                elif (x[i, i2] <= -1):
                     mels[diag_ind] *= -1.
                 else:
                     mels[diag_ind] *= 1.
 
-            if (x[i, l] >= 1):
+            if (x[i, k] >= 1):
                 mels[diag_ind] *= 1.
-            elif (x[i, l] <= -1):
+            elif (x[i, k] <= -1):
                 mels[diag_ind] *= -1.
             else:
                 mels[diag_ind] *= 0.
@@ -152,12 +174,12 @@ class StringCorrelation(AbstractOperator):
 
         """
 
-        return self._flattened_kernel(x, sections, self._edges, self._l)
+        return self._flattened_kernel(x, sections, self._edges, self._j, self._k)
 
 
 class FerroCorrelationZ(AbstractOperator):
     r"""
-    The ferromagnetic correlation-operator between site j and k in z-direction.
+    The ferromagnetic correlation-operator between site j and k. Spins in z-direction.
     """
 
     def __init__(self, hilbert, j, k):
@@ -166,8 +188,8 @@ class FerroCorrelationZ(AbstractOperator):
 
         Args:
            hilbert (netket.hilbert.Boson): Hilbert space the operator acts on.
-           j (float): The first Spin is at site j.
-           k (float): The last Spin is at site k.
+           j (int): The first spin is at site j.
+           k (int): The last spin is at site k.
 
         """
         self._j = j
@@ -306,6 +328,9 @@ class FerroCorrelationZ(AbstractOperator):
 
 #copied from my old code. Maybe I can make the code look nicer. But I only needed it to compare it to the fast version.
 def FerroCorrelationZ_slow(hilbert, j, k):
+    r"""
+        Slow implementation of the FerroCorrelationZ operator. I do not recommend to use this.
+        """
     hi = hilbert
     # We need to specify the local operators as a matrix acting on a local Hilbert space
     sf = []
@@ -334,6 +359,9 @@ def FerroCorrelationZ_slow(hilbert, j, k):
 
 
 def StringCorrelation_slow(hilbert, j, k):
+    r"""
+            Slow implementation of the StringCorrelation operator. I do not recommend to use this.
+            """
     hi = hilbert
     # We need to specify the local operators as a matrix acting on a local Hilbert space
     sf = []
