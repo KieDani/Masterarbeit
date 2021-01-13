@@ -43,7 +43,7 @@ def build_Heisenbergchain_S1(L, periodic = False):
     #print('This graph has ' + str(g.n_nodes) + ' sites')
     #print('with the following set of edges: ' + str(g.n_edges))
 
-    hi = nk.hilbert.Spin(s=1, graph=g)
+    hi = nk.hilbert.Spin(s=1, N=g.n_nodes)
 
     # Pauli Matrices for Spin 1
     sigmax = 1. / np.sqrt(2) * np.asarray([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
@@ -58,7 +58,7 @@ def build_Heisenbergchain_S1(L, periodic = False):
     ]
 
     # Custom Graph Hamiltonian operator
-    ha = nk.operator.GraphOperator(hi, bond_ops=bond_operator)
+    ha = nk.operator.GraphOperator(hi, g, bond_ops=bond_operator)
 
     return ha, hi, g
 
@@ -86,7 +86,7 @@ def build_AKLTchain(L, periodic = False):
     #print('This graph has ' + str(g.n_nodes) + ' sites')
     #print('with the following set of edges: ' + str(g.n_edges))
 
-    hi = nk.hilbert.Spin(s=1, graph=g)
+    hi = nk.hilbert.Spin(s=1, N=g.n_nodes)
 
     # Pauli Matrices for Spin 1
     sigmax = 1. / np.sqrt(2) * np.asarray([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
@@ -103,7 +103,7 @@ def build_AKLTchain(L, periodic = False):
     ]
 
     # Custom Graph Hamiltonian operator
-    ha = nk.operator.GraphOperator(hi, bond_ops=bond_operator)
+    ha = nk.operator.GraphOperator(hi, g, bond_ops=bond_operator)
 
     return ha, hi, g
 
@@ -133,7 +133,7 @@ def build_Heisenbergchain_S1_transformed(L, periodic = False):
     #print('This graph has ' + str(g.n_nodes) + ' sites')
     #print('with the following set of edges: ' + str(g.n_edges))
 
-    hi = nk.hilbert.Spin(s=1, graph=g)
+    hi = nk.hilbert.Spin(s=1, N=g.n_nodes)
 
     interaction = np.asarray([[-1, 0, 0, 0, -1, 0, 0, 0, 0], [0, 0, 0, -1, 0, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0],
                               [0, -1, 0, 0, 0, 0, 0, 0, 0], [-1, 0, 0, 0, 0, 0, 0, 0, -1], [0, 0, 0, 0, 0, 0, 0, -1, 0],
@@ -144,7 +144,7 @@ def build_Heisenbergchain_S1_transformed(L, periodic = False):
     ]
 
     # Custom Graph Hamiltonian operator
-    ha = nk.operator.GraphOperator(hi, bond_ops=bond_operator)
+    ha = nk.operator.GraphOperator(hi, g, bond_ops=bond_operator)
 
     return ha, hi, g
 
@@ -174,9 +174,9 @@ def build_AKLTchain_transformed(L, periodic = False):
     #print('This graph has ' + str(g.n_nodes) + ' sites')
     #print('with the following set of edges: ' + str(g.n_edges))
 
-    hi = nk.hilbert.Spin(s=1, graph=g)
+    hi = nk.hilbert.Spin(s=1, N=g.n_nodes)
 
-    # Pauli Matrices for Spin 1
+    # Pauli Matrices for Spin_size_1_t 1
     sigmax = 1. / np.sqrt(2) * np.asarray([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
     sigmaz = np.asarray([[1, 0, 0], [0, 0, 0], [0, 0, -1]])
     sigmay = 1. / np.sqrt(2) * np.asarray([[0, -1j, 0], [1j, 0, -1j], [0, 1j, 0]])
@@ -193,7 +193,7 @@ def build_AKLTchain_transformed(L, periodic = False):
     ]
 
     # Custom Graph Hamiltonian operator
-    ha = nk.operator.GraphOperator(hi, bond_ops=bond_operator)
+    ha = nk.operator.GraphOperator(hi, g, bond_ops=bond_operator)
 
     return ha, hi, g
 
