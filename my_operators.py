@@ -45,7 +45,8 @@ class StringCorrelation(AbstractOperator):
         self._hilbert = hilbert
         self._n_sites = hilbert.size
         self._section = hilbert.size + 1
-        self._edges = _np.asarray(hilbert.graph.edges())
+        #self._edges = _np.asarray(hilbert.graph.edges())
+        self._edges = None
         super().__init__()
 
     @property
@@ -197,7 +198,8 @@ class FerroCorrelationZ(AbstractOperator):
         self._hilbert = hilbert
         self._n_sites = hilbert.size
         self._section = hilbert.size + 1
-        self._edges = _np.asarray(hilbert.graph.edges())
+        #self._edges = _np.asarray(hilbert.graph.edges())
+        self._edges = None
         super().__init__()
 
     @property
