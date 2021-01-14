@@ -460,13 +460,21 @@ machine = '_DeepFFNN'
 
 
 
+#plot('run/firstResults_FFNN/L16_estimate.log', L = 16 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
+#plot('run/firstResults_FFNN/L16_estimate.log', L = 16 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original='transformed')
 #plot('run/firstResults_FFNN/L32_estimate.log', L = 32 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
+#plot('run/firstResults_FFNN/L32_estimate.log', L = 32 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original='transformed')
 
 def wrapper(i):
     machine_names = ['JaxRBM', 'JaxSymmRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
     plot('run/compareArchitectures/CPU/Iterations/' + machine_names[i] + '/L16.log', L = 16 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed')
+    #plot('run/compareArchitectures/CPU/Iterations/' + machine_names[i] + '/L30.log', L = 30 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed')
 
-# with Pool(8) as p:
-#     p.map(wrapper, [0, 2, 3, 4, 5, 6, 7, 8])
 
-#plot('run/L16_estimate.log', L = 16 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
+with Pool(8) as p:
+    pass
+    #p.map(wrapper, [0, 2, 3, 4, 5, 6, 7, 8])
+
+
+#plot('run/observableArchitekture/JaxDeepConvNN/L14_estimate.log', L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
+#plot('run/observableArchitekture/JaxDeepFFNN/L14_estimate.log', L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
