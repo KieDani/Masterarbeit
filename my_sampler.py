@@ -1,15 +1,37 @@
+"""Implementation of custom Monte-Carlo sampler
+
+Implementation of Monte-Carlo Kernels that define the update process of the MCMC.
+It is used with netket.sampler.jax.MetropolisHastings.
+
+This project requires the following libraries:
+netket, numpy, scipy, jax, jaxlib, networkx, torch
+
+This file contains the following classes:
+
+    * _JaxVBSKernel
+
+This file contains the following functions:
+
+    *  getVBSSampler
+"""
 import jax
 import jax.numpy as jnp
 import netket as nk
 
 
 class _JaxVBSKernel:
+    """A Monte Carlo Kernel to use with netket.sampler.jax.MetropolisHastings.
+
+    Local spinflips are performed and with a propbability of 20% the state is repaired, so that it is a VBS state again.
+    It only works with Spin-1 hilbert spaces.
+    """
     def __init__(self, local_states, size):
         self.local_states = jax.numpy.sort(jax.numpy.array(local_states))
         self.size = size
         self.n_states = self.local_states.size
 
     def transition(self, key, state):
+        """Here, the update of a state is performed"""
         def local_update(val):
             key = val[0]
             state = val[1]
@@ -44,10 +66,11 @@ class _JaxVBSKernel:
         keys = jax.random.split(key, 2)
         rand_num = jax.random.randint(keys[0], shape=(1,), minval=1, maxval=11)[0]
         #print(rand_num)
-        return jax.lax.cond(rand_num < 8, local_update, VBS_update , (keys[1], state))
+        return jax.lax.cond(rand_num < 9, local_update, VBS_update , (keys[1], state))
 
 
     def random_state(self, key, state):
+        """Here, a random VBS state is created."""
         def helper_while_body(val):
             new_key = val[0]
             new_key = jax.random.split(new_key, 1)[0]
@@ -82,6 +105,14 @@ class _JaxVBSKernel:
         return keys[0], state
 
 def getVBSSampler(machine):
+    """Method to easily create a Metropolis Hastings sampler with _JaxVBSKernel.
+
+        Args:
+            hilbert (netket.machine) : machine
+
+        Returns:
+            sampler (netket.sampler) : sampler
+                                                        """
     kernel = _JaxVBSKernel(local_states=machine.hilbert._local_states, size=machine.hilbert._size)
     sampler = nk.sampler.jax.MetropolisHastings(machine, kernel, n_chains=16, sweep_size=1)
     return sampler
