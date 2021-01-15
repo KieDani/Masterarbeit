@@ -680,7 +680,8 @@ def JaxConv3NN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
 
 def JaxDeepConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     """Complex deep convolutional Neural Network Machine implemented in Jax.
-            Conv1d, complexReLU, Conv1d, complexReLU, Conv1d, complexReLU, Dense, complexReLU, Dense
+            Conv1d, complexReLU, Conv1d, complexReLU, Conv1d, complexReLU,
+            Conv1d, complexReLU, Dense, complexReLU, Dense
 
     Args:
         hilbert (netket.hilbert) : hilbert space
@@ -699,7 +700,8 @@ def JaxDeepConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sample
     print('JaxDeepConvNN is used')
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(FixSrLayer, InputForConvLayer, Conv1d(alpha, (3,)), ComplexReLu,
-                                      Conv1d(alpha, (3,)), ComplexReLu, Conv1d(alpha, (3,)), ComplexReLu, stax.Flatten,
+                                      Conv1d(alpha, (3,)), ComplexReLu, Conv1d(alpha, (3,)), ComplexReLu,
+                                      Conv1d(alpha, (3,)), ComplexReLu, stax.Flatten,
                                       Dense(input_size * alpha), ComplexReLu, Dense(1), FormatLayer)
     ma = nk.machine.Jax(
         hilbert,
