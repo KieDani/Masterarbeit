@@ -243,9 +243,16 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.1)
+# alpha = int(alpha0 * 0.07)
 # print(alpha)
 # machine_name = 'JaxDeepFFNN'
+# generate_machine = machines.get_machine(machine_name)
+# ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+# print(machine_name, ma.n_par, compare/ma.n_par)
+#
+# alpha = int(0.14*alpha0)
+# print(alpha)
+# machine_name = 'JaxDeepConvNN'
 # generate_machine = machines.get_machine(machine_name)
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
@@ -314,9 +321,16 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.10)
+# alpha = int(alpha0 * 0.07)
 # print(alpha)
 # machine_name = 'JaxDeepFFNN'
+# generate_machine = machines.get_machine(machine_name)
+# ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+# print(machine_name, ma.n_par, compare/ma.n_par)
+#
+# alpha = int(0.12*alpha0)
+# print(alpha)
+# machine_name = 'JaxDeepConvNN'
 # generate_machine = machines.get_machine(machine_name)
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
@@ -384,9 +398,16 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.1)
+# alpha = int(alpha0 * 0.07)
 # print(alpha)
 # machine_name = 'JaxDeepFFNN'
+# generate_machine = machines.get_machine(machine_name)
+# ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+# print(machine_name, ma.n_par, compare/ma.n_par)
+#
+# alpha = int(0.11*alpha0)
+# print(alpha)
+# machine_name = 'JaxDeepConvNN'
 # generate_machine = machines.get_machine(machine_name)
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
