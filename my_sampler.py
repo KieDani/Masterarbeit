@@ -4,7 +4,7 @@ Implementation of Monte-Carlo Kernels that define the update process of the MCMC
 It is used with netket.sampler.jax.MetropolisHastings.
 
 This project requires the following libraries:
-netket, numpy, scipy, jax, jaxlib, networkx, torch
+netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm
 
 This file contains the following classes:
 

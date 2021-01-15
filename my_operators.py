@@ -6,7 +6,7 @@ To use the operators easily, you can use the method get_operator in helping_func
 To implement the observables, I mainly used the code of NetKets BoseHubbard hamiltonian.
 
 This project requires the following libraries:
-netket, numpy, scipy, jax, jaxlib, networkx, torch
+netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm
 
 This file contains the following classes:
 
