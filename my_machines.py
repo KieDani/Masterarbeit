@@ -63,6 +63,7 @@ from torch.nn.common_types import _size_1_t
 import functools
 import sys
 import my_sampler
+import random
 
 
 
@@ -298,6 +299,24 @@ def UnaryLayer():
 
     return init_fun, apply_fun
 UnaryLayer = UnaryLayer()
+
+
+def DropoutLayer(rate, mode='train'):
+    """Layer construction function for a dropout layer with given rate.
+    This layer does not need the rng argument. Therefore, it is probably slower than the original stax implementation.
+    """
+    def init_fun(rng, input_shape):
+        return input_shape, ()
+    def apply_fun(params, inputs, **kwargs):
+        key = jax.random.PRNGKey(random.randint(0, 999))
+        key, rng = jax.random.split(key)
+        if mode == 'train':
+            keep = jax.random.bernoulli(rng, rate, inputs.shape)
+            return jnp.where(keep, inputs / rate, 0)
+        else:
+            return inputs
+    return init_fun, apply_fun
+
 
 """One dimensional convolutional layer. Conv1d                                     """
 Conv1d = functools.partial(stax.GeneralConv, ('NHC', 'HIO', 'NHC'))
@@ -824,6 +843,55 @@ def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
     return ma, op, sa, machine_name
 
 
+def JaxDeepDropoutFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    """Complex deep Feed Forward Neural Network Machine implemented in Jax with two hidden layer and one Dropout layer.
+                Dense, complexReLU, Dropout, Dense, complex ReLU, Dense, complex ReLU, Dense
+
+    Args:
+        hilbert (netket.hilbert) : hilbert space
+        hamiltonian (netket.hamiltonian) : hamiltonian
+        alpha (int) : hidden layer density
+        optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+        lr (float) : learning rate
+        sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+
+    Returns:
+        ma (netket.machine) : machine
+        op (netket.optimizer) : optimizer
+        sa (netket.sampler) : sampler
+        machine_name (str) : name of the machine, see get_operator
+                """
+    print('JaxDeepDropoutFFNN is used')
+    input_size = hilbert.size
+    init_fun, apply_fun = stax.serial(FixSrLayer,
+        Dense(input_size * alpha), ComplexReLu, DropoutLayer(rate=0.95),
+        Dense(input_size * alpha), ComplexReLu, Dense(input_size * alpha),
+        ComplexReLu, Dense(1), FormatLayer)
+    ma = nk.machine.Jax(
+        hilbert,
+        (init_fun, apply_fun), dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+    # Optimizer
+    if (optimizer == 'Sgd'):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == 'Adam'):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+    # Sampler
+    if (sampler == 'Local'):
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
+    elif (sampler == 'VBS'):
+        sa = my_sampler.getVBSSampler(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    machine_name = 'JaxDeepFFNN'
+    return ma, op, sa, machine_name
+
+
 class Torch_FFNN_model(torch.nn.Module):
     """Class for a real Feed Forward Neural Network implemented in PyTorch."""
     def __init__(self, hilbert, alpha):
@@ -1046,6 +1114,8 @@ def get_machine(machine_name):
         return JaxFFNN
     elif(machine_name == 'JaxDeepFFNN'):
         return JaxDeepFFNN
+    elif (machine_name == 'JaxDeepDropoutFFNN'):
+        return JaxDeepDropoutFFNN
     elif(machine_name == 'TorchFFNN'):
         return TorchFFNN
     elif(machine_name == 'TorchConvNN'):
