@@ -381,6 +381,7 @@ def plot_operator_both_sides(dataname, L):
 def compareArchitektures(machine_names, path, L):
     for machine_name in machine_names:
         deviations_energy = list()
+        times = list()
         for i in range(0, 5):
             try:
                 dataname = ''.join((path, machine_name, '/', str(i), 'L', str(L), '.log'))
@@ -400,14 +401,14 @@ def compareArchitektures(machine_names, path, L):
                     factor = (L - 1) * (-1.401484)
                 deviation_energy = (factor - np.mean(energy[-int(1./3*len(energy)):])) / factor
                 deviations_energy.append(deviation_energy)
-                # print(machine_name + '; (E_exact - E)/E_exact = ' + str(deviation_energy))
-                # expected_energy = np.ones_like(np.asarray(iters)) * factor
-                # plt.plot(iters, expected_energy, color='red')
-                # plt.plot(iters, energy)
-                # plt.title(dataname)
-                # plt.xlabel('Iteration')
-                # plt.ylabel('Energy')
-                # plt.show()
+                # Time data is created at the end of the simulation -> There might be no .time data yet
+                try:
+                    with open(''.join((dataname.split('.')[0], '.time')), 'r') as reader:
+                        time = reader.read()
+                        #print(time)
+                        times.append(float(time))
+                except:
+                    pass
             except:
                 #Results not yet finished
                 pass
@@ -415,7 +416,10 @@ def compareArchitektures(machine_names, path, L):
         median = np.median(deviations_energy)
         variance = np.var(deviations_energy)
         minimum = np.amin(deviations_energy)
-        print(''.join((machine_name + '; mean=', str(mean), ' variance=', str(variance), ' median=', str(median), ' minimum=', str(minimum))))
+        maximum = np.amax(deviations_energy)
+        meantime = np.mean(times)
+        #mintime  = np.amin(times)
+        print(''.join((machine_name + '; mean=', str(mean), ' variance=', str(variance), ' median=', str(median), ' minimum=', str(minimum), ' maximum=', str(maximum), ' time=', str(meantime))))
 
 
 
@@ -520,5 +524,5 @@ with Pool(8) as p:
 #plot('run/observableArchitekture/JaxDeepConvNN/L14_estimate.log', L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
 #plot('run/observableArchitekture/JaxDeepFFNN/L14_estimate.log', L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
 
-#machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
-#compareArchitektures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
+machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
+compareArchitektures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
