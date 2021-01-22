@@ -378,6 +378,47 @@ def plot_operator_both_sides(dataname, L):
     plt.show()
 
 
+def compareArchitektures(machine_names, path, L):
+    for machine_name in machine_names:
+        deviations_energy = list()
+        for i in range(0, 5):
+            try:
+                dataname = ''.join((path, machine_name, '/', str(i), 'L', str(L), '.log'))
+                data = json.load(open(dataname))
+                iters = []
+                energy = []
+
+                for iteration in data["Output"]:
+                    iters.append(iteration["Iteration"])
+                    energy.append(iteration["Energy"]["Mean"])
+
+                tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674,
+                       -17.028, -18.459, -19.827, -21.250, -22.626]
+                if (L < len(tmp)):
+                    factor = tmp[L]
+                else:
+                    factor = (L - 1) * (-1.401484)
+                deviation_energy = (factor - np.mean(energy[-int(1./3*len(energy)):])) / factor
+                deviations_energy.append(deviation_energy)
+                # print(machine_name + '; (E_exact - E)/E_exact = ' + str(deviation_energy))
+                # expected_energy = np.ones_like(np.asarray(iters)) * factor
+                # plt.plot(iters, expected_energy, color='red')
+                # plt.plot(iters, energy)
+                # plt.title(dataname)
+                # plt.xlabel('Iteration')
+                # plt.ylabel('Energy')
+                # plt.show()
+            except:
+                #Results not yet finished
+                pass
+        mean = np.mean(deviations_energy)
+        median = np.median(deviations_energy)
+        variance = np.var(deviations_energy)
+        minimum = np.amin(deviations_energy)
+        print(''.join((machine_name + '; mean=', str(mean), ' variance=', str(variance), ' median=', str(median), ' minimum=', str(minimum))))
+
+
+
 
 #plot(dataname='run/L100.log', L=100)
 #plot(dataname='run/L20_estimate.log', L=20, observables=True)
@@ -466,15 +507,18 @@ machine = '_DeepFFNN'
 #plot('run/firstResults_FFNN/L32_estimate.log', L = 32 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original='transformed')
 
 def wrapper(i):
-    machine_names = ['JaxRBM', 'JaxSymmRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
-    plot('run/compareArchitectures/CPU/Iterations/' + machine_names[i] + '/L16.log', L = 16 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed')
-    #plot('run/compareArchitectures/CPU/Iterations/' + machine_names[i] + '/L30.log', L = 30 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed')
+    machine_names = ['JaxRBM', 'JaxSymmRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
+    #plot('run/compareArchitectures/CPU/Iterations/' + machine_names[i] + '/L16.log', L = 16 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed')
+    plot('run/compareArchitectures/CPU/Iterations/' + machine_names[i] + '/1L30.log', L = 30 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed')
 
 
 with Pool(8) as p:
     pass
-    #p.map(wrapper, [0, 2, 3, 4, 5, 6, 7, 8])
+    #p.map(wrapper, [0, 2, 3, 4, 5, 6, 7, 8, 9])
 
 
 #plot('run/observableArchitekture/JaxDeepConvNN/L14_estimate.log', L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
 #plot('run/observableArchitekture/JaxDeepFFNN/L14_estimate.log', L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
+
+#machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
+#compareArchitektures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
