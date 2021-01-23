@@ -5,7 +5,7 @@ using the function get_machine.
 If a pretrained machine is loaded, you get an optimizer and sampler using the function load_machine
 
 This project requires the following libraries:
-netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm
+netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib
 
 This file contains the following functions:
 

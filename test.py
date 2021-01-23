@@ -8,7 +8,7 @@ The supported machines are defined in my_machines.py, the supported hamiltonians
 To use this file, you have to import it and use its functions.
 
 This project requires the following libraries:
-netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm
+netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib
 
 This file contains the following functions:
 

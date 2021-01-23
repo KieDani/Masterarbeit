@@ -2,6 +2,9 @@
 
 I added some helpful functions that I use in my other files.
 
+This project requires the following libraries:
+netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib
+
 This file contains the following functions:
 
     * Lanczos

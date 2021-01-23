@@ -5,7 +5,7 @@ So far, the Heisnbergchain and the AKLT model are implemented.
 Use the method get_hamiltonian to create hamiltonian, graph and hilbert space.
 
 This project requires the following libraries:
-netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm
+netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib
 This file contains the following functions:
 
     * build_Heisenbergchain_S1
