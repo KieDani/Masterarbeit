@@ -1,3 +1,18 @@
+"""Implementation of some functions to plot the results.
+
+This project requires the following libraries:
+netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib
+
+This file contains the following functions:
+
+    * plot
+    * compare_original_transformed
+    * present
+    * plot_startingpoints
+    * plot_Sr
+    * plot_operator_both_sides
+    * compareArchitectures
+"""
 # Load the data from the .log file
 import json
 import matplotlib.pyplot as plt
@@ -8,6 +23,16 @@ from multiprocessing import Pool
 
 
 def plot(dataname, L, observables=True, symmetric_operator = False, periodic=False, transformed_or_original = 'transformed'):
+    """Function to plot the results of the calculations
+        Multiple possibilities to plot the results
+
+            Args:
+                dataname (str) : the dataname (with the relative path)
+                L (int) : Lattice size
+                symmetric_operator (bool) : if the observable is measured symmetrically to the center
+                periodic (bool) : if exact results of the periodic lattice are plotted
+                transformed_or_original (str) : which hamiltonian is used. 'transformed' or 'original'
+                                                    """
     data=json.load(open(dataname))
     # Extract the relevant information
 
@@ -100,6 +125,8 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
 
 
 def compare_original_transformed(L, periodic=False):
+    """comparison of the exact results of the original and periodic heisenberg hamiltonian
+    """
     if(periodic==True):
         dataname = ''.join(('run/exact_periodic_original/L', str(L), '_exact.csv'))
         dataname2 = ''.join(('run/exact_periodic_transformed/L', str(L), '_exact.csv'))
@@ -126,6 +153,7 @@ def compare_original_transformed(L, periodic=False):
 
 # Ls should be an array with 4 Elements
 def present(Ls, path):
+    """function to visalize multiple plots at once"""
 
     #a = x data, b = f(x), c = expected energy
     def plot4me(a, b, c, text='Energy-Iterations'):
@@ -207,6 +235,7 @@ def present(Ls, path):
 
 
 def plot_startingpoints(dataname, L, fast=True):
+    """plots results of the observable for multiple starting points"""
     data = json.load(open(dataname))
     # Extract the relevant information
 
@@ -262,6 +291,7 @@ def plot_startingpoints(dataname, L, fast=True):
 
 
 def plot_Sr(path, L):
+    """compares multiple Sr values"""
     def calcMean(array):
         length = np.minimum(15, len(array))
         sum = 0.
@@ -333,6 +363,7 @@ def plot_Sr(path, L):
 
 
 def plot_operator_both_sides(dataname, L):
+    """plot of operator. One is starting at the center going to the left. The other is going to the right."""
     data = json.load(open(dataname))
     # Extract the relevant information
 
@@ -376,6 +407,59 @@ def plot_operator_both_sides(dataname, L):
         plt.legend()
     plt.title('operator-distance')
     plt.show()
+
+
+def compareArchitectures(machine_names, path, L):
+    """Function to compare the results of defferent architectures.
+        Mean energy, variance, mean time, and so on are evaluated
+
+            Args:
+                machine_names (list) : list with machine names (str) as elements
+                path (str) : path to the data folder
+                L (int) : Lattice size
+                                                        """
+    for machine_name in machine_names:
+        deviations_energy = list()
+        times = list()
+        for i in range(0, 5):
+            try:
+                dataname = ''.join((path, machine_name, '/', str(i), 'L', str(L), '.log'))
+                data = json.load(open(dataname))
+                iters = []
+                energy = []
+
+                for iteration in data["Output"]:
+                    iters.append(iteration["Iteration"])
+                    energy.append(iteration["Energy"]["Mean"])
+
+                tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674,
+                       -17.028, -18.459, -19.827, -21.250, -22.626]
+                if (L < len(tmp)):
+                    factor = tmp[L]
+                else:
+                    factor = (L - 1) * (-1.401484)
+                deviation_energy = (factor - np.mean(energy[-int(1./3*len(energy)):])) / factor
+                deviations_energy.append(deviation_energy)
+                # Time data is created at the end of the simulation -> There might be no .time data yet
+                try:
+                    with open(''.join((dataname.split('.')[0], '.time')), 'r') as reader:
+                        time = reader.read()
+                        #print(time)
+                        times.append(float(time))
+                except:
+                    pass
+            except:
+                #Results not yet finished
+                pass
+        mean = np.mean(deviations_energy)
+        median = np.median(deviations_energy)
+        variance = np.var(deviations_energy)
+        minimum = np.amin(deviations_energy)
+        maximum = np.amax(deviations_energy)
+        meantime = np.mean(times)
+        #mintime  = np.amin(times)
+        print(''.join((machine_name + '; mean=', str(mean), ' variance=', str(variance), ' median=', str(median), ' minimum=', str(minimum), ' maximum=', str(maximum), ' time=', str(meantime))))
+
 
 
 
@@ -460,13 +544,24 @@ machine = '_DeepFFNN'
 
 
 
+#plot('run/firstResults_FFNN/L16_estimate.log', L = 16 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
+#plot('run/firstResults_FFNN/L16_estimate.log', L = 16 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original='transformed')
 #plot('run/firstResults_FFNN/L32_estimate.log', L = 32 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
+#plot('run/firstResults_FFNN/L32_estimate.log', L = 32 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original='transformed')
 
 def wrapper(i):
-    machine_names = ['JaxRBM', 'JaxSymmRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
-    plot('run/compareArchitectures/CPU/Iterations/' + machine_names[i] + '/L16.log', L = 16 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed')
+    machine_names = ['JaxRBM', 'JaxSymmRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
+    #plot('run/compareArchitectures/CPU/Iterations/' + machine_names[i] + '/L16.log', L = 16 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed')
+    plot('run/compareArchitectures/CPU/Iterations/' + machine_names[i] + '/1L30.log', L = 30 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed')
 
-# with Pool(8) as p:
-#     p.map(wrapper, [0, 2, 3, 4, 5, 6, 7, 8])
 
-#plot('run/L16_estimate.log', L = 16 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
+with Pool(8) as p:
+    pass
+    #p.map(wrapper, [0, 2, 3, 4, 5, 6, 7, 8, 9])
+
+
+#plot('run/observableArchitekture/JaxDeepConvNN/L14_estimate.log', L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
+#plot('run/observableArchitekture/JaxDeepFFNN/L14_estimate.log', L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
+
+machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
+#compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)

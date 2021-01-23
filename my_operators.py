@@ -6,7 +6,7 @@ To use the operators easily, you can use the method get_operator in helping_func
 To implement the observables, I mainly used the code of NetKets BoseHubbard hamiltonian.
 
 This project requires the following libraries:
-netket, numpy, scipy, jax, jaxlib, networkx, torch
+netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib
 
 This file contains the following classes:
 
@@ -34,10 +34,10 @@ class StringCorrelation(AbstractOperator):
         r"""
         Constructs a new stringcorrelationoperator.
 
-        Args:
-           hilbert (netket.hilbert.Boson): Hilbert space the operator acts on.
-           j (int): The Operator starts at site j.
-           k (int) : The Operator ends at site k.
+            Args:
+               hilbert (netket.hilbert.Boson): Hilbert space the operator acts on.
+               j (int): The Operator starts at site j.
+               k (int) : The Operator ends at site k.
 
         """
         self._j = j
@@ -45,7 +45,8 @@ class StringCorrelation(AbstractOperator):
         self._hilbert = hilbert
         self._n_sites = hilbert.size
         self._section = hilbert.size + 1
-        self._edges = _np.asarray(hilbert.graph.edges())
+        #self._edges = _np.asarray(hilbert.graph.edges())
+        self._edges = None
         super().__init__()
 
     @property
@@ -197,7 +198,8 @@ class FerroCorrelationZ(AbstractOperator):
         self._hilbert = hilbert
         self._n_sites = hilbert.size
         self._section = hilbert.size + 1
-        self._edges = _np.asarray(hilbert.graph.edges())
+        #self._edges = _np.asarray(hilbert.graph.edges())
+        self._edges = None
         super().__init__()
 
     @property

@@ -5,7 +5,7 @@ So far, the Heisnbergchain and the AKLT model are implemented.
 Use the method get_hamiltonian to create hamiltonian, graph and hilbert space.
 
 This project requires the following libraries:
-netket, numpy, scipy, jax, jaxlib, networkx, torch
+netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib
 This file contains the following functions:
 
     * build_Heisenbergchain_S1
@@ -23,10 +23,11 @@ import sys
 
 def build_Heisenbergchain_S1(L, periodic = False):
     """Loading the Heisenberg chain
+        The original Heisenberg chain is created
 
-     Args:
-        L (int) : The number of sites of the lattice
-        periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
+             Args:
+                L (int) : The number of sites of the lattice
+                periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
                 """
     print('Building the normal S=1 Heisenberg chain')
     J = [1]
@@ -43,7 +44,7 @@ def build_Heisenbergchain_S1(L, periodic = False):
     #print('This graph has ' + str(g.n_nodes) + ' sites')
     #print('with the following set of edges: ' + str(g.n_edges))
 
-    hi = nk.hilbert.Spin(s=1, graph=g)
+    hi = nk.hilbert.Spin(s=1, N=g.n_nodes)
 
     # Pauli Matrices for Spin 1
     sigmax = 1. / np.sqrt(2) * np.asarray([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
@@ -58,7 +59,7 @@ def build_Heisenbergchain_S1(L, periodic = False):
     ]
 
     # Custom Graph Hamiltonian operator
-    ha = nk.operator.GraphOperator(hi, bond_ops=bond_operator)
+    ha = nk.operator.GraphOperator(hi, g, bond_ops=bond_operator)
 
     return ha, hi, g
 
@@ -66,10 +67,11 @@ def build_Heisenbergchain_S1(L, periodic = False):
 #TODO check, if the results are correct
 def build_AKLTchain(L, periodic = False):
     """Loading the AKLT chain
+        The original AKLT chain is loaded
 
-    Args:
-        L (int) : The number of sites of the lattice
-        periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
+            Args:
+                L (int) : The number of sites of the lattice
+                periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
                 """
     print('Building the normal AKLT chain')
     J = [1]
@@ -86,7 +88,7 @@ def build_AKLTchain(L, periodic = False):
     #print('This graph has ' + str(g.n_nodes) + ' sites')
     #print('with the following set of edges: ' + str(g.n_edges))
 
-    hi = nk.hilbert.Spin(s=1, graph=g)
+    hi = nk.hilbert.Spin(s=1, N=g.n_nodes)
 
     # Pauli Matrices for Spin 1
     sigmax = 1. / np.sqrt(2) * np.asarray([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
@@ -103,19 +105,18 @@ def build_AKLTchain(L, periodic = False):
     ]
 
     # Custom Graph Hamiltonian operator
-    ha = nk.operator.GraphOperator(hi, bond_ops=bond_operator)
+    ha = nk.operator.GraphOperator(hi, g, bond_ops=bond_operator)
 
     return ha, hi, g
 
 
 def build_Heisenbergchain_S1_transformed(L, periodic = False):
     """Loading the transformed Heisenberg chain. See https://doi.org/10.1007/BF02097239
-
         The transformed model is easier to solve with NetKet.
 
-    Args:
-            L (int) : The number of sites of the lattice
-            periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
+            Args:
+                L (int) : The number of sites of the lattice
+                periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
                 """
     print('Building the transformed S=1 Heisenberg chain')
     J = [1]
@@ -133,7 +134,7 @@ def build_Heisenbergchain_S1_transformed(L, periodic = False):
     #print('This graph has ' + str(g.n_nodes) + ' sites')
     #print('with the following set of edges: ' + str(g.n_edges))
 
-    hi = nk.hilbert.Spin(s=1, graph=g)
+    hi = nk.hilbert.Spin(s=1, N=g.n_nodes)
 
     interaction = np.asarray([[-1, 0, 0, 0, -1, 0, 0, 0, 0], [0, 0, 0, -1, 0, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0],
                               [0, -1, 0, 0, 0, 0, 0, 0, 0], [-1, 0, 0, 0, 0, 0, 0, 0, -1], [0, 0, 0, 0, 0, 0, 0, -1, 0],
@@ -144,7 +145,7 @@ def build_Heisenbergchain_S1_transformed(L, periodic = False):
     ]
 
     # Custom Graph Hamiltonian operator
-    ha = nk.operator.GraphOperator(hi, bond_ops=bond_operator)
+    ha = nk.operator.GraphOperator(hi, g, bond_ops=bond_operator)
 
     return ha, hi, g
 
@@ -152,12 +153,11 @@ def build_Heisenbergchain_S1_transformed(L, periodic = False):
 #TODO check, if the results are correct
 def build_AKLTchain_transformed(L, periodic = False):
     """Loading the transformed Heisenberg chain. See https://doi.org/10.1007/BF02097239
-
         The transformed model is easier to solve with NetKet.
 
-    Args:
-            L (int) : The number of sites of the lattice
-            periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
+            Args:
+                L (int) : The number of sites of the lattice
+                periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
                 """
     print('Building the normal AKLT chain')
     J = [1]
@@ -174,9 +174,9 @@ def build_AKLTchain_transformed(L, periodic = False):
     #print('This graph has ' + str(g.n_nodes) + ' sites')
     #print('with the following set of edges: ' + str(g.n_edges))
 
-    hi = nk.hilbert.Spin(s=1, graph=g)
+    hi = nk.hilbert.Spin(s=1, N=g.n_nodes)
 
-    # Pauli Matrices for Spin 1
+    # Pauli Matrices for Spin_size_1_t 1
     sigmax = 1. / np.sqrt(2) * np.asarray([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
     sigmaz = np.asarray([[1, 0, 0], [0, 0, 0], [0, 0, -1]])
     sigmay = 1. / np.sqrt(2) * np.asarray([[0, -1j, 0], [1j, 0, -1j], [0, 1j, 0]])
@@ -193,19 +193,20 @@ def build_AKLTchain_transformed(L, periodic = False):
     ]
 
     # Custom Graph Hamiltonian operator
-    ha = nk.operator.GraphOperator(hi, bond_ops=bond_operator)
+    ha = nk.operator.GraphOperator(hi, g, bond_ops=bond_operator)
 
     return ha, hi, g
 
 
 def get_hamiltonian(hamiltonian_name, L, periodic = False):
     """Method to choose the desired model.
+        Mutiple models can be easily chosen.
 
-    Args:
-        L (int) : The number of sites of the lattice
-        periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
-        hamiltonian_name (str) : Possible Inputs are 'transformed_Heisenberg', 'original_heisenberg',
-            'transformed_AKLT', 'original_AKLT'
+            Args:
+                L (int) : The number of sites of the lattice
+                periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
+                hamiltonian_name (str) : Possible Inputs are 'transformed_Heisenberg', 'original_heisenberg',
+                        'transformed_AKLT', 'original_AKLT'
                 """
     if(hamiltonian_name == 'transformed_Heisenberg'):
         return build_Heisenbergchain_S1_transformed(L, periodic)

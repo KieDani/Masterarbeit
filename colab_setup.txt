@@ -9,7 +9,7 @@ drive.mount('/content/drive')
 %cd 'drive/My Drive/Masterarbeit/'
 
 
-%pip install numba==0.50
+%pip install numba
 
 
 #test, if netket works

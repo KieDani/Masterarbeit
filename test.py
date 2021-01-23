@@ -8,7 +8,7 @@ The supported machines are defined in my_machines.py, the supported hamiltonians
 To use this file, you have to import it and use its functions.
 
 This project requires the following libraries:
-netket, numpy, scipy, jax, jaxlib, networkx, torch
+netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib
 
 This file contains the following functions:
 
@@ -42,20 +42,20 @@ __alpha__ = 4
 def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples = __number_samples__, n_iterations = __number_iterations__):
     """Method to train a machine.
 
-    A hamiltonian and sampler can be chosen. The machine is defined and trained for the hamiltonian.
+        A hamiltonian and sampler can be chosen. The machine is defined and trained for the hamiltonian.
 
-    Args:
-        L (int) : The number of sites of the lattice
-        alpha (int) : A factor to define the size of different machines
-        sr (float) : The parameter for stochastic reconfiguration method. If it is None, stochastic reconfiguration is not used
-        dataname (str) : The dataname. If None, an automatic dataname is chosen
-        path (str) : The directory, where the results are saved. If None, the directory is 'run'
-        machine_name (str) A string to choose the machine. Possible inputs: See get_machine in my_machines.py
-        sampler (str) : A string to choose the sampler: Recommended: 'Local' (this works with every machine)
-        hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
-        n_samples (int) : The number of samples used in every iteration step
-        n_iterations (int) : The number of iterations (training steps)
-            """
+            Args:
+                L (int) : The number of sites of the lattice.
+                alpha (int) : A factor to define the size of different machines.
+                sr (float) : The parameter for stochastic reconfiguration method. If it is None, stochastic reconfiguration is not used.
+                dataname (str) : The dataname. If None, an automatic dataname is chosen
+                path (str) : The directory, where the results are saved. If None, the directory is 'run'
+                machine_name (str) A string to choose the machine. Possible inputs: See get_machine in my_machines.py
+                sampler (str) : A string to choose the sampler: Recommended: 'Local' (this works with every machine)
+                hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
+                n_samples (int) : The number of samples used in every iteration step
+                n_iterations (int) : The number of iterations (training steps)
+                                                    """
     ha, hi, g = models.get_hamiltonian(hamiltonian_name, L)
     print('uses', hamiltonian_name, 'hamiltonian')
     sys.stdout.flush()
@@ -89,17 +89,17 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
 
         A hamiltonian and sampler can be chosen. The machine is defined and trained for the hamiltonian.
 
-    Args:
-        L (int) : The number of sites of the lattice
-        alpha (int) : A factor to define the size of different machines
-        sr (float) : The parameter for stochastic reconfiguration method. If it is None, stochastic reconfiguration is not used
-        dataname (str) : The dataname. If None, an automatic dataname is chosen
-        path (str) : The directory, where the results are saved. If None, the directory is 'run'
-        machine_name (str) A string to choose the machine. Possible inputs: See get_machine in my_machines.py
-        sampler (str) : A string to choose the sampler: Recommended: 'Local' (this works with every machine)
-        hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
-        n_samples (int) : The number of samples used in every iteration step
-        n_iterations (int) : The number of iterations (training steps)
+            Args:
+                L (int) : The number of sites of the lattice
+                alpha (int) : A factor to define the size of different machines
+                sr (float) : The parameter for stochastic reconfiguration method. If it is None, stochastic reconfiguration is not used
+                dataname (str) : The dataname. If None, an automatic dataname is chosen
+                path (str) : The directory, where the results are saved. If None, the directory is 'run'
+                machine_name (str) A string to choose the machine. Possible inputs: See get_machine in my_machines.py
+                sampler (str) : A string to choose the sampler: Recommended: 'Local' (this works with every machine)
+                hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
+                n_samples (int) : The number of samples used in every iteration step
+                n_iterations (int) : The number of iterations (training steps)
 
                 """
     if (dataname == None):
@@ -141,14 +141,14 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
         and a observable is evaluated with the power method.
         Use this only for small lattices, because it needs an awful lot of RAM.
 
-    Args:
-        L (int): The number of sites of the lattice
-        symmetric (bool) :
-            If True, the evaluated observable is symmetric to the center of the lattice.
-            If false, it starts at one end of the lattice.
-        dataname (str) : The dataname. If None, an automatic dataname is chosen
-        path (str) : The directory, where the results are saved. If None, the directory is 'run'
-        hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: 'transformed_Heisenberg', 'original_Heisenberg'
+            Args:
+                L (int): The number of sites of the lattice
+                symmetric (bool) :
+                    If True, the evaluated observable is symmetric to the center of the lattice.
+                    If false, it starts at one end of the lattice.
+                dataname (str) : The dataname. If None, an automatic dataname is chosen
+                path (str) : The directory, where the results are saved. If None, the directory is 'run'
+                hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: 'transformed_Heisenberg', 'original_Heisenberg'
 
                 """
     ha, hi, g = models.get_hamiltonian(hamiltonian_name, L)
@@ -243,9 +243,16 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.1)
+# alpha = int(alpha0 * 0.07)
 # print(alpha)
 # machine_name = 'JaxDeepFFNN'
+# generate_machine = machines.get_machine(machine_name)
+# ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+# print(machine_name, ma.n_par, compare/ma.n_par)
+#
+# alpha = int(0.14*alpha0)
+# print(alpha)
+# machine_name = 'JaxDeepConvNN'
 # generate_machine = machines.get_machine(machine_name)
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
@@ -314,9 +321,16 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.10)
+# alpha = int(alpha0 * 0.07)
 # print(alpha)
 # machine_name = 'JaxDeepFFNN'
+# generate_machine = machines.get_machine(machine_name)
+# ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+# print(machine_name, ma.n_par, compare/ma.n_par)
+#
+# alpha = int(0.12*alpha0)
+# print(alpha)
+# machine_name = 'JaxDeepConvNN'
 # generate_machine = machines.get_machine(machine_name)
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
@@ -384,9 +398,16 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.1)
+# alpha = int(alpha0 * 0.07)
 # print(alpha)
 # machine_name = 'JaxDeepFFNN'
+# generate_machine = machines.get_machine(machine_name)
+# ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+# print(machine_name, ma.n_par, compare/ma.n_par)
+#
+# alpha = int(0.11*alpha0)
+# print(alpha)
+# machine_name = 'JaxDeepConvNN'
 # generate_machine = machines.get_machine(machine_name)
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
