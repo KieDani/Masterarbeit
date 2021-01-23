@@ -106,12 +106,13 @@ class _JaxVBSKernel:
 
 def getVBSSampler(machine):
     """Method to easily create a Metropolis Hastings sampler with _JaxVBSKernel.
+        The sampler does not solve the problems with the original AKLT and Heisenberg chain
 
-        Args:
-            hilbert (netket.machine) : machine
+            Args:
+                hilbert (netket.machine) : machine
 
-        Returns:
-            sampler (netket.sampler) : sampler
+            Returns:
+                sampler (netket.sampler) : sampler
                                                         """
     kernel = _JaxVBSKernel(local_states=machine.hilbert._local_states, size=machine.hilbert._size)
     sampler = nk.sampler.jax.MetropolisHastings(machine, kernel, n_chains=16, sweep_size=1)

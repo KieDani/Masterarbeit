@@ -1,0 +1,1176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>plot API documentation</title>
+<meta name="description" content="Implementation of some functions to plot the results …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>plot</code></h1>
+</header>
+<section id="section-intro">
+<p>Implementation of some functions to plot the results.</p>
+<p>This project requires the following libraries:
+netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib</p>
+<p>This file contains the following functions:</p>
+<pre><code>* plot
+* compare_original_transformed
+* present
+* plot_startingpoints
+* plot_Sr
+* plot_operator_both_sides
+* compareArchitectures
+</code></pre>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;Implementation of some functions to plot the results.
+
+This project requires the following libraries:
+netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib
+
+This file contains the following functions:
+
+    * plot
+    * compare_original_transformed
+    * present
+    * plot_startingpoints
+    * plot_Sr
+    * plot_operator_both_sides
+    * compareArchitectures
+&#34;&#34;&#34;
+# Load the data from the .log file
+import json
+import matplotlib.pyplot as plt
+import numpy as np
+import helping_functions as functions
+from multiprocessing import Pool
+
+
+
+def plot(dataname, L, observables=True, symmetric_operator = False, periodic=False, transformed_or_original = &#39;transformed&#39;):
+    &#34;&#34;&#34;Function to plot the results of the calculations
+        Multiple possibilities to plot the results
+
+            Args:
+                dataname (str) : the dataname (with the relative path)
+                L (int) : Lattice size
+                symmetric_operator (bool) : if the observable is measured symmetrically to the center
+                periodic (bool) : if exact results of the periodic lattice are plotted
+                transformed_or_original (str) : which hamiltonian is used. &#39;transformed&#39; or &#39;original&#39;
+                                                    &#34;&#34;&#34;
+    data=json.load(open(dataname))
+    # Extract the relevant information
+
+    length = L
+
+    iters=[]
+    energy=[]
+    sfs_fast = list()
+    xAxis_fast = list()
+
+    for iteration in data[&#34;Output&#34;]:
+        iters.append(iteration[&#34;Iteration&#34;])
+        energy.append(iteration[&#34;Energy&#34;][&#34;Mean&#34;])
+
+    def calcMean(array):
+        length = np.minimum(15, len(array))
+        sum = 0.
+        for i in range(length):
+            sum += array[-i+0]
+        return sum / float(length)
+
+    def getsf(i):
+        sf = list()
+        for iteration in data[&#34;Output&#34;]:
+            if(symmetric_operator == True):
+                try:
+                    sf.append(iteration[&#39;Symmetric_Ferro_correlation_function&#39; + str(i)][&#34;Mean&#34;])
+                except:
+                    print(&#39;Symmetric operator is plotted. If I do not plot old data, I probably made a mistake!&#39;)
+                    sf.append(iteration[&#39;Ferro_correlation_function&#39; + str(i)][&#34;Mean&#34;])
+            else:
+                sf.append(iteration[&#39;Ferro_correlation_function&#39; + str(i)][&#34;Mean&#34;])
+        return calcMean(sf)
+
+    plt.plot(iters, energy)
+    if(periodic == False):
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+    else:
+        if(transformed_or_original == &#39;transformed&#39;):
+            #energy of transformed hamiltonian
+            tmp = [None, None, None, None, -6.000, -7.096, -8.617, -9.863, -11.337, -12.647, -14.094, -15.438, -16.870, -18.234, -19.655, -21.032, -22.447, -23.832 ]
+        else:
+            #energy of the normal hamiltonian
+            tmp = [None, None, None, None, -5.999, -6.531, -8.617, -9.572, -11.337, -12.480, -14.094, -15.337, -16.870, -18.170, -19.655, -20.991, -22.447 ]
+    if (L &lt; len(tmp)):
+        factor = tmp[L]
+    else:
+        factor = (L - 1) * (-1.4)
+    expected_energy = np.ones_like(np.asarray(iters)) * factor
+    print(dataname + &#39;; (E_exact - E)/E_exact = &#39; + str((factor - np.mean(energy[-int(1./3 * len(energy)):])) / factor))
+    plt.plot(iters, expected_energy, color=&#39;red&#39;)
+    plt.title(dataname)
+    plt.xlabel(&#39;Iteration&#39;)
+    plt.ylabel(&#39;Energy&#39;)
+    plt.show()
+
+    if(observables == True):
+        if(symmetric_operator == True):
+            for i in range(1, int(L / 2.)):
+                sfs_fast.append(getsf(2*i))
+                xAxis_fast.append(2*i)
+                if(periodic == False):
+                    dataname_operator = &#39;&#39;.join((&#39;run/exact_symmetricOperator_&#39;, transformed_or_original , &#39;/L&#39;, str(L), &#39;_exact.csv&#39;))
+                else:
+                    dataname_operator = &#39;&#39;.join((&#39;run/exact_periodic_symmetricOperator_&#39;, transformed_or_original , &#39;/L&#39;, str(L), &#39;_exact.csv&#39;))
+        else:
+            for i in range(1, length):
+                sfs_fast.append(getsf(i))
+                xAxis_fast.append(i)
+                if(periodic == False):
+                    dataname_operator = &#39;&#39;.join((&#39;run/exact_&#39;, transformed_or_original , &#39;/L&#39;, str(L), &#39;_exact.csv&#39;))
+                else:
+                    dataname_operator = &#39;&#39;.join((&#39;run/exact_periodic_&#39;, transformed_or_original , &#39;/L&#39;, str(L), &#39;_exact.csv&#39;))
+
+        plt.plot(xAxis_fast, sfs_fast)
+        try:
+            operator = -1 * np.loadtxt(dataname_operator)
+            if(transformed_or_original == &#39;transformed&#39;): operator = operator * -1
+            if(symmetric_operator == True):
+                x_operator = np.arange(2, 2*len(operator)+1, 2)
+            else:
+                x_operator = np.arange(1, len(operator)+1)
+        except:
+            print(dataname_operator)
+            operator = 0.374 * np.ones(len(xAxis_fast))
+            x_operator = xAxis_fast
+        plt.plot(x_operator, operator, color=&#39;red&#39;)
+        plt.title(dataname)
+        plt.show()
+
+
+def compare_original_transformed(L, periodic=False):
+    &#34;&#34;&#34;comparison of the exact results of the original and periodic heisenberg hamiltonian
+    &#34;&#34;&#34;
+    if(periodic==True):
+        dataname = &#39;&#39;.join((&#39;run/exact_periodic_original/L&#39;, str(L), &#39;_exact.csv&#39;))
+        dataname2 = &#39;&#39;.join((&#39;run/exact_periodic_transformed/L&#39;, str(L), &#39;_exact.csv&#39;))
+    else:
+        dataname = &#39;&#39;.join((&#39;run/exact_original/L&#39;, str(L), &#39;_exact.csv&#39;))
+        dataname2 = &#39;&#39;.join((&#39;run/exact_transformed/L&#39;, str(L), &#39;_exact.csv&#39;))
+    try:
+        operator_orig = -1 * np.loadtxt(dataname)
+        x_operator_orig = np.arange(1, len(operator_orig) + 1)
+        operator_trans = +1 * np.loadtxt(dataname2)
+        x_operator_trans = np.arange(1, len(operator_trans) + 1)
+        operator_inf = 0.374 * np.ones(len(x_operator_orig))
+    except:
+        print(&#39;L is too large&#39;)
+    plt.plot(x_operator_orig, operator_orig, color=&#39;green&#39;, label=&#39;original Hamiltonian&#39;)
+    plt.plot(x_operator_trans, operator_trans, color=&#39;blue&#39;, label=&#39;transformed Hamiltonian&#39;)
+    plt.plot(x_operator_orig, operator_inf, color=&#39;red&#39;, label=&#39;expected infinity value&#39;)
+    plt.title(&#39;Compare observable for periodic lattice&#39;)
+    plt.xlabel(&#39;distance between sites&#39;)
+    plt.ylabel(&#39;Observable&#39;)
+    plt.legend()
+    plt.show()
+
+
+# Ls should be an array with 4 Elements
+def present(Ls, path):
+    &#34;&#34;&#34;function to visalize multiple plots at once&#34;&#34;&#34;
+
+    #a = x data, b = f(x), c = expected energy
+    def plot4me(a, b, c, text=&#39;Energy-Iterations&#39;):
+        plt.subplot(221)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
+        plt.plot(a[0], b[0])
+        if(c != None): plt.plot(a[0], c[0])
+        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[0]))))
+        plt.subplot(222)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
+        plt.plot(a[1], b[1])
+        if (c != None): plt.plot(a[1], c[1])
+        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[1]))))
+        plt.subplot(223)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
+        plt.plot(a[2], b[2])
+        if (c != None): plt.plot(a[2], c[2])
+        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[2]))))
+        plt.subplot(224)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
+        plt.plot(a[3], b[3])
+        if (c != None): plt.plot(a[3], c[3])
+        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[3]))))
+        plt.show()
+
+    iters_list = []
+    energy_list = []
+    sfs_fast_list = []
+    xAxis_fast_list = []
+    expected_energy_list = []
+    for j in range(0, len(Ls)):
+        l = Ls[j]
+        print(&#39;&#39;.join((path, &#39;/L&#39;, str(l), &#39;.log&#39;)))
+        data_energy = json.load(open(&#39;&#39;.join((path, &#39;/L&#39;, str(l), &#39;.log&#39;))))
+        data_observ = json.load(open(&#39;&#39;.join((path, &#39;/L&#39;, str(l), &#39;_estimate.log&#39;))))
+        # Extract the relevant information
+
+        length = l
+
+        iters = []
+        energy = []
+        sfs_fast = list()
+        xAxis_fast = list()
+
+        for iteration in data_energy[&#34;Output&#34;]:
+            iters.append(iteration[&#34;Iteration&#34;])
+            energy.append(iteration[&#34;Energy&#34;][&#34;Mean&#34;])
+
+        def calcMean(array):
+            length = np.minimum(15, len(array))
+            print(length)
+            sum = 0.
+            for i in range(length):
+                sum += array[-i + 0]
+            return sum / float(length)
+
+        def getsf(i):
+            sf = list()
+            for iteration in data_observ[&#34;Output&#34;]:
+                sf.append(iteration[&#39;Ferro_correlation_function&#39; + str(i)][&#34;Mean&#34;])
+            return calcMean(sf)
+
+        for i in range(1, length):
+            sfs_fast.append(getsf(i))
+            xAxis_fast.append(i)
+
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+        if(l &lt; len(tmp)):
+            factor = tmp[l]
+        else:
+            factor = (l-1) * (-1.4)
+        expected_energy = np.ones_like(np.asarray(iters)) * factor
+
+        expected_energy_list.append(expected_energy)
+        iters_list.append(np.asarray(iters))
+        energy_list.append(np.asarray(energy))
+        sfs_fast_list.append(np.asarray(sfs_fast))
+        xAxis_fast_list.append(np.asarray(xAxis_fast))
+
+    plot4me(iters_list, energy_list, expected_energy_list, text=&#39;Energy-Iteration&#39;)
+    plot4me(xAxis_fast_list, sfs_fast_list, None, text=&#39;operator-site&#39;)
+
+
+
+def plot_startingpoints(dataname, L, fast=True):
+    &#34;&#34;&#34;plots results of the observable for multiple starting points&#34;&#34;&#34;
+    data = json.load(open(dataname))
+    # Extract the relevant information
+
+    iters = []
+    energy = []
+
+    for iteration in data[&#34;Output&#34;]:
+        iters.append(iteration[&#34;Iteration&#34;])
+        energy.append(iteration[&#34;Energy&#34;][&#34;Mean&#34;])
+
+    def calcMean(array):
+        length = np.minimum(15, len(array))
+        sum = 0.
+        for i in range(length):
+            sum += array[-i + 0]
+        return sum / float(length)
+
+    def getsf(j, k):
+        sf = list()
+        for iteration in data[&#34;Output&#34;]:
+            sf.append(iteration[&#39;&#39;.join((str(j), &#39;Ferro_correlation_function&#39;, str(k - j)))][&#34;Mean&#34;])
+        return calcMean(sf)
+
+    plt.plot(iters, energy)
+    tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+    if (L &lt; len(tmp)):
+        factor = tmp[L]
+    else:
+        factor = (L - 1) * (-1.4)
+    expected_energy = np.ones_like(np.asarray(iters)) * factor
+    plt.plot(iters, expected_energy, color = &#39;red&#39;)
+    #print(energy +np.ones(len(iters)) * (L-1) * 1.4)
+    plt.title(&#39;Energy-iteration&#39;)
+    plt.show()
+
+    colors = [&#39;black&#39;, &#39;brown&#39;, &#39;grey&#39;, &#39;green&#39;, &#39;blue&#39;, &#39;orange&#39;, &#39;yellow&#39;]
+    for start, j in enumerate([1, 2, 3, int(L/4.), int(L/2.)]):
+        sfs_fast = list()
+        xAxis_fast = list()
+        if(fast == True):
+            max_range = L
+        else:
+            max_range = np.minimum(j + 8, L)
+        for k in range(j + 1, max_range):
+            sfs_fast.append(getsf(j, k))
+            xAxis_fast.append(k-j)
+
+        plt.plot(xAxis_fast, sfs_fast, color= colors[start], label=&#39;&#39;.join((&#39;startingpoint: &#39;, str(j))))
+        plt.plot(xAxis_fast, 0.374 * np.ones(len(xAxis_fast)), color = &#39;red&#39;)
+        plt.legend()
+    plt.title(&#39;operator-distance&#39;)
+    plt.show()
+
+
+def plot_Sr(path, L):
+    &#34;&#34;&#34;compares multiple Sr values&#34;&#34;&#34;
+    def calcMean(array):
+        length = np.minimum(15, len(array))
+        sum = 0.
+        for i in range(length):
+            sum += array[-i + 0]
+        return sum / float(length)
+
+    def getsf(i, data):
+        sf = list()
+        for iteration in data[&#34;Output&#34;]:
+            sf.append(iteration[&#39;Ferro_correlation_function&#39; + str(i)][&#34;Mean&#34;])
+        return calcMean(sf)
+
+    iterations = list()
+    energies = list()
+    strincorrs = list()
+    xes = list()
+    Sr = [0.01, 0.1,  1, 10, None]
+    for i, sr in enumerate(Sr):
+        sr_string = &#39;_&#39;.join((str(sr).split(&#39;.&#39;)))
+        dataname = &#39;&#39;.join((path, &#39;Sr&#39;, sr_string, &#39;L&#39;, str(L), &#39;.log&#39;))
+        dataname2 = &#39;&#39;.join((path, &#39;Sr&#39;, sr_string, &#39;L&#39;, str(L), &#39;_estimate.log&#39;))
+        data = json.load(open(dataname))
+        data2 = json.load(open(dataname2))
+        iters = []
+        energy = []
+        for iteration in data[&#34;Output&#34;]:
+            iters.append(iteration[&#34;Iteration&#34;])
+            energy.append(iteration[&#34;Energy&#34;][&#34;Mean&#34;])
+        iterations.append(np.asarray(iters))
+        energies.append(np.asarray(energy))
+
+        sfs_fast = list()
+        xAxis_fast = list()
+        for i in range(1, int(L / 2.)):
+            sfs_fast.append(getsf(2 * i, data2))
+            xAxis_fast.append(2 * i)
+        strincorrs.append(np.asarray(sfs_fast))
+        xes.append(np.asarray(xAxis_fast))
+
+    fig, axes = plt.subplots(2, 3)
+    for i in range(0, len(Sr)):
+        fig.suptitle(&#39;Energy - Iterations&#39;)
+        axes[int(i / 3), i % 3].plot(iterations[i], energies[i])
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+        if (L &lt; len(tmp)):
+            factor = tmp[L]
+        else:
+            factor = (L - 1) * (-1.4)
+        expected_energy = np.ones_like(np.asarray(iters)) * factor
+        axes[int(i / 3), i % 3].plot(iters, expected_energy, color=&#39;red&#39;)
+        axes[int(i / 3), i % 3].set_title(&#39;&#39;.join((&#39;Sr&#39;, str(Sr[i]), &#39;L&#39;, str(L), &#39;.log&#39;)))
+    plt.show()
+    fig, axes = plt.subplots(2, 3)
+    for i in range(0, len(Sr)):
+        fig.suptitle(&#39;Stringcorrelation - distance&#39;)
+        print(strincorrs[i])
+        axes[int(i / 3), i % 3].plot(xes[i], strincorrs[i])
+        try:
+            dataname = &#39;&#39;.join((&#39;run/exact_original/L&#39;, str(L), &#39;_exact.csv&#39;))
+            operator = -1 * np.loadtxt(dataname)
+            x_operator = np.arange(1, len(operator)+1)
+        except:
+            operator = 0.374 * np.ones(len(xAxis_fast))
+            x_operator = xAxis_fast
+        axes[int(i / 3), i % 3].plot(x_operator, operator, color=&#39;red&#39;)
+        axes[int(i / 3), i % 3].set_title(&#39;&#39;.join((&#39;Sr&#39;, str(Sr[i]), &#39;L&#39;, str(L), &#39;.log&#39;)))
+    plt.show()
+
+
+def plot_operator_both_sides(dataname, L):
+    &#34;&#34;&#34;plot of operator. One is starting at the center going to the left. The other is going to the right.&#34;&#34;&#34;
+    data = json.load(open(dataname))
+    # Extract the relevant information
+
+    iters = []
+    energy = []
+
+    for iteration in data[&#34;Output&#34;]:
+        iters.append(iteration[&#34;Iteration&#34;])
+        energy.append(iteration[&#34;Energy&#34;][&#34;Mean&#34;])
+
+    def calcMean(array):
+        length = np.minimum(15, len(array))
+        sum = 0.
+        for i in range(length):
+            sum += array[-i + 0]
+        return sum / float(length)
+
+    def getsf(j, k, mirrored = &#39;&#39;):
+        sf = list()
+        for iteration in data[&#34;Output&#34;]:
+            sf.append(iteration[&#39;&#39;.join((&#39;Ferro_correlation_function&#39;, mirrored, str(k - j)))][&#34;Mean&#34;])
+        return calcMean(sf)
+
+    plt.plot(iters, energy)
+    plt.plot(iters, -np.ones(len(iters)) * (L-1) * 1.4, color = &#39;red&#39;)
+    print(energy +np.ones(len(iters)) * (L-1) * 1.4)
+    plt.title(&#39;Energy-iteration&#39;)
+    plt.show()
+
+    colors = [&#39;black&#39;, &#39;blue&#39;]
+    for index, mirrored in enumerate([&#39;&#39;, &#39;_mirrored&#39;]):
+        sfs_fast = list()
+        xAxis_fast = list()
+        max_range = L
+        for i in range(1, int(L/2.)):
+            sfs_fast.append(getsf(int(L/2.), int(L/2.) + i, mirrored=mirrored))
+            xAxis_fast.append(i)
+
+        plt.plot(xAxis_fast, sfs_fast, color= colors[index], label=&#39;&#39;.join((&#39;operator&#39;, mirrored)))
+        plt.plot(xAxis_fast, 0.374 * np.ones(len(xAxis_fast)), color = &#39;red&#39;)
+        plt.legend()
+    plt.title(&#39;operator-distance&#39;)
+    plt.show()
+
+
+def compareArchitectures(machine_names, path, L):
+    &#34;&#34;&#34;Function to compare the results of defferent architectures.
+        Mean energy, variance, mean time, and so on are evaluated
+
+            Args:
+                machine_names (list) : list with machine names (str) as elements
+                path (str) : path to the data folder
+                L (int) : Lattice size
+                                                        &#34;&#34;&#34;
+    for machine_name in machine_names:
+        deviations_energy = list()
+        times = list()
+        for i in range(0, 5):
+            try:
+                dataname = &#39;&#39;.join((path, machine_name, &#39;/&#39;, str(i), &#39;L&#39;, str(L), &#39;.log&#39;))
+                data = json.load(open(dataname))
+                iters = []
+                energy = []
+
+                for iteration in data[&#34;Output&#34;]:
+                    iters.append(iteration[&#34;Iteration&#34;])
+                    energy.append(iteration[&#34;Energy&#34;][&#34;Mean&#34;])
+
+                tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674,
+                       -17.028, -18.459, -19.827, -21.250, -22.626]
+                if (L &lt; len(tmp)):
+                    factor = tmp[L]
+                else:
+                    factor = (L - 1) * (-1.401484)
+                deviation_energy = (factor - np.mean(energy[-int(1./3*len(energy)):])) / factor
+                deviations_energy.append(deviation_energy)
+                # Time data is created at the end of the simulation -&gt; There might be no .time data yet
+                try:
+                    with open(&#39;&#39;.join((dataname.split(&#39;.&#39;)[0], &#39;.time&#39;)), &#39;r&#39;) as reader:
+                        time = reader.read()
+                        #print(time)
+                        times.append(float(time))
+                except:
+                    pass
+            except:
+                #Results not yet finished
+                pass
+        mean = np.mean(deviations_energy)
+        median = np.median(deviations_energy)
+        variance = np.var(deviations_energy)
+        minimum = np.amin(deviations_energy)
+        maximum = np.amax(deviations_energy)
+        meantime = np.mean(times)
+        #mintime  = np.amin(times)
+        print(&#39;&#39;.join((machine_name + &#39;; mean=&#39;, str(mean), &#39; variance=&#39;, str(variance), &#39; median=&#39;, str(median), &#39; minimum=&#39;, str(minimum), &#39; maximum=&#39;, str(maximum), &#39; time=&#39;, str(meantime))))
+
+
+
+
+#plot(dataname=&#39;run/L100.log&#39;, L=100)
+#plot(dataname=&#39;run/L20_estimate.log&#39;, L=20, observables=True)
+
+#present(Ls=[6, 10, 15, 20], path=&#39;results/Sr&#39;)
+
+#plot_startingpoints(&#39;run/startingpoint_superpower/L30_estimate.log&#39;, 30, fast=True)
+
+
+
+#results operator both sides
+
+
+#RBM
+L=40
+machine = &#39;_RBM&#39;
+#plot(dataname=&#39;run/operator_both_sides&#39;+ machine + &#39;/L&#39; + str(L) + &#39;.log&#39;, L=L, observables=False)
+#plot_operator_both_sides(dataname=&#39;run/operator_both_sides&#39; + machine + &#39;/L&#39; + str(L) + &#39;_estimate.log&#39;, L=L)
+
+#SymRBM
+L=40
+machine = &#39;_SymRBM&#39;
+#plot(dataname=&#39;run/operator_both_sides&#39;+ machine + &#39;/L&#39; + str(L) + &#39;.log&#39;, L=L, observables=False)
+#plot_operator_both_sides(dataname=&#39;run/operator_both_sides&#39; + machine + &#39;/L&#39; + str(L) + &#39;_estimate.log&#39;, L=L)
+
+
+#DeepFFNN
+L=40
+machine = &#39;_DeepFFNN&#39;
+#plot(dataname=&#39;run/operator_both_sides&#39;+ machine + &#39;/L&#39; + str(L) + &#39;.log&#39;, L=L, observables=False)
+#plot_operator_both_sides(dataname=&#39;run/operator_both_sides&#39; + machine + &#39;/L&#39; + str(L) + &#39;_estimate.log&#39;, L=L)
+
+
+
+#results with symmetric operator
+
+
+#RBM
+L=40
+machine = &#39;_RBM&#39;
+#plot(dataname=&#39;run/symmetric_operator&#39;+ machine + &#39;/L&#39; + str(L) + &#39;.log&#39;, L=L, observables=False)
+#plot(&#39;run/symmetric_operator&#39;+ machine + &#39;/L&#39; + str(L) + &#39;_estimate.log&#39;, L=L, symmetric_operator=True, observables=True)
+
+
+#FFNN
+L=45
+machine = &#39;_FFNN&#39;
+#plot(dataname=&#39;run/symmetric_operator&#39;+ machine + &#39;/L&#39; + str(L) + &#39;.log&#39;, L=L, observables=False)
+#plot(&#39;run/symmetric_operator&#39;+ machine + &#39;/L&#39; + str(L) + &#39;_estimate.log&#39;, L=L, symmetric_operator=True, observables=True)
+
+
+
+#DeepFFNN
+L=60
+machine = &#39;_DeepFFNN&#39;
+#plot(dataname=&#39;run/symmetric_operator&#39;+ machine + &#39;/L&#39; + str(L) + &#39;.log&#39;, L=L, observables=False)
+#plot(&#39;run/symmetric_operator&#39;+ machine + &#39;/L&#39; + str(L) + &#39;_estimate.log&#39;, L=L, symmetric_operator=True, observables=True)
+
+
+
+#results test_sr
+
+
+#Compare Sr RBM
+#plot_Sr(path=&#39;run/test_sr/&#39;, L=40)
+
+#Compare Sr FFNN
+#plot_Sr(path=&#39;run/test_sr_ffnn/&#39;, L=40)
+#plot_Sr(path=&#39;run/test_sr_FFNN/&#39;, L=12)
+
+
+#plot(&#39;run/small_RBM/SrNoneL14_estimate.log&#39;, L = 14 ,symmetric_operator=False, observables=True)
+
+#compare_original_transformed(L=16, periodic=True)
+
+#plot(&#39;run/small_FFNN_periodic/SrNoneL8_estimate.log&#39;, L = 8 ,symmetric_operator=False, observables=True, periodic=True, transformed_or_original=&#39;original&#39;)
+
+#plot(&#39;run/small_FFNN/SrNoneL30_estimate.log&#39;, L = 30 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original=&#39;transformed&#39;)
+
+
+
+
+#plot(&#39;run/firstResults_FFNN/L16_estimate.log&#39;, L = 16 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original=&#39;transformed&#39;)
+#plot(&#39;run/firstResults_FFNN/L16_estimate.log&#39;, L = 16 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original=&#39;transformed&#39;)
+#plot(&#39;run/firstResults_FFNN/L32_estimate.log&#39;, L = 32 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original=&#39;transformed&#39;)
+#plot(&#39;run/firstResults_FFNN/L32_estimate.log&#39;, L = 32 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original=&#39;transformed&#39;)
+
+def wrapper(i):
+    machine_names = [&#39;JaxRBM&#39;, &#39;JaxSymmRBM&#39;, &#39;JaxFFNN&#39;, &#39;JaxDeepFFNN&#39;, &#39;JaxDeepConvNN&#39;, &#39;JaxSymmFFNN&#39;, &#39;JaxUnaryFFNN&#39;, &#39;JaxConv3NN&#39;, &#39;JaxResFFNN&#39;, &#39;JaxResConvNN&#39;]
+    #plot(&#39;run/compareArchitectures/CPU/Iterations/&#39; + machine_names[i] + &#39;/L16.log&#39;, L = 16 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original=&#39;transformed&#39;)
+    plot(&#39;run/compareArchitectures/CPU/Iterations/&#39; + machine_names[i] + &#39;/1L30.log&#39;, L = 30 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original=&#39;transformed&#39;)
+
+
+with Pool(8) as p:
+    pass
+    #p.map(wrapper, [0, 2, 3, 4, 5, 6, 7, 8, 9])
+
+
+#plot(&#39;run/observableArchitekture/JaxDeepConvNN/L14_estimate.log&#39;, L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original=&#39;transformed&#39;)
+#plot(&#39;run/observableArchitekture/JaxDeepFFNN/L14_estimate.log&#39;, L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original=&#39;transformed&#39;)
+
+machine_names = [&#39;JaxRBM&#39;, &#39;JaxFFNN&#39;, &#39;JaxDeepFFNN&#39;, &#39;JaxDeepConvNN&#39;, &#39;JaxSymmFFNN&#39;, &#39;JaxUnaryFFNN&#39;, &#39;JaxConv3NN&#39;, &#39;JaxResFFNN&#39;, &#39;JaxResConvNN&#39;]
+#compareArchitectures(machine_names, path=&#39;run/compareArchitectures/CPU/Iterations/&#39;, L=16)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="plot.compareArchitectures"><code class="name flex">
+<span>def <span class="ident">compareArchitectures</span></span>(<span>machine_names, path, L)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function to compare the results of defferent architectures.
+Mean energy, variance, mean time, and so on are evaluated</p>
+<pre><code>Args:
+    machine_names (list) : list with machine names (str) as elements
+    path (str) : path to the data folder
+    L (int) : Lattice size
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def compareArchitectures(machine_names, path, L):
+    &#34;&#34;&#34;Function to compare the results of defferent architectures.
+        Mean energy, variance, mean time, and so on are evaluated
+
+            Args:
+                machine_names (list) : list with machine names (str) as elements
+                path (str) : path to the data folder
+                L (int) : Lattice size
+                                                        &#34;&#34;&#34;
+    for machine_name in machine_names:
+        deviations_energy = list()
+        times = list()
+        for i in range(0, 5):
+            try:
+                dataname = &#39;&#39;.join((path, machine_name, &#39;/&#39;, str(i), &#39;L&#39;, str(L), &#39;.log&#39;))
+                data = json.load(open(dataname))
+                iters = []
+                energy = []
+
+                for iteration in data[&#34;Output&#34;]:
+                    iters.append(iteration[&#34;Iteration&#34;])
+                    energy.append(iteration[&#34;Energy&#34;][&#34;Mean&#34;])
+
+                tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674,
+                       -17.028, -18.459, -19.827, -21.250, -22.626]
+                if (L &lt; len(tmp)):
+                    factor = tmp[L]
+                else:
+                    factor = (L - 1) * (-1.401484)
+                deviation_energy = (factor - np.mean(energy[-int(1./3*len(energy)):])) / factor
+                deviations_energy.append(deviation_energy)
+                # Time data is created at the end of the simulation -&gt; There might be no .time data yet
+                try:
+                    with open(&#39;&#39;.join((dataname.split(&#39;.&#39;)[0], &#39;.time&#39;)), &#39;r&#39;) as reader:
+                        time = reader.read()
+                        #print(time)
+                        times.append(float(time))
+                except:
+                    pass
+            except:
+                #Results not yet finished
+                pass
+        mean = np.mean(deviations_energy)
+        median = np.median(deviations_energy)
+        variance = np.var(deviations_energy)
+        minimum = np.amin(deviations_energy)
+        maximum = np.amax(deviations_energy)
+        meantime = np.mean(times)
+        #mintime  = np.amin(times)
+        print(&#39;&#39;.join((machine_name + &#39;; mean=&#39;, str(mean), &#39; variance=&#39;, str(variance), &#39; median=&#39;, str(median), &#39; minimum=&#39;, str(minimum), &#39; maximum=&#39;, str(maximum), &#39; time=&#39;, str(meantime))))</code></pre>
+</details>
+</dd>
+<dt id="plot.compare_original_transformed"><code class="name flex">
+<span>def <span class="ident">compare_original_transformed</span></span>(<span>L, periodic=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>comparison of the exact results of the original and periodic heisenberg hamiltonian</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def compare_original_transformed(L, periodic=False):
+    &#34;&#34;&#34;comparison of the exact results of the original and periodic heisenberg hamiltonian
+    &#34;&#34;&#34;
+    if(periodic==True):
+        dataname = &#39;&#39;.join((&#39;run/exact_periodic_original/L&#39;, str(L), &#39;_exact.csv&#39;))
+        dataname2 = &#39;&#39;.join((&#39;run/exact_periodic_transformed/L&#39;, str(L), &#39;_exact.csv&#39;))
+    else:
+        dataname = &#39;&#39;.join((&#39;run/exact_original/L&#39;, str(L), &#39;_exact.csv&#39;))
+        dataname2 = &#39;&#39;.join((&#39;run/exact_transformed/L&#39;, str(L), &#39;_exact.csv&#39;))
+    try:
+        operator_orig = -1 * np.loadtxt(dataname)
+        x_operator_orig = np.arange(1, len(operator_orig) + 1)
+        operator_trans = +1 * np.loadtxt(dataname2)
+        x_operator_trans = np.arange(1, len(operator_trans) + 1)
+        operator_inf = 0.374 * np.ones(len(x_operator_orig))
+    except:
+        print(&#39;L is too large&#39;)
+    plt.plot(x_operator_orig, operator_orig, color=&#39;green&#39;, label=&#39;original Hamiltonian&#39;)
+    plt.plot(x_operator_trans, operator_trans, color=&#39;blue&#39;, label=&#39;transformed Hamiltonian&#39;)
+    plt.plot(x_operator_orig, operator_inf, color=&#39;red&#39;, label=&#39;expected infinity value&#39;)
+    plt.title(&#39;Compare observable for periodic lattice&#39;)
+    plt.xlabel(&#39;distance between sites&#39;)
+    plt.ylabel(&#39;Observable&#39;)
+    plt.legend()
+    plt.show()</code></pre>
+</details>
+</dd>
+<dt id="plot.plot"><code class="name flex">
+<span>def <span class="ident">plot</span></span>(<span>dataname, L, observables=True, symmetric_operator=False, periodic=False, transformed_or_original='transformed')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function to plot the results of the calculations
+Multiple possibilities to plot the results</p>
+<pre><code>Args:
+    dataname (str) : the dataname (with the relative path)
+    L (int) : Lattice size
+    symmetric_operator (bool) : if the observable is measured symmetrically to the center
+    periodic (bool) : if exact results of the periodic lattice are plotted
+    transformed_or_original (str) : which hamiltonian is used. 'transformed' or 'original'
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot(dataname, L, observables=True, symmetric_operator = False, periodic=False, transformed_or_original = &#39;transformed&#39;):
+    &#34;&#34;&#34;Function to plot the results of the calculations
+        Multiple possibilities to plot the results
+
+            Args:
+                dataname (str) : the dataname (with the relative path)
+                L (int) : Lattice size
+                symmetric_operator (bool) : if the observable is measured symmetrically to the center
+                periodic (bool) : if exact results of the periodic lattice are plotted
+                transformed_or_original (str) : which hamiltonian is used. &#39;transformed&#39; or &#39;original&#39;
+                                                    &#34;&#34;&#34;
+    data=json.load(open(dataname))
+    # Extract the relevant information
+
+    length = L
+
+    iters=[]
+    energy=[]
+    sfs_fast = list()
+    xAxis_fast = list()
+
+    for iteration in data[&#34;Output&#34;]:
+        iters.append(iteration[&#34;Iteration&#34;])
+        energy.append(iteration[&#34;Energy&#34;][&#34;Mean&#34;])
+
+    def calcMean(array):
+        length = np.minimum(15, len(array))
+        sum = 0.
+        for i in range(length):
+            sum += array[-i+0]
+        return sum / float(length)
+
+    def getsf(i):
+        sf = list()
+        for iteration in data[&#34;Output&#34;]:
+            if(symmetric_operator == True):
+                try:
+                    sf.append(iteration[&#39;Symmetric_Ferro_correlation_function&#39; + str(i)][&#34;Mean&#34;])
+                except:
+                    print(&#39;Symmetric operator is plotted. If I do not plot old data, I probably made a mistake!&#39;)
+                    sf.append(iteration[&#39;Ferro_correlation_function&#39; + str(i)][&#34;Mean&#34;])
+            else:
+                sf.append(iteration[&#39;Ferro_correlation_function&#39; + str(i)][&#34;Mean&#34;])
+        return calcMean(sf)
+
+    plt.plot(iters, energy)
+    if(periodic == False):
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+    else:
+        if(transformed_or_original == &#39;transformed&#39;):
+            #energy of transformed hamiltonian
+            tmp = [None, None, None, None, -6.000, -7.096, -8.617, -9.863, -11.337, -12.647, -14.094, -15.438, -16.870, -18.234, -19.655, -21.032, -22.447, -23.832 ]
+        else:
+            #energy of the normal hamiltonian
+            tmp = [None, None, None, None, -5.999, -6.531, -8.617, -9.572, -11.337, -12.480, -14.094, -15.337, -16.870, -18.170, -19.655, -20.991, -22.447 ]
+    if (L &lt; len(tmp)):
+        factor = tmp[L]
+    else:
+        factor = (L - 1) * (-1.4)
+    expected_energy = np.ones_like(np.asarray(iters)) * factor
+    print(dataname + &#39;; (E_exact - E)/E_exact = &#39; + str((factor - np.mean(energy[-int(1./3 * len(energy)):])) / factor))
+    plt.plot(iters, expected_energy, color=&#39;red&#39;)
+    plt.title(dataname)
+    plt.xlabel(&#39;Iteration&#39;)
+    plt.ylabel(&#39;Energy&#39;)
+    plt.show()
+
+    if(observables == True):
+        if(symmetric_operator == True):
+            for i in range(1, int(L / 2.)):
+                sfs_fast.append(getsf(2*i))
+                xAxis_fast.append(2*i)
+                if(periodic == False):
+                    dataname_operator = &#39;&#39;.join((&#39;run/exact_symmetricOperator_&#39;, transformed_or_original , &#39;/L&#39;, str(L), &#39;_exact.csv&#39;))
+                else:
+                    dataname_operator = &#39;&#39;.join((&#39;run/exact_periodic_symmetricOperator_&#39;, transformed_or_original , &#39;/L&#39;, str(L), &#39;_exact.csv&#39;))
+        else:
+            for i in range(1, length):
+                sfs_fast.append(getsf(i))
+                xAxis_fast.append(i)
+                if(periodic == False):
+                    dataname_operator = &#39;&#39;.join((&#39;run/exact_&#39;, transformed_or_original , &#39;/L&#39;, str(L), &#39;_exact.csv&#39;))
+                else:
+                    dataname_operator = &#39;&#39;.join((&#39;run/exact_periodic_&#39;, transformed_or_original , &#39;/L&#39;, str(L), &#39;_exact.csv&#39;))
+
+        plt.plot(xAxis_fast, sfs_fast)
+        try:
+            operator = -1 * np.loadtxt(dataname_operator)
+            if(transformed_or_original == &#39;transformed&#39;): operator = operator * -1
+            if(symmetric_operator == True):
+                x_operator = np.arange(2, 2*len(operator)+1, 2)
+            else:
+                x_operator = np.arange(1, len(operator)+1)
+        except:
+            print(dataname_operator)
+            operator = 0.374 * np.ones(len(xAxis_fast))
+            x_operator = xAxis_fast
+        plt.plot(x_operator, operator, color=&#39;red&#39;)
+        plt.title(dataname)
+        plt.show()</code></pre>
+</details>
+</dd>
+<dt id="plot.plot_Sr"><code class="name flex">
+<span>def <span class="ident">plot_Sr</span></span>(<span>path, L)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>compares multiple Sr values</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_Sr(path, L):
+    &#34;&#34;&#34;compares multiple Sr values&#34;&#34;&#34;
+    def calcMean(array):
+        length = np.minimum(15, len(array))
+        sum = 0.
+        for i in range(length):
+            sum += array[-i + 0]
+        return sum / float(length)
+
+    def getsf(i, data):
+        sf = list()
+        for iteration in data[&#34;Output&#34;]:
+            sf.append(iteration[&#39;Ferro_correlation_function&#39; + str(i)][&#34;Mean&#34;])
+        return calcMean(sf)
+
+    iterations = list()
+    energies = list()
+    strincorrs = list()
+    xes = list()
+    Sr = [0.01, 0.1,  1, 10, None]
+    for i, sr in enumerate(Sr):
+        sr_string = &#39;_&#39;.join((str(sr).split(&#39;.&#39;)))
+        dataname = &#39;&#39;.join((path, &#39;Sr&#39;, sr_string, &#39;L&#39;, str(L), &#39;.log&#39;))
+        dataname2 = &#39;&#39;.join((path, &#39;Sr&#39;, sr_string, &#39;L&#39;, str(L), &#39;_estimate.log&#39;))
+        data = json.load(open(dataname))
+        data2 = json.load(open(dataname2))
+        iters = []
+        energy = []
+        for iteration in data[&#34;Output&#34;]:
+            iters.append(iteration[&#34;Iteration&#34;])
+            energy.append(iteration[&#34;Energy&#34;][&#34;Mean&#34;])
+        iterations.append(np.asarray(iters))
+        energies.append(np.asarray(energy))
+
+        sfs_fast = list()
+        xAxis_fast = list()
+        for i in range(1, int(L / 2.)):
+            sfs_fast.append(getsf(2 * i, data2))
+            xAxis_fast.append(2 * i)
+        strincorrs.append(np.asarray(sfs_fast))
+        xes.append(np.asarray(xAxis_fast))
+
+    fig, axes = plt.subplots(2, 3)
+    for i in range(0, len(Sr)):
+        fig.suptitle(&#39;Energy - Iterations&#39;)
+        axes[int(i / 3), i % 3].plot(iterations[i], energies[i])
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+        if (L &lt; len(tmp)):
+            factor = tmp[L]
+        else:
+            factor = (L - 1) * (-1.4)
+        expected_energy = np.ones_like(np.asarray(iters)) * factor
+        axes[int(i / 3), i % 3].plot(iters, expected_energy, color=&#39;red&#39;)
+        axes[int(i / 3), i % 3].set_title(&#39;&#39;.join((&#39;Sr&#39;, str(Sr[i]), &#39;L&#39;, str(L), &#39;.log&#39;)))
+    plt.show()
+    fig, axes = plt.subplots(2, 3)
+    for i in range(0, len(Sr)):
+        fig.suptitle(&#39;Stringcorrelation - distance&#39;)
+        print(strincorrs[i])
+        axes[int(i / 3), i % 3].plot(xes[i], strincorrs[i])
+        try:
+            dataname = &#39;&#39;.join((&#39;run/exact_original/L&#39;, str(L), &#39;_exact.csv&#39;))
+            operator = -1 * np.loadtxt(dataname)
+            x_operator = np.arange(1, len(operator)+1)
+        except:
+            operator = 0.374 * np.ones(len(xAxis_fast))
+            x_operator = xAxis_fast
+        axes[int(i / 3), i % 3].plot(x_operator, operator, color=&#39;red&#39;)
+        axes[int(i / 3), i % 3].set_title(&#39;&#39;.join((&#39;Sr&#39;, str(Sr[i]), &#39;L&#39;, str(L), &#39;.log&#39;)))
+    plt.show()</code></pre>
+</details>
+</dd>
+<dt id="plot.plot_operator_both_sides"><code class="name flex">
+<span>def <span class="ident">plot_operator_both_sides</span></span>(<span>dataname, L)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>plot of operator. One is starting at the center going to the left. The other is going to the right.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_operator_both_sides(dataname, L):
+    &#34;&#34;&#34;plot of operator. One is starting at the center going to the left. The other is going to the right.&#34;&#34;&#34;
+    data = json.load(open(dataname))
+    # Extract the relevant information
+
+    iters = []
+    energy = []
+
+    for iteration in data[&#34;Output&#34;]:
+        iters.append(iteration[&#34;Iteration&#34;])
+        energy.append(iteration[&#34;Energy&#34;][&#34;Mean&#34;])
+
+    def calcMean(array):
+        length = np.minimum(15, len(array))
+        sum = 0.
+        for i in range(length):
+            sum += array[-i + 0]
+        return sum / float(length)
+
+    def getsf(j, k, mirrored = &#39;&#39;):
+        sf = list()
+        for iteration in data[&#34;Output&#34;]:
+            sf.append(iteration[&#39;&#39;.join((&#39;Ferro_correlation_function&#39;, mirrored, str(k - j)))][&#34;Mean&#34;])
+        return calcMean(sf)
+
+    plt.plot(iters, energy)
+    plt.plot(iters, -np.ones(len(iters)) * (L-1) * 1.4, color = &#39;red&#39;)
+    print(energy +np.ones(len(iters)) * (L-1) * 1.4)
+    plt.title(&#39;Energy-iteration&#39;)
+    plt.show()
+
+    colors = [&#39;black&#39;, &#39;blue&#39;]
+    for index, mirrored in enumerate([&#39;&#39;, &#39;_mirrored&#39;]):
+        sfs_fast = list()
+        xAxis_fast = list()
+        max_range = L
+        for i in range(1, int(L/2.)):
+            sfs_fast.append(getsf(int(L/2.), int(L/2.) + i, mirrored=mirrored))
+            xAxis_fast.append(i)
+
+        plt.plot(xAxis_fast, sfs_fast, color= colors[index], label=&#39;&#39;.join((&#39;operator&#39;, mirrored)))
+        plt.plot(xAxis_fast, 0.374 * np.ones(len(xAxis_fast)), color = &#39;red&#39;)
+        plt.legend()
+    plt.title(&#39;operator-distance&#39;)
+    plt.show()</code></pre>
+</details>
+</dd>
+<dt id="plot.plot_startingpoints"><code class="name flex">
+<span>def <span class="ident">plot_startingpoints</span></span>(<span>dataname, L, fast=True)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>plots results of the observable for multiple starting points</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_startingpoints(dataname, L, fast=True):
+    &#34;&#34;&#34;plots results of the observable for multiple starting points&#34;&#34;&#34;
+    data = json.load(open(dataname))
+    # Extract the relevant information
+
+    iters = []
+    energy = []
+
+    for iteration in data[&#34;Output&#34;]:
+        iters.append(iteration[&#34;Iteration&#34;])
+        energy.append(iteration[&#34;Energy&#34;][&#34;Mean&#34;])
+
+    def calcMean(array):
+        length = np.minimum(15, len(array))
+        sum = 0.
+        for i in range(length):
+            sum += array[-i + 0]
+        return sum / float(length)
+
+    def getsf(j, k):
+        sf = list()
+        for iteration in data[&#34;Output&#34;]:
+            sf.append(iteration[&#39;&#39;.join((str(j), &#39;Ferro_correlation_function&#39;, str(k - j)))][&#34;Mean&#34;])
+        return calcMean(sf)
+
+    plt.plot(iters, energy)
+    tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+    if (L &lt; len(tmp)):
+        factor = tmp[L]
+    else:
+        factor = (L - 1) * (-1.4)
+    expected_energy = np.ones_like(np.asarray(iters)) * factor
+    plt.plot(iters, expected_energy, color = &#39;red&#39;)
+    #print(energy +np.ones(len(iters)) * (L-1) * 1.4)
+    plt.title(&#39;Energy-iteration&#39;)
+    plt.show()
+
+    colors = [&#39;black&#39;, &#39;brown&#39;, &#39;grey&#39;, &#39;green&#39;, &#39;blue&#39;, &#39;orange&#39;, &#39;yellow&#39;]
+    for start, j in enumerate([1, 2, 3, int(L/4.), int(L/2.)]):
+        sfs_fast = list()
+        xAxis_fast = list()
+        if(fast == True):
+            max_range = L
+        else:
+            max_range = np.minimum(j + 8, L)
+        for k in range(j + 1, max_range):
+            sfs_fast.append(getsf(j, k))
+            xAxis_fast.append(k-j)
+
+        plt.plot(xAxis_fast, sfs_fast, color= colors[start], label=&#39;&#39;.join((&#39;startingpoint: &#39;, str(j))))
+        plt.plot(xAxis_fast, 0.374 * np.ones(len(xAxis_fast)), color = &#39;red&#39;)
+        plt.legend()
+    plt.title(&#39;operator-distance&#39;)
+    plt.show()</code></pre>
+</details>
+</dd>
+<dt id="plot.present"><code class="name flex">
+<span>def <span class="ident">present</span></span>(<span>Ls, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>function to visalize multiple plots at once</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def present(Ls, path):
+    &#34;&#34;&#34;function to visalize multiple plots at once&#34;&#34;&#34;
+
+    #a = x data, b = f(x), c = expected energy
+    def plot4me(a, b, c, text=&#39;Energy-Iterations&#39;):
+        plt.subplot(221)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
+        plt.plot(a[0], b[0])
+        if(c != None): plt.plot(a[0], c[0])
+        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[0]))))
+        plt.subplot(222)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
+        plt.plot(a[1], b[1])
+        if (c != None): plt.plot(a[1], c[1])
+        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[1]))))
+        plt.subplot(223)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
+        plt.plot(a[2], b[2])
+        if (c != None): plt.plot(a[2], c[2])
+        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[2]))))
+        plt.subplot(224)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
+        plt.plot(a[3], b[3])
+        if (c != None): plt.plot(a[3], c[3])
+        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[3]))))
+        plt.show()
+
+    iters_list = []
+    energy_list = []
+    sfs_fast_list = []
+    xAxis_fast_list = []
+    expected_energy_list = []
+    for j in range(0, len(Ls)):
+        l = Ls[j]
+        print(&#39;&#39;.join((path, &#39;/L&#39;, str(l), &#39;.log&#39;)))
+        data_energy = json.load(open(&#39;&#39;.join((path, &#39;/L&#39;, str(l), &#39;.log&#39;))))
+        data_observ = json.load(open(&#39;&#39;.join((path, &#39;/L&#39;, str(l), &#39;_estimate.log&#39;))))
+        # Extract the relevant information
+
+        length = l
+
+        iters = []
+        energy = []
+        sfs_fast = list()
+        xAxis_fast = list()
+
+        for iteration in data_energy[&#34;Output&#34;]:
+            iters.append(iteration[&#34;Iteration&#34;])
+            energy.append(iteration[&#34;Energy&#34;][&#34;Mean&#34;])
+
+        def calcMean(array):
+            length = np.minimum(15, len(array))
+            print(length)
+            sum = 0.
+            for i in range(length):
+                sum += array[-i + 0]
+            return sum / float(length)
+
+        def getsf(i):
+            sf = list()
+            for iteration in data_observ[&#34;Output&#34;]:
+                sf.append(iteration[&#39;Ferro_correlation_function&#39; + str(i)][&#34;Mean&#34;])
+            return calcMean(sf)
+
+        for i in range(1, length):
+            sfs_fast.append(getsf(i))
+            xAxis_fast.append(i)
+
+        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+        if(l &lt; len(tmp)):
+            factor = tmp[l]
+        else:
+            factor = (l-1) * (-1.4)
+        expected_energy = np.ones_like(np.asarray(iters)) * factor
+
+        expected_energy_list.append(expected_energy)
+        iters_list.append(np.asarray(iters))
+        energy_list.append(np.asarray(energy))
+        sfs_fast_list.append(np.asarray(sfs_fast))
+        xAxis_fast_list.append(np.asarray(xAxis_fast))
+
+    plot4me(iters_list, energy_list, expected_energy_list, text=&#39;Energy-Iteration&#39;)
+    plot4me(xAxis_fast_list, sfs_fast_list, None, text=&#39;operator-site&#39;)</code></pre>
+</details>
+</dd>
+<dt id="plot.wrapper"><code class="name flex">
+<span>def <span class="ident">wrapper</span></span>(<span>i)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wrapper(i):
+    machine_names = [&#39;JaxRBM&#39;, &#39;JaxSymmRBM&#39;, &#39;JaxFFNN&#39;, &#39;JaxDeepFFNN&#39;, &#39;JaxDeepConvNN&#39;, &#39;JaxSymmFFNN&#39;, &#39;JaxUnaryFFNN&#39;, &#39;JaxConv3NN&#39;, &#39;JaxResFFNN&#39;, &#39;JaxResConvNN&#39;]
+    #plot(&#39;run/compareArchitectures/CPU/Iterations/&#39; + machine_names[i] + &#39;/L16.log&#39;, L = 16 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original=&#39;transformed&#39;)
+    plot(&#39;run/compareArchitectures/CPU/Iterations/&#39; + machine_names[i] + &#39;/1L30.log&#39;, L = 30 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original=&#39;transformed&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="plot.compareArchitectures" href="#plot.compareArchitectures">compareArchitectures</a></code></li>
+<li><code><a title="plot.compare_original_transformed" href="#plot.compare_original_transformed">compare_original_transformed</a></code></li>
+<li><code><a title="plot.plot" href="#plot.plot">plot</a></code></li>
+<li><code><a title="plot.plot_Sr" href="#plot.plot_Sr">plot_Sr</a></code></li>
+<li><code><a title="plot.plot_operator_both_sides" href="#plot.plot_operator_both_sides">plot_operator_both_sides</a></code></li>
+<li><code><a title="plot.plot_startingpoints" href="#plot.plot_startingpoints">plot_startingpoints</a></code></li>
+<li><code><a title="plot.present" href="#plot.present">present</a></code></li>
+<li><code><a title="plot.wrapper" href="#plot.wrapper">wrapper</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>

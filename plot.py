@@ -24,13 +24,14 @@ from multiprocessing import Pool
 
 def plot(dataname, L, observables=True, symmetric_operator = False, periodic=False, transformed_or_original = 'transformed'):
     """Function to plot the results of the calculations
+        Multiple possibilities to plot the results
 
-        Args:
-            dataname (str) : the dataname (with the relative path)
-            L (int) : Lattice size
-            symmetric_operator (bool) : if the observable is measured symmetrically to the center
-            periodic (bool) : if exact results of the periodic lattice are plotted
-            transformed_or_original (str) : which hamiltonian is used. 'transformed' or 'original'
+            Args:
+                dataname (str) : the dataname (with the relative path)
+                L (int) : Lattice size
+                symmetric_operator (bool) : if the observable is measured symmetrically to the center
+                periodic (bool) : if exact results of the periodic lattice are plotted
+                transformed_or_original (str) : which hamiltonian is used. 'transformed' or 'original'
                                                     """
     data=json.load(open(dataname))
     # Extract the relevant information
@@ -409,7 +410,8 @@ def plot_operator_both_sides(dataname, L):
 
 
 def compareArchitectures(machine_names, path, L):
-    """Function to compare the results of defferent architectures
+    """Function to compare the results of defferent architectures.
+        Mean energy, variance, mean time, and so on are evaluated
 
             Args:
                 machine_names (list) : list with machine names (str) as elements

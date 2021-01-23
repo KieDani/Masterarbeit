@@ -28,12 +28,12 @@ def Lanczos(hamilton, L):
     """Lanczos method to calculate the ground state energy of a hamiltonian.
         It only works for L<= 12. If L is larger, it returns None to prevent memory overflow.
 
-        Args:
-            hamiltonian (netket.hamiltonian) : hamiltonian
-            L (int) : Lattice size
+            Args:
+                hamiltonian (netket.hamiltonian) : hamiltonian
+                L (int) : Lattice size
 
-        Returns:
-            exact_ens (float) : exact ground state energy
+            Returns:
+                exact_ens (float) : exact ground state energy
                                                 """
     if L <= 12:
         exact_ens = scipy.sparse.linalg.eigsh(hamilton.to_sparse(), k=1, which='SA', return_eigenvectors=False)
@@ -109,12 +109,12 @@ def create_machinefile(machine_name, L, alpha, dataname, use_sr):
 
 def test_operator_startingpoint(hilbert, L, fast=True):
     """Method to compare the effect of the starting site of the observable FerroCorrelationZ.
-            I recommend to use fast=True to use the fast implementation of FerroCorrelationZ.
+        I recommend to use fast=True to use the fast implementation of FerroCorrelationZ.
 
-                Args:
-                    hilbert (netket.hilbert) : hilbert space
-                    L (int) : Lattice size
-                    fast (bool) : Use True
+            Args:
+                hilbert (netket.hilbert) : hilbert space
+                L (int) : Lattice size
+                fast (bool) : Use True
 
                 Returns:
                     observables (dict) : dictionary with names of observable (str) and observables (netket.operator)
@@ -139,12 +139,12 @@ def test_operator_both_sides(hilbert, L):
         Starting point is the center of the lattice. It goes from the center to the left
         and from the center to the right.
 
-                    Args:
-                        hilbert (netket.hilbert) : hilbert space
-                        L (int) : Lattice size
+            Args:
+                hilbert (netket.hilbert) : hilbert space
+                L (int) : Lattice size
 
-                    Returns:
-                        observables (dict) : dictionary with names of observable (str) and observables (netket.operator)
+            Returns:
+                observables (dict) : dictionary with names of observable (str) and observables (netket.operator)
                                                             """
     observables = {}
     for i in range(1, int(L/2.)):
@@ -160,16 +160,17 @@ def test_operator_both_sides(hilbert, L):
 #hamiltonian has to be a sparse matrix
 def power_method(hamiltonian, L, eigenvalue_lanczos):
     """Calculates the gound state vector.
-                At the moment it works only if the ground state energy is the dominant eigenvalue.
-                It needs a lot of RAM. Therefore, use it only for small lattices.
 
-                    Args:
-                        hamiltonian (scipy.sparse) : use to_dense of netket.hamiltonian object.
-                        L (int) : Lattice size
-                        eigenvalue_lanczos (float) : exact ground state energy
+        At the moment it works only if the ground state energy is the dominant eigenvalue.
+        It needs a lot of RAM. Therefore, use it only for small lattices.
 
-                    Returns:
-                        x (numpy.array) : ground state of the hamiltonian.
+            Args:
+                hamiltonian (scipy.sparse) : use to_dense of netket.hamiltonian object.
+                L (int) : Lattice size
+                eigenvalue_lanczos (float) : exact ground state energy
+
+            Returns:
+                x (numpy.array) : ground state of the hamiltonian.
                                                             """
 
     #generate starting vector

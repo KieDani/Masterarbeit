@@ -34,10 +34,10 @@ class StringCorrelation(AbstractOperator):
         r"""
         Constructs a new stringcorrelationoperator.
 
-        Args:
-           hilbert (netket.hilbert.Boson): Hilbert space the operator acts on.
-           j (int): The Operator starts at site j.
-           k (int) : The Operator ends at site k.
+            Args:
+               hilbert (netket.hilbert.Boson): Hilbert space the operator acts on.
+               j (int): The Operator starts at site j.
+               k (int) : The Operator ends at site k.
 
         """
         self._j = j
