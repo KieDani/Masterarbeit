@@ -1133,6 +1133,7 @@ def TorchConvNN(hilbert, hamiltonian, alpha=1, optimizer=&#39;Sgd&#39;, lr=0.1, 
 # Input: machine with already loaded parameters. Here, only optimizer and sampler are updated
 def load_machine(machine, hamiltonian, optimizer=&#39;Sgd&#39;, lr=0.1, sampler=&#39;Local&#39;):
     &#34;&#34;&#34;Method to get an operator and sampler for a loaded machine. The machine is not loaded in this method!
+        The machine is not returned -&gt; Syntax is a bit different than in the other functions
 
             Args:
                 machine (netket.machine) : loaded machine
@@ -1166,7 +1167,8 @@ def load_machine(machine, hamiltonian, optimizer=&#39;Sgd&#39;, lr=0.1, sampler=
 
 #method to simply get the desired machine
 def get_machine(machine_name):
-    &#34;&#34;&#34;Method to easily get the desired machine
+    &#34;&#34;&#34;Method to easily get the desired machine.
+        If the machine is spelled wrong, None is returned!
 
             Args:
                 machine_name (str) : possible choices are &#39;JaxRBM&#39;, &#39;JaxSymmRBM&#39;, &#39;JaxFFNN&#39;, &#39;JaxDeepFFNN&#39;, &#39;TorchFFNN&#39;,
@@ -2336,17 +2338,20 @@ def complexrelu(x):
 <span>def <span class="ident">get_machine</span></span>(<span>machine_name)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Method to easily get the desired machine</p>
-<h2 id="args">Args</h2>
-<p>machine_name (str) : possible choices are 'JaxRBM', 'JaxSymmRBM', 'JaxFFNN', 'JaxDeepFFNN', 'TorchFFNN',
-'TorchConvNN', 'JaxSymmFFNN', 'JaxUnaryRBM', 'JaxUnaryFFNN', 'JaxResFFNN', 'JaxConv3NN',
-'JaxResConvNN', or 'JaxDeepConvNN'</p></div>
+<div class="desc"><p>Method to easily get the desired machine.
+If the machine is spelled wrong, None is returned!</p>
+<pre><code>Args:
+    machine_name (str) : possible choices are 'JaxRBM', 'JaxSymmRBM', 'JaxFFNN', 'JaxDeepFFNN', 'TorchFFNN',
+       'TorchConvNN', 'JaxSymmFFNN', 'JaxUnaryRBM', 'JaxUnaryFFNN', 'JaxResFFNN', 'JaxConv3NN',
+       'JaxResConvNN', or 'JaxDeepConvNN'
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_machine(machine_name):
-    &#34;&#34;&#34;Method to easily get the desired machine
+    &#34;&#34;&#34;Method to easily get the desired machine.
+        If the machine is spelled wrong, None is returned!
 
             Args:
                 machine_name (str) : possible choices are &#39;JaxRBM&#39;, &#39;JaxSymmRBM&#39;, &#39;JaxFFNN&#39;, &#39;JaxDeepFFNN&#39;, &#39;TorchFFNN&#39;,
@@ -2391,22 +2396,26 @@ def complexrelu(x):
 <span>def <span class="ident">load_machine</span></span>(<span>machine, hamiltonian, optimizer='Sgd', lr=0.1, sampler='Local')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Method to get an operator and sampler for a loaded machine. The machine is not loaded in this method!</p>
-<h2 id="args">Args</h2>
-<p>machine (netket.machine) : loaded machine
-hamiltonian (netket.hamiltonian) : hamiltonian
-optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
-lr (float) : learning rate
-sampler (str) : possible choices are 'Local', 'Exact', 'VBS'</p>
-<h2 id="returns">Returns</h2>
-<p>op (netket.optimizer) : optimizer
-sa (netket.sampler) : sampler</p></div>
+<div class="desc"><p>Method to get an operator and sampler for a loaded machine. The machine is not loaded in this method!
+The machine is not returned -&gt; Syntax is a bit different than in the other functions</p>
+<pre><code>Args:
+    machine (netket.machine) : loaded machine
+    hamiltonian (netket.hamiltonian) : hamiltonian
+    optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+    lr (float) : learning rate
+    sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+
+Returns:
+    op (netket.optimizer) : optimizer
+    sa (netket.sampler) : sampler
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def load_machine(machine, hamiltonian, optimizer=&#39;Sgd&#39;, lr=0.1, sampler=&#39;Local&#39;):
     &#34;&#34;&#34;Method to get an operator and sampler for a loaded machine. The machine is not loaded in this method!
+        The machine is not returned -&gt; Syntax is a bit different than in the other functions
 
             Args:
                 machine (netket.machine) : loaded machine
