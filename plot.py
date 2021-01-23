@@ -1,3 +1,18 @@
+"""Implementation of custom Monte-Carlo sampler
+
+Implementation of some functions to plot the results.
+
+This project requires the following libraries:
+netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm
+
+This file contains the following classes:
+
+    * _JaxVBSKernel
+
+This file contains the following functions:
+
+    *  getVBSSampler
+"""
 # Load the data from the .log file
 import json
 import matplotlib.pyplot as plt
@@ -8,6 +23,15 @@ from multiprocessing import Pool
 
 
 def plot(dataname, L, observables=True, symmetric_operator = False, periodic=False, transformed_or_original = 'transformed'):
+    """Function to plot the results of the calculations
+
+        Args:
+            dataname (str) : the dataname (with the relative path)
+            L (int) : Lattice size
+            symmetric_operator (bool) : if the observable is measured symmetrically to the center
+            periodic (bool) : if exact results of the periodic lattice are plotted
+            transformed_or_original (str) : which hamiltonian is used. 'transformed' or 'original'
+                                                    """
     data=json.load(open(dataname))
     # Extract the relevant information
 
@@ -100,6 +124,8 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
 
 
 def compare_original_transformed(L, periodic=False):
+    """comparison of the exact results of the original and periodic heisenberg hamiltonian
+    """
     if(periodic==True):
         dataname = ''.join(('run/exact_periodic_original/L', str(L), '_exact.csv'))
         dataname2 = ''.join(('run/exact_periodic_transformed/L', str(L), '_exact.csv'))
@@ -126,6 +152,7 @@ def compare_original_transformed(L, periodic=False):
 
 # Ls should be an array with 4 Elements
 def present(Ls, path):
+    """function to visalize multiple plots at once"""
 
     #a = x data, b = f(x), c = expected energy
     def plot4me(a, b, c, text='Energy-Iterations'):
@@ -207,6 +234,7 @@ def present(Ls, path):
 
 
 def plot_startingpoints(dataname, L, fast=True):
+    """plots results of the observable for multiple starting points"""
     data = json.load(open(dataname))
     # Extract the relevant information
 
@@ -262,6 +290,7 @@ def plot_startingpoints(dataname, L, fast=True):
 
 
 def plot_Sr(path, L):
+    """compares multiple Sr values"""
     def calcMean(array):
         length = np.minimum(15, len(array))
         sum = 0.
@@ -333,6 +362,7 @@ def plot_Sr(path, L):
 
 
 def plot_operator_both_sides(dataname, L):
+    """plot of operator. One is starting at the center going to the left. The other is going to the right."""
     data = json.load(open(dataname))
     # Extract the relevant information
 
@@ -379,6 +409,13 @@ def plot_operator_both_sides(dataname, L):
 
 
 def compareArchitektures(machine_names, path, L):
+    """Function to compare the results of defferent architectures
+
+            Args:
+                machine_names (list) : list with machine names (str) as elements
+                path (str) : path to the data folder
+                L (int) : Lattice size
+                                                        """
     for machine_name in machine_names:
         deviations_energy = list()
         times = list()
