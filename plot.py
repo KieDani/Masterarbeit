@@ -5,13 +5,15 @@ Implementation of some functions to plot the results.
 This project requires the following libraries:
 netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm
 
-This file contains the following classes:
-
-    * _JaxVBSKernel
-
 This file contains the following functions:
 
-    *  getVBSSampler
+    * plot
+    * compare_original_transformed
+    * present
+    * plot_startingpoints
+    * plot_Sr
+    * plot_operator_both_sides
+    * compareArchitectures
 """
 # Load the data from the .log file
 import json
@@ -408,7 +410,7 @@ def plot_operator_both_sides(dataname, L):
     plt.show()
 
 
-def compareArchitektures(machine_names, path, L):
+def compareArchitectures(machine_names, path, L):
     """Function to compare the results of defferent architectures
 
             Args:
@@ -562,4 +564,4 @@ with Pool(8) as p:
 #plot('run/observableArchitekture/JaxDeepFFNN/L14_estimate.log', L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
 
 machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
-compareArchitektures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
+#compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
