@@ -27,6 +27,7 @@ import numpy as np
 import scipy as sp
 import sys
 import jax
+import csv
 
 
 
@@ -85,7 +86,7 @@ def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mach
 
 #ensure, that the machine is the same as used before!
 def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples =10000, n_iterations = 20):
-    """Method to load a pretrained machine and measure some observables.
+    """Method to load a pretrained machine and continue the training.
 
         A hamiltonian and sampler can be chosen. The machine is defined and trained for the hamiltonian.
 
@@ -125,13 +126,40 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
 
     functions.create_machinefile(machine_name, L, alpha, dataname, sr)
     start = time.time()
-    gs2.run(n_iter=n_iterations, out=''.join((dataname, '_estimate')), obs=observables, write_every=4, save_params_every=4)
+    gs2.run(n_iter=n_iterations, out=''.join((dataname, '_load')), obs=observables, write_every=4, save_params_every=4)
     end = time.time()
-    with open(''.join((dataname, '_estimate', '.time')), 'w') as reader:
+    with open(''.join((dataname, '_load', '.time')), 'w') as reader:
         reader.write(str(end - start))
     print(gs2.estimate(observables))
     print('Time', end - start)
     sys.stdout.flush()
+
+
+def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples =10000, n_iterations = 20):
+    if (dataname == None):
+        dataname = ''.join(('L', str(L)))
+    dataname = functions.create_path(dataname, path=path)
+    ha, hi, g = models.get_hamiltonian(hamiltonian_name, L)
+    generate_machine = machines.get_machine(machine_name)
+    ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+    ma.load(''.join((dataname, '.wf')))
+    op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer='Adamax', lr=0.001, sampler=sampler)
+    observables = {**functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=False),
+                   **functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)}
+    #save_dict = {}
+    for i in range(n_iterations):
+        measurement = nk.variational.estimate_expectations(observables, sa, n_samples=n_samples)
+        #save_dict[''.join(('Iteration', str(i)))] = measurement
+        if(i == 0):
+            w = csv.writer(open(''.join((dataname, '_observables', '.csv')), "w"))
+            for key, val in measurement.items():
+                w.writerow([key, val])
+        else:
+            w = csv.writer(open(''.join((dataname, 'observables', '.csv')), "a"))
+            for key, val in measurement.items():
+                w.writerow([key, val])
+        print(measurement)
+
 
 
 def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonian_name = 'transformed_Heisenberg'):
@@ -211,7 +239,8 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 #run(L=4, alpha=2, n_samples=300, n_iterations=300, machine_name='JaxFFNN', sampler='VBS')
 
 #exact(L=6, symmetric=False, hamiltonian_name='original_Heisenberg')
-#run(L=16, alpha=16, machine_name='JaxDeepConvNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=500, n_iterations=300)
+#run(L=12, alpha=5, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=500, n_iterations=100)
+#measureObservable(L=12, alpha=5, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=500, n_iterations=10)
 #load(L=16, alpha=16, machine_name='JaxDeepConvNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=2000, n_iterations=30)
 
 
