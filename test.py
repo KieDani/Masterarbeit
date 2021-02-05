@@ -115,9 +115,7 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
     ma.load(''.join((dataname, '.wf')))
     op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer='Adamax', lr=0.001, sampler=sampler)
     #observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)
-    observables = {**functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=False), **functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)}
-
-    print('Estimated results:')
+    #observables = {**functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=False), **functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)}
     if(sr == None):
         gs2 = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=n_samples)#, n_discard=5000)
     else:
@@ -126,16 +124,33 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
 
     functions.create_machinefile(machine_name, L, alpha, dataname, sr)
     start = time.time()
-    gs2.run(n_iter=n_iterations, out=''.join((dataname, '_load')), obs=observables, write_every=4, save_params_every=4)
+    #gs2.run(n_iter=n_iterations, out=''.join((dataname, '_load')), obs=observables, write_every=4, save_params_every=4)
+    gs2.run(n_iter=n_iterations, out=dataname, write_every=10, save_params_every=10)
     end = time.time()
-    with open(''.join((dataname, '_load', '.time')), 'w') as reader:
+    with open(''.join((dataname, '.time')), 'a') as reader:
         reader.write(str(end - start))
-    print(gs2.estimate(observables))
+    #print(gs2.estimate(observables))
     print('Time', end - start)
     sys.stdout.flush()
 
 
 def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples =10000, n_iterations = 20):
+    """Method to measure th observables with a trained machine.
+
+            The sampler can be chosen.
+
+                Args:
+                    L (int) : The number of sites of the lattice
+                    alpha (int) : A factor to define the size of different machines
+                    dataname (str) : The dataname. If None, an automatic dataname is chosen
+                    path (str) : The directory, where the results are saved. If None, the directory is 'run'
+                    machine_name (str) A string to choose the machine. Possible inputs: See get_machine in my_machines.py
+                    sampler (str) : A string to choose the sampler: Recommended: 'Local' (this works with every machine)
+                    hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
+                    n_samples (int) : The number of samples used in every iteration step
+                    n_iterations (int) : The number of iterations (training steps)
+
+                    """
     if (dataname == None):
         dataname = ''.join(('L', str(L)))
     dataname = functions.create_path(dataname, path=path)
@@ -155,7 +170,7 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
             for key, val in measurement.items():
                 w.writerow([key, val])
         else:
-            w = csv.writer(open(''.join((dataname, 'observables', '.csv')), "a"))
+            w = csv.writer(open(''.join((dataname, '_observables', '.csv')), "a"))
             for key, val in measurement.items():
                 w.writerow([key, val])
         print(measurement)
@@ -243,6 +258,9 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 #measureObservable(L=12, alpha=5, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=500, n_iterations=10)
 #load(L=16, alpha=16, machine_name='JaxDeepConvNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=2000, n_iterations=30)
 
+#run(L=12, alpha=6, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=500, n_iterations=150)
+#load(L=12, alpha=6, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=100, n_iterations=100)
+#measureObservable(L=12, alpha=6, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=20000, n_iterations=2)
 
 
 
