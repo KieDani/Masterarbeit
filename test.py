@@ -254,14 +254,9 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 #jax.config.update('jax_disable_jit', True)
 #run(L=4, alpha=2, n_samples=300, n_iterations=300, machine_name='JaxFFNN', sampler='VBS')
 
-#exact(L=6, symmetric=False, hamiltonian_name='original_Heisenberg')
-#run(L=12, alpha=5, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=500, n_iterations=100)
-#measureObservable(L=12, alpha=5, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=500, n_iterations=10)
-#load(L=16, alpha=16, machine_name='JaxDeepConvNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=2000, n_iterations=30)
-
 #run(L=12, alpha=6, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=500, n_iterations=150)
 #load(L=12, alpha=6, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=100, n_iterations=100)
-#measureObservable(L=12, alpha=6, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=20000, n_iterations=2)
+#measureObservable(L=12, alpha=6, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=2000, n_iterations=100)
 
 
 
