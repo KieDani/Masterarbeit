@@ -169,11 +169,12 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
 
 
 def plotObservables(dataname, L):
-    &#34;&#34;&#34;Function to plot the results of measureObservables
+    &#34;&#34;&#34;Function to plot the results of the function measureObservables().
+        The csv file is loaded and evaluated.
 
-                Args:
-                    dataname (str) : the dataname (including the relative path)
-                    L (int) : Lattice size
+            Args:
+                dataname (str) : the dataname (including the relative path)
+                L (int) : Lattice size
                                                         &#34;&#34;&#34;
     #observable 1 at position 0, etc
     numbers = np.zeros(L-1, dtype=np.int32)
@@ -184,7 +185,11 @@ def plotObservables(dataname, L):
         for row in spamreader:
             for i in range(0, L-1):
                 if row[0] == &#39;&#39;.join((&#39;Ferro_correlation_function&#39;, str(i+1))):
-                    values[i] += float(row[1].split(&#39;+&#39;)[0])
+                    value = row[1].split(&#39;+&#39;)[0]
+                    if value[-1] == &#39;e&#39;:
+                        value = &#39;&#39;.join((value, row[1].split(&#39;+&#39;)[1]))
+                    value = float(value)
+                    values[i] += value
                     numbers[i] += 1
         print(values)
         print(numbers)
@@ -883,20 +888,23 @@ Multiple possibilities to plot the results</p>
 <span>def <span class="ident">plotObservables</span></span>(<span>dataname, L)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Function to plot the results of measureObservables</p>
-<h2 id="args">Args</h2>
-<p>dataname (str) : the dataname (including the relative path)
-L (int) : Lattice size</p></div>
+<div class="desc"><p>Function to plot the results of the function measureObservables().
+The csv file is loaded and evaluated.</p>
+<pre><code>Args:
+    dataname (str) : the dataname (including the relative path)
+    L (int) : Lattice size
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def plotObservables(dataname, L):
-    &#34;&#34;&#34;Function to plot the results of measureObservables
+    &#34;&#34;&#34;Function to plot the results of the function measureObservables().
+        The csv file is loaded and evaluated.
 
-                Args:
-                    dataname (str) : the dataname (including the relative path)
-                    L (int) : Lattice size
+            Args:
+                dataname (str) : the dataname (including the relative path)
+                L (int) : Lattice size
                                                         &#34;&#34;&#34;
     #observable 1 at position 0, etc
     numbers = np.zeros(L-1, dtype=np.int32)
@@ -907,7 +915,11 @@ L (int) : Lattice size</p></div>
         for row in spamreader:
             for i in range(0, L-1):
                 if row[0] == &#39;&#39;.join((&#39;Ferro_correlation_function&#39;, str(i+1))):
-                    values[i] += float(row[1].split(&#39;+&#39;)[0])
+                    value = row[1].split(&#39;+&#39;)[0]
+                    if value[-1] == &#39;e&#39;:
+                        value = &#39;&#39;.join((value, row[1].split(&#39;+&#39;)[1]))
+                    value = float(value)
+                    values[i] += value
                     numbers[i] += 1
         print(values)
         print(numbers)

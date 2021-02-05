@@ -297,14 +297,9 @@ def exact(L = __L__, symmetric = True, dataname = None, path = &#39;run&#39;, ha
 #jax.config.update(&#39;jax_disable_jit&#39;, True)
 #run(L=4, alpha=2, n_samples=300, n_iterations=300, machine_name=&#39;JaxFFNN&#39;, sampler=&#39;VBS&#39;)
 
-#exact(L=6, symmetric=False, hamiltonian_name=&#39;original_Heisenberg&#39;)
-#run(L=12, alpha=5, machine_name=&#39;JaxDeepFFNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=500, n_iterations=100)
-#measureObservable(L=12, alpha=5, machine_name=&#39;JaxDeepFFNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=500, n_iterations=10)
-#load(L=16, alpha=16, machine_name=&#39;JaxDeepConvNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=2000, n_iterations=30)
-
 #run(L=12, alpha=6, machine_name=&#39;JaxDeepFFNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=500, n_iterations=150)
 #load(L=12, alpha=6, machine_name=&#39;JaxDeepFFNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=100, n_iterations=100)
-#measureObservable(L=12, alpha=6, machine_name=&#39;JaxDeepFFNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=20000, n_iterations=2)
+#measureObservable(L=12, alpha=6, machine_name=&#39;JaxDeepFFNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=2000, n_iterations=100)
 
 
 
@@ -334,7 +329,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = &#39;run&#39;, ha
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.07)
+# alpha = int(alpha0 * 0.1)
 # print(alpha)
 # machine_name = &#39;JaxDeepFFNN&#39;
 # generate_machine = machines.get_machine(machine_name)
@@ -412,7 +407,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = &#39;run&#39;, ha
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.07)
+# alpha = int(alpha0 * 0.1)
 # print(alpha)
 # machine_name = &#39;JaxDeepFFNN&#39;
 # generate_machine = machines.get_machine(machine_name)
@@ -489,7 +484,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = &#39;run&#39;, ha
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.07)
+# alpha = int(alpha0 * 0.1)
 # print(alpha)
 # machine_name = &#39;JaxDeepFFNN&#39;
 # generate_machine = machines.get_machine(machine_name)
