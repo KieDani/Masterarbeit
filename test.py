@@ -1,7 +1,7 @@
 """Easy usage of Netket + my custom code
 
-This script allows the user to train a machine using the run-method. A machine can also be loaded with the load method.
-In the load method an observable is evaluated additionally.
+This script allows the user to train a machine using the run function. A machine can also be loaded with the load function.
+To measure an observable, you can use the function measureObservable.
 Furthermore, exact results can be computed with the method exact.
 It is recommended to use few samples plus many iterations with the run method and many samples plus few iterations with the load method.
 The supported machines are defined in my_machines.py, the supported hamiltonians are defined in my_models.py, and the observables are defined in my_operators.py.
@@ -14,6 +14,7 @@ This file contains the following functions:
 
     * run
     * load
+    * measureObservables
     * exact
 """
 import netket as nk
