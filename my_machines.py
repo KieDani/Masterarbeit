@@ -797,7 +797,7 @@ def JaxResConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler
 
 def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     """Complex deep Feed Forward Neural Network Machine implemented in Jax with two hidden layer.
-        Dense, complexReLU, Dense, complex ReLU, Dense, complex ReLU, Dense
+        Dense, complexReLU, Dense, complex ReLU, Dense
 
             Args:
                 hilbert (netket.hilbert) : hilbert space
@@ -816,8 +816,7 @@ def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
     print('JaxDeepFFNN is used')
     input_size = hilbert.size
     init_fun, apply_fun = stax.serial(FixSrLayer,
-        Dense(input_size * alpha), ComplexReLu, Dense(input_size * alpha), ComplexReLu, Dense(input_size * alpha),
-        ComplexReLu, Dense(1), FormatLayer)
+        Dense(input_size * alpha), ComplexReLu, Dense(input_size * alpha), ComplexReLu, Dense(1), FormatLayer)
     ma = nk.machine.Jax(
         hilbert,
         (init_fun, apply_fun), dtype=complex

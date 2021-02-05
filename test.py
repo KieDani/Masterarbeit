@@ -286,7 +286,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.07)
+# alpha = int(alpha0 * 0.1)
 # print(alpha)
 # machine_name = 'JaxDeepFFNN'
 # generate_machine = machines.get_machine(machine_name)
@@ -364,7 +364,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.07)
+# alpha = int(alpha0 * 0.1)
 # print(alpha)
 # machine_name = 'JaxDeepFFNN'
 # generate_machine = machines.get_machine(machine_name)
@@ -441,7 +441,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.07)
+# alpha = int(alpha0 * 0.1)
 # print(alpha)
 # machine_name = 'JaxDeepFFNN'
 # generate_machine = machines.get_machine(machine_name)
