@@ -128,11 +128,12 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
 
 
 def plotObservables(dataname, L):
-    """Function to plot the results of measureObservables
+    """Function to plot the results of the function measureObservables().
+        The csv file is loaded and evaluated.
 
-                Args:
-                    dataname (str) : the dataname (including the relative path)
-                    L (int) : Lattice size
+            Args:
+                dataname (str) : the dataname (including the relative path)
+                L (int) : Lattice size
                                                         """
     #observable 1 at position 0, etc
     numbers = np.zeros(L-1, dtype=np.int32)
