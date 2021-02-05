@@ -27,6 +27,7 @@
 netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib</p>
 <p>This file contains the following functions:</p>
 <pre><code>* plot
+* plotObservable
 * compare_original_transformed
 * present
 * plot_startingpoints
@@ -46,6 +47,7 @@ netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib
 This file contains the following functions:
 
     * plot
+    * plotObservable
     * compare_original_transformed
     * present
     * plot_startingpoints
@@ -59,6 +61,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import helping_functions as functions
 from multiprocessing import Pool
+import csv
 
 
 
@@ -159,6 +162,42 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
             print(dataname_operator)
             operator = 0.374 * np.ones(len(xAxis_fast))
             x_operator = xAxis_fast
+        plt.plot(x_operator, operator, color=&#39;red&#39;)
+        plt.title(dataname)
+        plt.show()
+
+
+
+def plotObservables(dataname, L):
+    &#34;&#34;&#34;Function to plot the results of measureObservables
+
+                Args:
+                    dataname (str) : the dataname (including the relative path)
+                    L (int) : Lattice size
+                                                        &#34;&#34;&#34;
+    #observable 1 at position 0, etc
+    numbers = np.zeros(L-1, dtype=np.int32)
+    values = np.zeros(L-1, dtype=np.float64)
+
+    with open(dataname) as csvfile:
+        spamreader = csv.reader(csvfile)
+        for row in spamreader:
+            for i in range(0, L-1):
+                if row[0] == &#39;&#39;.join((&#39;Ferro_correlation_function&#39;, str(i+1))):
+                    values[i] += float(row[1].split(&#39;+&#39;)[0])
+                    numbers[i] += 1
+        print(values)
+        print(numbers)
+        print(values/numbers)
+        plt.plot(range(1, L), values/numbers)
+        dataname_operator = &#39;&#39;.join((&#39;run/exact_&#39;, &#39;transformed&#39;, &#39;/L&#39;, str(L), &#39;_exact.csv&#39;))
+        try:
+            operator = 1 * np.loadtxt(dataname_operator)
+            x_operator = np.arange(1, len(operator) + 1)
+        except:
+            print(dataname_operator)
+            operator = 0.374 * np.ones(len(values))
+            x_operator = range(1, L)
         plt.plot(x_operator, operator, color=&#39;red&#39;)
         plt.title(dataname)
         plt.show()
@@ -604,7 +643,11 @@ with Pool(8) as p:
 #plot(&#39;run/observableArchitekture/JaxDeepFFNN/L14_estimate.log&#39;, L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original=&#39;transformed&#39;)
 
 machine_names = [&#39;JaxRBM&#39;, &#39;JaxFFNN&#39;, &#39;JaxDeepFFNN&#39;, &#39;JaxDeepConvNN&#39;, &#39;JaxSymmFFNN&#39;, &#39;JaxUnaryFFNN&#39;, &#39;JaxConv3NN&#39;, &#39;JaxResFFNN&#39;, &#39;JaxResConvNN&#39;]
-#compareArchitectures(machine_names, path=&#39;run/compareArchitectures/CPU/Iterations/&#39;, L=16)</code></pre>
+#compareArchitectures(machine_names, path=&#39;run/compareArchitectures/CPU/Iterations/&#39;, L=16)
+
+
+
+plotObservables(&#39;run/L12_observables.csv&#39;, 12)</code></pre>
 </details>
 </section>
 <section>
@@ -831,6 +874,53 @@ Multiple possibilities to plot the results</p>
             print(dataname_operator)
             operator = 0.374 * np.ones(len(xAxis_fast))
             x_operator = xAxis_fast
+        plt.plot(x_operator, operator, color=&#39;red&#39;)
+        plt.title(dataname)
+        plt.show()</code></pre>
+</details>
+</dd>
+<dt id="plot.plotObservables"><code class="name flex">
+<span>def <span class="ident">plotObservables</span></span>(<span>dataname, L)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function to plot the results of measureObservables</p>
+<h2 id="args">Args</h2>
+<p>dataname (str) : the dataname (including the relative path)
+L (int) : Lattice size</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plotObservables(dataname, L):
+    &#34;&#34;&#34;Function to plot the results of measureObservables
+
+                Args:
+                    dataname (str) : the dataname (including the relative path)
+                    L (int) : Lattice size
+                                                        &#34;&#34;&#34;
+    #observable 1 at position 0, etc
+    numbers = np.zeros(L-1, dtype=np.int32)
+    values = np.zeros(L-1, dtype=np.float64)
+
+    with open(dataname) as csvfile:
+        spamreader = csv.reader(csvfile)
+        for row in spamreader:
+            for i in range(0, L-1):
+                if row[0] == &#39;&#39;.join((&#39;Ferro_correlation_function&#39;, str(i+1))):
+                    values[i] += float(row[1].split(&#39;+&#39;)[0])
+                    numbers[i] += 1
+        print(values)
+        print(numbers)
+        print(values/numbers)
+        plt.plot(range(1, L), values/numbers)
+        dataname_operator = &#39;&#39;.join((&#39;run/exact_&#39;, &#39;transformed&#39;, &#39;/L&#39;, str(L), &#39;_exact.csv&#39;))
+        try:
+            operator = 1 * np.loadtxt(dataname_operator)
+            x_operator = np.arange(1, len(operator) + 1)
+        except:
+            print(dataname_operator)
+            operator = 0.374 * np.ones(len(values))
+            x_operator = range(1, L)
         plt.plot(x_operator, operator, color=&#39;red&#39;)
         plt.title(dataname)
         plt.show()</code></pre>
@@ -1159,6 +1249,7 @@ Multiple possibilities to plot the results</p>
 <li><code><a title="plot.compareArchitectures" href="#plot.compareArchitectures">compareArchitectures</a></code></li>
 <li><code><a title="plot.compare_original_transformed" href="#plot.compare_original_transformed">compare_original_transformed</a></code></li>
 <li><code><a title="plot.plot" href="#plot.plot">plot</a></code></li>
+<li><code><a title="plot.plotObservables" href="#plot.plotObservables">plotObservables</a></code></li>
 <li><code><a title="plot.plot_Sr" href="#plot.plot_Sr">plot_Sr</a></code></li>
 <li><code><a title="plot.plot_operator_both_sides" href="#plot.plot_operator_both_sides">plot_operator_both_sides</a></code></li>
 <li><code><a title="plot.plot_startingpoints" href="#plot.plot_startingpoints">plot_startingpoints</a></code></li>
