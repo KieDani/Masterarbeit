@@ -144,7 +144,11 @@ def plotObservables(dataname, L):
         for row in spamreader:
             for i in range(0, L-1):
                 if row[0] == ''.join(('Ferro_correlation_function', str(i+1))):
-                    values[i] += float(row[1].split('+')[0])
+                    value = row[1].split('+')[0]
+                    if value[-1] == 'e':
+                        value = ''.join((value, row[1].split('+')[1]))
+                    value = float(value)
+                    values[i] += value
                     numbers[i] += 1
         print(values)
         print(numbers)
