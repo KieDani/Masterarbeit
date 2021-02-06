@@ -162,7 +162,7 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
     op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer='Adamax', lr=0.001, sampler=sampler)
     observables = {**functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=False),
                    **functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)}
-    #save_dict = {}
+    start = time.time()
     for i in range(n_iterations):
         measurement = nk.variational.estimate_expectations(observables, sa, n_samples=n_samples)
         #save_dict[''.join(('Iteration', str(i)))] = measurement
@@ -175,6 +175,13 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
             for key, val in measurement.items():
                 w.writerow([key, val])
         print(measurement)
+
+    end = time.time()
+    with open(''.join((dataname, '_observables', '.time')), 'w') as reader:
+        reader.write(str(end - start))
+    # print(gs2.estimate(observables))
+    print('Time', end - start)
+    sys.stdout.flush()
 
 
 
