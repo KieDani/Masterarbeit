@@ -6,6 +6,7 @@ netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib
 This file contains the following functions:
 
     * plot
+    * plotObservable
     * compare_original_transformed
     * present
     * plot_startingpoints
@@ -19,6 +20,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import helping_functions as functions
 from multiprocessing import Pool
+import csv
 
 
 
@@ -119,6 +121,47 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
             print(dataname_operator)
             operator = 0.374 * np.ones(len(xAxis_fast))
             x_operator = xAxis_fast
+        plt.plot(x_operator, operator, color='red')
+        plt.title(dataname)
+        plt.show()
+
+
+
+def plotObservables(dataname, L):
+    """Function to plot the results of the function measureObservables().
+        The csv file is loaded and evaluated.
+
+            Args:
+                dataname (str) : the dataname (including the relative path)
+                L (int) : Lattice size
+                                                        """
+    #observable 1 at position 0, etc
+    numbers = np.zeros(L-1, dtype=np.int32)
+    values = np.zeros(L-1, dtype=np.float64)
+
+    with open(dataname) as csvfile:
+        spamreader = csv.reader(csvfile)
+        for row in spamreader:
+            for i in range(0, L-1):
+                if row[0] == ''.join(('Ferro_correlation_function', str(i+1))):
+                    value = row[1].split('+')[0]
+                    if value[-1] == 'e':
+                        value = ''.join((value, row[1].split('+')[1]))
+                    value = float(value)
+                    values[i] += value
+                    numbers[i] += 1
+        print(values)
+        print(numbers)
+        print(values/numbers)
+        plt.plot(range(1, L), values/numbers)
+        dataname_operator = ''.join(('run/exact_', 'transformed', '/L', str(L), '_exact.csv'))
+        try:
+            operator = 1 * np.loadtxt(dataname_operator)
+            x_operator = np.arange(1, len(operator) + 1)
+        except:
+            print(dataname_operator)
+            operator = 0.374 * np.ones(len(values))
+            x_operator = range(1, L)
         plt.plot(x_operator, operator, color='red')
         plt.title(dataname)
         plt.show()
@@ -565,3 +608,7 @@ with Pool(8) as p:
 
 machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
 #compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
+
+
+
+plotObservables('run/L12_observables.csv', 12)

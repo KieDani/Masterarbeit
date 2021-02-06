@@ -1,7 +1,7 @@
 """Easy usage of Netket + my custom code
 
-This script allows the user to train a machine using the run-method. A machine can also be loaded with the load method.
-In the load method an observable is evaluated additionally.
+This script allows the user to train a machine using the run function. A machine can also be loaded with the load function.
+To measure an observable, you can use the function measureObservable.
 Furthermore, exact results can be computed with the method exact.
 It is recommended to use few samples plus many iterations with the run method and many samples plus few iterations with the load method.
 The supported machines are defined in my_machines.py, the supported hamiltonians are defined in my_models.py, and the observables are defined in my_operators.py.
@@ -14,6 +14,7 @@ This file contains the following functions:
 
     * run
     * load
+    * measureObservables
     * exact
 """
 import netket as nk
@@ -27,6 +28,7 @@ import numpy as np
 import scipy as sp
 import sys
 import jax
+import csv
 
 
 
@@ -85,7 +87,7 @@ def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mach
 
 #ensure, that the machine is the same as used before!
 def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples =10000, n_iterations = 20):
-    """Method to load a pretrained machine and measure some observables.
+    """Method to load a pretrained machine and continue the training.
 
         A hamiltonian and sampler can be chosen. The machine is defined and trained for the hamiltonian.
 
@@ -114,9 +116,7 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
     ma.load(''.join((dataname, '.wf')))
     op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer='Adamax', lr=0.001, sampler=sampler)
     #observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)
-    observables = {**functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=False), **functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)}
-
-    print('Estimated results:')
+    #observables = {**functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=False), **functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)}
     if(sr == None):
         gs2 = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=n_samples)#, n_discard=5000)
     else:
@@ -125,13 +125,64 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
 
     functions.create_machinefile(machine_name, L, alpha, dataname, sr)
     start = time.time()
-    gs2.run(n_iter=n_iterations, out=''.join((dataname, '_estimate')), obs=observables, write_every=4, save_params_every=4)
+    #gs2.run(n_iter=n_iterations, out=''.join((dataname, '_load')), obs=observables, write_every=4, save_params_every=4)
+    gs2.run(n_iter=n_iterations, out=dataname, write_every=10, save_params_every=10)
     end = time.time()
-    with open(''.join((dataname, '_estimate', '.time')), 'w') as reader:
+    with open(''.join((dataname, '.time')), 'a') as reader:
         reader.write(str(end - start))
-    print(gs2.estimate(observables))
+    #print(gs2.estimate(observables))
     print('Time', end - start)
     sys.stdout.flush()
+
+
+def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples =10000, n_iterations = 20):
+    """Method to measure th observables with a trained machine.
+
+            The sampler can be chosen.
+
+                Args:
+                    L (int) : The number of sites of the lattice
+                    alpha (int) : A factor to define the size of different machines
+                    dataname (str) : The dataname. If None, an automatic dataname is chosen
+                    path (str) : The directory, where the results are saved. If None, the directory is 'run'
+                    machine_name (str) A string to choose the machine. Possible inputs: See get_machine in my_machines.py
+                    sampler (str) : A string to choose the sampler: Recommended: 'Local' (this works with every machine)
+                    hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
+                    n_samples (int) : The number of samples used in every iteration step
+                    n_iterations (int) : The number of iterations (training steps)
+
+                    """
+    if (dataname == None):
+        dataname = ''.join(('L', str(L)))
+    dataname = functions.create_path(dataname, path=path)
+    ha, hi, g = models.get_hamiltonian(hamiltonian_name, L)
+    generate_machine = machines.get_machine(machine_name)
+    ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+    ma.load(''.join((dataname, '.wf')))
+    op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer='Adamax', lr=0.001, sampler=sampler)
+    observables = {**functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=False),
+                   **functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)}
+    start = time.time()
+    for i in range(n_iterations):
+        measurement = nk.variational.estimate_expectations(observables, sa, n_samples=n_samples)
+        #save_dict[''.join(('Iteration', str(i)))] = measurement
+        if(i == 0):
+            w = csv.writer(open(''.join((dataname, '_observables', '.csv')), "w"))
+            for key, val in measurement.items():
+                w.writerow([key, val])
+        else:
+            w = csv.writer(open(''.join((dataname, '_observables', '.csv')), "a"))
+            for key, val in measurement.items():
+                w.writerow([key, val])
+        print(measurement)
+
+    end = time.time()
+    with open(''.join((dataname, '_observables', '.time')), 'w') as reader:
+        reader.write(str(end - start))
+    # print(gs2.estimate(observables))
+    print('Time', end - start)
+    sys.stdout.flush()
+
 
 
 def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonian_name = 'transformed_Heisenberg'):
@@ -210,10 +261,9 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 #jax.config.update('jax_disable_jit', True)
 #run(L=4, alpha=2, n_samples=300, n_iterations=300, machine_name='JaxFFNN', sampler='VBS')
 
-#exact(L=6, symmetric=False, hamiltonian_name='original_Heisenberg')
-#run(L=16, alpha=16, machine_name='JaxDeepConvNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=500, n_iterations=300)
-#load(L=16, alpha=16, machine_name='JaxDeepConvNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=2000, n_iterations=30)
-
+#run(L=12, alpha=6, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=500, n_iterations=150)
+#load(L=12, alpha=6, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=100, n_iterations=100)
+#measureObservable(L=12, alpha=6, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=2000, n_iterations=100)
 
 
 
@@ -243,7 +293,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.07)
+# alpha = int(alpha0 * 0.1)
 # print(alpha)
 # machine_name = 'JaxDeepFFNN'
 # generate_machine = machines.get_machine(machine_name)
@@ -321,7 +371,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.07)
+# alpha = int(alpha0 * 0.1)
 # print(alpha)
 # machine_name = 'JaxDeepFFNN'
 # generate_machine = machines.get_machine(machine_name)
@@ -398,7 +448,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.07)
+# alpha = int(alpha0 * 0.1)
 # print(alpha)
 # machine_name = 'JaxDeepFFNN'
 # generate_machine = machines.get_machine(machine_name)

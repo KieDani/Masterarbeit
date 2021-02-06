@@ -23,8 +23,8 @@
 </header>
 <section id="section-intro">
 <p>Easy usage of Netket + my custom code</p>
-<p>This script allows the user to train a machine using the run-method. A machine can also be loaded with the load method.
-In the load method an observable is evaluated additionally.
+<p>This script allows the user to train a machine using the run function. A machine can also be loaded with the load function.
+To measure an observable, you can use the function measureObservable.
 Furthermore, exact results can be computed with the method exact.
 It is recommended to use few samples plus many iterations with the run method and many samples plus few iterations with the load method.
 The supported machines are defined in my_machines.py, the supported hamiltonians are defined in my_models.py, and the observables are defined in my_operators.py.
@@ -34,6 +34,7 @@ netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib</p>
 <p>This file contains the following functions:</p>
 <pre><code>* run
 * load
+* measureObservables
 * exact
 </code></pre>
 <details class="source">
@@ -42,8 +43,8 @@ netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib</p>
 </summary>
 <pre><code class="python">&#34;&#34;&#34;Easy usage of Netket + my custom code
 
-This script allows the user to train a machine using the run-method. A machine can also be loaded with the load method.
-In the load method an observable is evaluated additionally.
+This script allows the user to train a machine using the run function. A machine can also be loaded with the load function.
+To measure an observable, you can use the function measureObservable.
 Furthermore, exact results can be computed with the method exact.
 It is recommended to use few samples plus many iterations with the run method and many samples plus few iterations with the load method.
 The supported machines are defined in my_machines.py, the supported hamiltonians are defined in my_models.py, and the observables are defined in my_operators.py.
@@ -56,6 +57,7 @@ This file contains the following functions:
 
     * run
     * load
+    * measureObservables
     * exact
 &#34;&#34;&#34;
 import netket as nk
@@ -69,6 +71,7 @@ import numpy as np
 import scipy as sp
 import sys
 import jax
+import csv
 
 
 
@@ -127,7 +130,7 @@ def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = &#39;run&#3
 
 #ensure, that the machine is the same as used before!
 def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = &#39;run&#39;, machine_name = &#39;JaxRBM&#39;, sampler = &#39;Local&#39;, hamiltonian_name = &#39;transformed_Heisenberg&#39;, n_samples =10000, n_iterations = 20):
-    &#34;&#34;&#34;Method to load a pretrained machine and measure some observables.
+    &#34;&#34;&#34;Method to load a pretrained machine and continue the training.
 
         A hamiltonian and sampler can be chosen. The machine is defined and trained for the hamiltonian.
 
@@ -156,9 +159,7 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = &#39;run&#
     ma.load(&#39;&#39;.join((dataname, &#39;.wf&#39;)))
     op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer=&#39;Adamax&#39;, lr=0.001, sampler=sampler)
     #observables = functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=True)
-    observables = {**functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=False), **functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=True)}
-
-    print(&#39;Estimated results:&#39;)
+    #observables = {**functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=False), **functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=True)}
     if(sr == None):
         gs2 = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=n_samples)#, n_discard=5000)
     else:
@@ -167,13 +168,57 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = &#39;run&#
 
     functions.create_machinefile(machine_name, L, alpha, dataname, sr)
     start = time.time()
-    gs2.run(n_iter=n_iterations, out=&#39;&#39;.join((dataname, &#39;_estimate&#39;)), obs=observables, write_every=4, save_params_every=4)
+    #gs2.run(n_iter=n_iterations, out=&#39;&#39;.join((dataname, &#39;_load&#39;)), obs=observables, write_every=4, save_params_every=4)
+    gs2.run(n_iter=n_iterations, out=dataname, write_every=10, save_params_every=10)
     end = time.time()
-    with open(&#39;&#39;.join((dataname, &#39;_estimate&#39;, &#39;.time&#39;)), &#39;w&#39;) as reader:
+    with open(&#39;&#39;.join((dataname, &#39;.time&#39;)), &#39;a&#39;) as reader:
         reader.write(str(end - start))
-    print(gs2.estimate(observables))
+    #print(gs2.estimate(observables))
     print(&#39;Time&#39;, end - start)
     sys.stdout.flush()
+
+
+def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = &#39;run&#39;, machine_name = &#39;JaxRBM&#39;, sampler = &#39;Local&#39;, hamiltonian_name = &#39;transformed_Heisenberg&#39;, n_samples =10000, n_iterations = 20):
+    &#34;&#34;&#34;Method to measure th observables with a trained machine.
+
+            The sampler can be chosen.
+
+                Args:
+                    L (int) : The number of sites of the lattice
+                    alpha (int) : A factor to define the size of different machines
+                    dataname (str) : The dataname. If None, an automatic dataname is chosen
+                    path (str) : The directory, where the results are saved. If None, the directory is &#39;run&#39;
+                    machine_name (str) A string to choose the machine. Possible inputs: See get_machine in my_machines.py
+                    sampler (str) : A string to choose the sampler: Recommended: &#39;Local&#39; (this works with every machine)
+                    hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
+                    n_samples (int) : The number of samples used in every iteration step
+                    n_iterations (int) : The number of iterations (training steps)
+
+                    &#34;&#34;&#34;
+    if (dataname == None):
+        dataname = &#39;&#39;.join((&#39;L&#39;, str(L)))
+    dataname = functions.create_path(dataname, path=path)
+    ha, hi, g = models.get_hamiltonian(hamiltonian_name, L)
+    generate_machine = machines.get_machine(machine_name)
+    ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+    ma.load(&#39;&#39;.join((dataname, &#39;.wf&#39;)))
+    op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer=&#39;Adamax&#39;, lr=0.001, sampler=sampler)
+    observables = {**functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=False),
+                   **functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=True)}
+    #save_dict = {}
+    for i in range(n_iterations):
+        measurement = nk.variational.estimate_expectations(observables, sa, n_samples=n_samples)
+        #save_dict[&#39;&#39;.join((&#39;Iteration&#39;, str(i)))] = measurement
+        if(i == 0):
+            w = csv.writer(open(&#39;&#39;.join((dataname, &#39;_observables&#39;, &#39;.csv&#39;)), &#34;w&#34;))
+            for key, val in measurement.items():
+                w.writerow([key, val])
+        else:
+            w = csv.writer(open(&#39;&#39;.join((dataname, &#39;_observables&#39;, &#39;.csv&#39;)), &#34;a&#34;))
+            for key, val in measurement.items():
+                w.writerow([key, val])
+        print(measurement)
+
 
 
 def exact(L = __L__, symmetric = True, dataname = None, path = &#39;run&#39;, hamiltonian_name = &#39;transformed_Heisenberg&#39;):
@@ -252,10 +297,9 @@ def exact(L = __L__, symmetric = True, dataname = None, path = &#39;run&#39;, ha
 #jax.config.update(&#39;jax_disable_jit&#39;, True)
 #run(L=4, alpha=2, n_samples=300, n_iterations=300, machine_name=&#39;JaxFFNN&#39;, sampler=&#39;VBS&#39;)
 
-#exact(L=6, symmetric=False, hamiltonian_name=&#39;original_Heisenberg&#39;)
-#run(L=16, alpha=16, machine_name=&#39;JaxDeepConvNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=500, n_iterations=300)
-#load(L=16, alpha=16, machine_name=&#39;JaxDeepConvNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=2000, n_iterations=30)
-
+#run(L=12, alpha=6, machine_name=&#39;JaxDeepFFNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=500, n_iterations=150)
+#load(L=12, alpha=6, machine_name=&#39;JaxDeepFFNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=100, n_iterations=100)
+#measureObservable(L=12, alpha=6, machine_name=&#39;JaxDeepFFNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=2000, n_iterations=100)
 
 
 
@@ -285,7 +329,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = &#39;run&#39;, ha
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.07)
+# alpha = int(alpha0 * 0.1)
 # print(alpha)
 # machine_name = &#39;JaxDeepFFNN&#39;
 # generate_machine = machines.get_machine(machine_name)
@@ -363,7 +407,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = &#39;run&#39;, ha
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.07)
+# alpha = int(alpha0 * 0.1)
 # print(alpha)
 # machine_name = &#39;JaxDeepFFNN&#39;
 # generate_machine = machines.get_machine(machine_name)
@@ -440,7 +484,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = &#39;run&#39;, ha
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
 #
-# alpha = int(alpha0 * 0.07)
+# alpha = int(alpha0 * 0.1)
 # print(alpha)
 # machine_name = &#39;JaxDeepFFNN&#39;
 # generate_machine = machines.get_machine(machine_name)
@@ -590,7 +634,7 @@ Use this only for small lattices, because it needs an awful lot of RAM.</p>
 <span>def <span class="ident">load</span></span>(<span>L=50, alpha=4, sr=None, dataname=None, path='run', machine_name='JaxRBM', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=10000, n_iterations=20)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Method to load a pretrained machine and measure some observables.</p>
+<div class="desc"><p>Method to load a pretrained machine and continue the training.</p>
 <p>A hamiltonian and sampler can be chosen. The machine is defined and trained for the hamiltonian.</p>
 <pre><code>Args:
     L (int) : The number of sites of the lattice
@@ -609,7 +653,7 @@ Use this only for small lattices, because it needs an awful lot of RAM.</p>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = &#39;run&#39;, machine_name = &#39;JaxRBM&#39;, sampler = &#39;Local&#39;, hamiltonian_name = &#39;transformed_Heisenberg&#39;, n_samples =10000, n_iterations = 20):
-    &#34;&#34;&#34;Method to load a pretrained machine and measure some observables.
+    &#34;&#34;&#34;Method to load a pretrained machine and continue the training.
 
         A hamiltonian and sampler can be chosen. The machine is defined and trained for the hamiltonian.
 
@@ -638,9 +682,7 @@ Use this only for small lattices, because it needs an awful lot of RAM.</p>
     ma.load(&#39;&#39;.join((dataname, &#39;.wf&#39;)))
     op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer=&#39;Adamax&#39;, lr=0.001, sampler=sampler)
     #observables = functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=True)
-    observables = {**functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=False), **functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=True)}
-
-    print(&#39;Estimated results:&#39;)
+    #observables = {**functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=False), **functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=True)}
     if(sr == None):
         gs2 = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=n_samples)#, n_discard=5000)
     else:
@@ -649,13 +691,77 @@ Use this only for small lattices, because it needs an awful lot of RAM.</p>
 
     functions.create_machinefile(machine_name, L, alpha, dataname, sr)
     start = time.time()
-    gs2.run(n_iter=n_iterations, out=&#39;&#39;.join((dataname, &#39;_estimate&#39;)), obs=observables, write_every=4, save_params_every=4)
+    #gs2.run(n_iter=n_iterations, out=&#39;&#39;.join((dataname, &#39;_load&#39;)), obs=observables, write_every=4, save_params_every=4)
+    gs2.run(n_iter=n_iterations, out=dataname, write_every=10, save_params_every=10)
     end = time.time()
-    with open(&#39;&#39;.join((dataname, &#39;_estimate&#39;, &#39;.time&#39;)), &#39;w&#39;) as reader:
+    with open(&#39;&#39;.join((dataname, &#39;.time&#39;)), &#39;a&#39;) as reader:
         reader.write(str(end - start))
-    print(gs2.estimate(observables))
+    #print(gs2.estimate(observables))
     print(&#39;Time&#39;, end - start)
     sys.stdout.flush()</code></pre>
+</details>
+</dd>
+<dt id="test.measureObservable"><code class="name flex">
+<span>def <span class="ident">measureObservable</span></span>(<span>L=50, alpha=4, dataname=None, path='run', machine_name='JaxRBM', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=10000, n_iterations=20)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Method to measure th observables with a trained machine.</p>
+<p>The sampler can be chosen.</p>
+<pre><code>Args:
+    L (int) : The number of sites of the lattice
+    alpha (int) : A factor to define the size of different machines
+    dataname (str) : The dataname. If None, an automatic dataname is chosen
+    path (str) : The directory, where the results are saved. If None, the directory is 'run'
+    machine_name (str) A string to choose the machine. Possible inputs: See get_machine in my_machines.py
+    sampler (str) : A string to choose the sampler: Recommended: 'Local' (this works with every machine)
+    hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
+    n_samples (int) : The number of samples used in every iteration step
+    n_iterations (int) : The number of iterations (training steps)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = &#39;run&#39;, machine_name = &#39;JaxRBM&#39;, sampler = &#39;Local&#39;, hamiltonian_name = &#39;transformed_Heisenberg&#39;, n_samples =10000, n_iterations = 20):
+    &#34;&#34;&#34;Method to measure th observables with a trained machine.
+
+            The sampler can be chosen.
+
+                Args:
+                    L (int) : The number of sites of the lattice
+                    alpha (int) : A factor to define the size of different machines
+                    dataname (str) : The dataname. If None, an automatic dataname is chosen
+                    path (str) : The directory, where the results are saved. If None, the directory is &#39;run&#39;
+                    machine_name (str) A string to choose the machine. Possible inputs: See get_machine in my_machines.py
+                    sampler (str) : A string to choose the sampler: Recommended: &#39;Local&#39; (this works with every machine)
+                    hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
+                    n_samples (int) : The number of samples used in every iteration step
+                    n_iterations (int) : The number of iterations (training steps)
+
+                    &#34;&#34;&#34;
+    if (dataname == None):
+        dataname = &#39;&#39;.join((&#39;L&#39;, str(L)))
+    dataname = functions.create_path(dataname, path=path)
+    ha, hi, g = models.get_hamiltonian(hamiltonian_name, L)
+    generate_machine = machines.get_machine(machine_name)
+    ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
+    ma.load(&#39;&#39;.join((dataname, &#39;.wf&#39;)))
+    op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer=&#39;Adamax&#39;, lr=0.001, sampler=sampler)
+    observables = {**functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=False),
+                   **functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=True)}
+    #save_dict = {}
+    for i in range(n_iterations):
+        measurement = nk.variational.estimate_expectations(observables, sa, n_samples=n_samples)
+        #save_dict[&#39;&#39;.join((&#39;Iteration&#39;, str(i)))] = measurement
+        if(i == 0):
+            w = csv.writer(open(&#39;&#39;.join((dataname, &#39;_observables&#39;, &#39;.csv&#39;)), &#34;w&#34;))
+            for key, val in measurement.items():
+                w.writerow([key, val])
+        else:
+            w = csv.writer(open(&#39;&#39;.join((dataname, &#39;_observables&#39;, &#39;.csv&#39;)), &#34;a&#34;))
+            for key, val in measurement.items():
+                w.writerow([key, val])
+        print(measurement)</code></pre>
 </details>
 </dd>
 <dt id="test.run"><code class="name flex">
@@ -739,6 +845,7 @@ Use this only for small lattices, because it needs an awful lot of RAM.</p>
 <ul class="">
 <li><code><a title="test.exact" href="#test.exact">exact</a></code></li>
 <li><code><a title="test.load" href="#test.load">load</a></code></li>
+<li><code><a title="test.measureObservable" href="#test.measureObservable">measureObservable</a></code></li>
 <li><code><a title="test.run" href="#test.run">run</a></code></li>
 </ul>
 </li>
