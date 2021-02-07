@@ -174,7 +174,9 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
             w = csv.writer(open(''.join((dataname, '_observables', '.csv')), "a"))
             for key, val in measurement.items():
                 w.writerow([key, val])
-        print(measurement)
+        #print(measurement)
+        if i%10 == 0:
+            print('Progress: ', float(i)/n_iterations*100)
 
     end = time.time()
     with open(''.join((dataname, '_observables', '.time')), 'w') as reader:
