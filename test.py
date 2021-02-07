@@ -163,8 +163,12 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
     observables = {**functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=False),
                    **functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)}
     start = time.time()
+    time_per_iteration = 0
     for i in range(n_iterations):
+        before = time.time()
         measurement = nk.variational.estimate_expectations(observables, sa, n_samples=n_samples)
+        after = time.time()
+        time_per_iteration += after - before
         #save_dict[''.join(('Iteration', str(i)))] = measurement
         if(i == 0):
             w = csv.writer(open(''.join((dataname, '_observables', '.csv')), "w"))
@@ -176,7 +180,9 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
                 w.writerow([key, val])
         #print(measurement)
         if i%10 == 0:
-            print('Progress: ', float(i)/n_iterations*100, '%')
+            time_per_iteration = time_per_iteration / 10
+            print('Progress: ', float(i)/n_iterations*100, '%', ';  Time per iteration: ', time_per_iteration)
+            time_per_iteration = 0
 
     end = time.time()
     with open(''.join((dataname, '_observables', '.time')), 'w') as reader:
