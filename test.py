@@ -276,6 +276,25 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 
 
 
+
+# import test
+#
+# #machines = ['JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxConv3NN']
+# machines = ['JaxDeepFFNN', 'JaxDeepConvNN']
+# alphas = [10, 14]
+# Ls = [30, 40, 50, 16]
+#
+# for l in Ls:
+#   for i, m in enumerate(machines):
+#     path = ''.join(('run/secondResults/', m))
+#     #test.measureObservable(L=l, alpha=alphas[i], machine_name=m, sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=500, n_iterations=4000, path=path)
+#     #test.run(L=l, alpha=alphas[i], machine_name=m, sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=2000, n_iterations=1000, dataname='test')
+
+
+
+
+
+
 # L=16
 # alpha0 = 100
 # ha, hi, g = models.build_Heisenbergchain_S1_transformed(L=L)
