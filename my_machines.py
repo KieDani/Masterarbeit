@@ -332,7 +332,7 @@ def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loca
                 alpha (int) : hidden layer density
                 optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
                 lr (float) : learning rate
-                sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                sampler (str) : possible choices are 'Local', 'Exact', 'VBS', 'Inverse'
 
             Returns:
                 ma (netket.machine) : machine
@@ -362,6 +362,8 @@ def JaxRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loca
         sa = nk.sampler.ExactSampler(machine=ma)
     elif (sampler == 'VBS'):
         sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == 'Inverse'):
+        sa = my_sampler.getInverseSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxRBM'
@@ -378,7 +380,7 @@ def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
                 alpha (int) : hidden layer density
                 optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
                 lr (float) : learning rate
-                sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                sampler (str) : possible choices are 'Local', 'Exact', 'VBS', 'Inverse'
 
             Returns:
                 ma (netket.machine) : machine
@@ -408,6 +410,8 @@ def JaxSymmRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
         sa = nk.sampler.ExactSampler(machine=ma)
     elif (sampler == 'VBS'):
         sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == 'Inverse'):
+        sa = my_sampler.getInverseSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxSymmRBM'
@@ -425,7 +429,7 @@ def JaxUnaryRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
                 alpha (int) : hidden layer density
                 optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
                 lr (float) : learning rate
-                sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                sampler (str) : possible choices are 'Local', 'Exact', 'VBS', 'Inverse'
 
             Returns:
                 ma (netket.machine) : machine
@@ -456,6 +460,8 @@ def JaxUnaryRBM(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         sa = nk.sampler.ExactSampler(machine=ma)
     elif (sampler == 'VBS'):
         sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == 'Inverse'):
+        sa = my_sampler.getInverseSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxUnaryRBM'
@@ -472,7 +478,7 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
                 alpha (int) : hidden layer density
                 optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
                 lr (float) : learning rate
-                sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                sampler (str) : possible choices are 'Local', 'Exact', 'VBS', 'Inverse'
 
             Returns:
                 ma (netket.machine) : machine
@@ -504,6 +510,8 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Loc
         sa = nk.sampler.ExactSampler(machine=ma)
     elif(sampler == 'VBS'):
         sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == 'Inverse'):
+        sa = my_sampler.getInverseSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxFFNN'
@@ -520,7 +528,7 @@ def JaxResFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
                 alpha (int) : hidden layer density
                 optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
                 lr (float) : learning rate
-                sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                sampler (str) : possible choices are 'Local', 'Exact', 'VBS', 'Inverse'
 
             Returns:
                 ma (netket.machine) : machine
@@ -550,6 +558,8 @@ def JaxResFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
         sa = nk.sampler.ExactSampler(machine=ma)
     elif (sampler == 'VBS'):
         sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == 'Inverse'):
+        sa = my_sampler.getInverseSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxResFFNN'
@@ -566,7 +576,7 @@ def JaxUnaryFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler
                 alpha (int) : hidden layer density
                 optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
                 lr (float) : learning rate
-                sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                sampler (str) : possible choices are 'Local', 'Exact', 'VBS', 'Inverse'
 
             Returns:
                 ma (netket.machine) : machine
@@ -598,6 +608,8 @@ def JaxUnaryFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler
         sa = nk.sampler.ExactSampler(machine=ma)
     elif (sampler == 'VBS'):
         sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == 'Inverse'):
+        sa = my_sampler.getInverseSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxUnaryFFNN'
@@ -614,7 +626,7 @@ def JaxSymmFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
                 alpha (int) : hidden layer density
                 optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
                 lr (float) : learning rate
-                sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                sampler (str) : possible choices are 'Local', 'Exact', 'VBS', 'Inverse'
 
             Returns:
                 ma (netket.machine) : machine
@@ -645,6 +657,8 @@ def JaxSymmFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         sa = nk.sampler.ExactSampler(machine=ma)
     elif (sampler == 'VBS'):
         sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == 'Inverse'):
+        sa = my_sampler.getInverseSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxSymmFFNN'
@@ -660,7 +674,7 @@ def JaxConv3NN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
                 alpha (int) : hidden layer density
                 optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
                 lr (float) : learning rate
-                sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                sampler (str) : possible choices are 'Local', 'Exact', 'VBS', 'Inverse'
 
             Returns:
                 ma (netket.machine) : machine
@@ -691,6 +705,8 @@ def JaxConv3NN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='
         sa = nk.sampler.ExactSampler(machine=ma)
     elif (sampler == 'VBS'):
         sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == 'Inverse'):
+        sa = my_sampler.getInverseSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxConv3NN'
@@ -708,7 +724,7 @@ def JaxDeepConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sample
                 alpha (int) : hidden layer density
                 optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
                 lr (float) : learning rate
-                sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                sampler (str) : possible choices are 'Local', 'Exact', 'VBS', 'Inverse'
 
             Returns:
                 ma (netket.machine) : machine
@@ -741,6 +757,8 @@ def JaxDeepConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sample
         sa = nk.sampler.ExactSampler(machine=ma)
     elif (sampler == 'VBS'):
         sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == 'Inverse'):
+        sa = my_sampler.getInverseSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxResConvNN'
@@ -757,7 +775,7 @@ def JaxResConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler
                 alpha (int) : hidden layer density
                 optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
                 lr (float) : learning rate
-                sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                sampler (str) : possible choices are 'Local', 'Exact', 'VBS', 'Inverse'
 
             Returns:
                 ma (netket.machine) : machine
@@ -789,6 +807,8 @@ def JaxResConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler
         sa = nk.sampler.ExactSampler(machine=ma)
     elif (sampler == 'VBS'):
         sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == 'Inverse'):
+        sa = my_sampler.getInverseSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxResConvNN'
@@ -805,7 +825,7 @@ def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
                 alpha (int) : hidden layer density
                 optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
                 lr (float) : learning rate
-                sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                sampler (str) : possible choices are 'Local', 'Exact', 'VBS', 'Inverse'
 
             Returns:
                 ma (netket.machine) : machine
@@ -836,6 +856,8 @@ def JaxDeepFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler=
         sa = nk.sampler.ExactSampler(machine=ma)
     elif (sampler == 'VBS'):
         sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == 'Inverse'):
+        sa = my_sampler.getInverseSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxDeepFFNN'
@@ -852,7 +874,7 @@ def JaxDeepDropoutFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, s
                 alpha (int) : hidden layer density
                 optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
                 lr (float) : learning rate
-                sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                sampler (str) : possible choices are 'Local', 'Exact', 'VBS', 'Inverse'
 
             Returns:
                 ma (netket.machine) : machine
@@ -885,6 +907,8 @@ def JaxDeepDropoutFFNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, s
         sa = nk.sampler.ExactSampler(machine=ma)
     elif (sampler == 'VBS'):
         sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == 'Inverse'):
+        sa = my_sampler.getInverseSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = 'JaxDeepFFNN'
@@ -1072,7 +1096,7 @@ def load_machine(machine, hamiltonian, optimizer='Sgd', lr=0.1, sampler='Local')
                 hamiltonian (netket.hamiltonian) : hamiltonian
                 optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
                 lr (float) : learning rate
-                sampler (str) : possible choices are 'Local', 'Exact', 'VBS'
+                sampler (str) : possible choices are 'Local', 'Exact', 'VBS', 'Inverse'
 
             Returns:
                 op (netket.optimizer) : optimizer
@@ -1091,6 +1115,10 @@ def load_machine(machine, hamiltonian, optimizer='Sgd', lr=0.1, sampler='Local')
         sa = nk.sampler.MetropolisLocal(machine=ma)
     elif (sampler == 'Exact'):
         sa = nk.sampler.ExactSampler(machine=ma)
+    elif (sampler == 'VBS'):
+        sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == 'Inverse'):
+        sa = my_sampler.getInverseSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     return op, sa

@@ -117,3 +117,90 @@ def getVBSSampler(machine):
     kernel = _JaxVBSKernel(local_states=machine.hilbert._local_states, size=machine.hilbert._size)
     sampler = nk.sampler.jax.MetropolisHastings(machine, kernel, n_chains=16, sweep_size=1)
     return sampler
+
+
+
+class _JaxInverseKernel:
+    """A Monte Carlo Kernel to use with netket.sampler.jax.MetropolisHastings.
+
+    Inverse VBS-transformation of the states sampled with local spinflips.
+    It only works with Spin-1 hilbert spaces.
+    """
+    def __init__(self, local_states, size):
+        self.local_states = jax.numpy.sort(jax.numpy.array(local_states))
+        self.size = size
+        self.n_states = self.local_states.size
+
+
+    def transition_local(self, key, state):
+        keys = jax.random.split(key, 2)
+        si = jax.random.randint(keys[0], shape=(1,), minval=0, maxval=self.size)
+        rs = jax.random.randint(keys[1], shape=(1,), minval=0, maxval=self.n_states - 1)
+
+        return jax.ops.index_update(
+            state, si, self.local_states[rs + (self.local_states[rs] >= state[si])]
+        )
+
+    def random_state_local(self, key, state):
+        keys = jax.random.split(key, 2)
+
+        rs = jax.random.randint(
+            keys[1], shape=(self.size,), minval=0, maxval=self.n_states
+        )
+        return keys[0], self.local_states[rs]
+
+    def inverse_transformation(self, state):
+        def flip(val):
+            state = val[0]
+            i = val[1]
+            counter = val[2]
+            counter += 1
+            # flips every second none-0 spin
+            state = jax.lax.cond(counter % 2 == 1, lambda xTrue: jax.ops.index_update(state, jax.ops.index[i], -1 * state[i]), lambda xFalse: state, None)
+            return state, counter
+
+        #counts the number of none-0 spins to see, if number is even or odd
+        counter = 0
+        for i in range(len(state)):
+            condition = jnp.logical_or(state[i] > 0.5, state[i] < -0.5)
+            state, counter = jax.lax.cond(condition, flip,
+                                          lambda xFalse: (xFalse[0], xFalse[1]), (state, i, counter))
+        return state
+
+
+
+    def transition(self, key, state):
+        """Here, the update of a state is performed"""
+        keys = jax.random.split(key, 2)
+        si = jax.random.randint(keys[0], shape=(1,), minval=0, maxval=self.size)
+        rs = jax.random.randint(keys[1], shape=(1,), minval=0, maxval=self.n_states - 1)
+        state = jax.ops.index_update(
+            state, si, self.local_states[rs + (self.local_states[rs] >= state[si])])
+        return self.inverse_transformation(state)
+
+
+
+    def random_state(self, key, state):
+        """Here, a random VBS state is created."""
+        keys = jax.random.split(key, 2)
+
+        rs = jax.random.randint(
+            keys[1], shape=(self.size,), minval=0, maxval=self.n_states
+        )
+
+        return keys[0], self.inverse_transformation(self.local_states[rs])
+
+
+def getInverseSampler(machine):
+    """Method to easily create a Metropolis Hastings sampler with _JaxVBSKernel.
+        The sampler does not solve the problems with the original AKLT and Heisenberg chain
+
+            Args:
+                hilbert (netket.machine) : machine
+
+            Returns:
+                sampler (netket.sampler) : sampler
+                                                        """
+    kernel = _JaxInverseKernel(local_states=machine.hilbert._local_states, size=machine.hilbert._size)
+    sampler = nk.sampler.jax.MetropolisHastings(machine, kernel, n_chains=16, sweep_size=1)
+    return sampler
