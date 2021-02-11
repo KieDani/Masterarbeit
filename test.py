@@ -183,6 +183,7 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
         if i%10 == 0:
             time_per_iteration = time_per_iteration / 10
             print('Progress: ', float(i)/n_iterations*100, '%', ';  Time per iteration: ', time_per_iteration)
+            sys.stdout.flush()
             time_per_iteration = 0
 
     end = time.time()
