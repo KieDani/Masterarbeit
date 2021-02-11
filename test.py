@@ -160,11 +160,16 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
     ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
     ma.load(''.join((dataname, '.wf')))
     op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer='Adamax', lr=0.001, sampler=sampler)
-    observables = {**functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=False),
-                   **functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)}
+    #observables = {**functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=False),
+    #               **functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)}
+    observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=False)
     start = time.time()
+    time_per_iteration = 0
     for i in range(n_iterations):
+        before = time.time()
         measurement = nk.variational.estimate_expectations(observables, sa, n_samples=n_samples)
+        after = time.time()
+        time_per_iteration += after - before
         #save_dict[''.join(('Iteration', str(i)))] = measurement
         if(i == 0):
             w = csv.writer(open(''.join((dataname, '_observables', '.csv')), "w"))
@@ -174,7 +179,11 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
             w = csv.writer(open(''.join((dataname, '_observables', '.csv')), "a"))
             for key, val in measurement.items():
                 w.writerow([key, val])
-        print(measurement)
+        #print(measurement)
+        if i%10 == 0:
+            time_per_iteration = time_per_iteration / 10
+            print('Progress: ', float(i)/n_iterations*100, '%', ';  Time per iteration: ', time_per_iteration)
+            time_per_iteration = 0
 
     end = time.time()
     with open(''.join((dataname, '_observables', '.time')), 'w') as reader:
@@ -261,9 +270,10 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 #jax.config.update('jax_disable_jit', True)
 #run(L=4, alpha=2, n_samples=300, n_iterations=300, machine_name='JaxFFNN', sampler='VBS')
 
-#run(L=12, alpha=6, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=500, n_iterations=150)
+#run(L=30, alpha=10, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=2000, n_iterations=150)
 #load(L=12, alpha=6, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=100, n_iterations=100)
 #measureObservable(L=12, alpha=6, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=2000, n_iterations=100)
+
 
 
 
