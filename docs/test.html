@@ -78,6 +78,7 @@ import csv
 
 
 
+
 __L__ = 50
 __number_samples__ = 700
 __number_iterations__ = 500
@@ -178,7 +179,7 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = &#39;run&#
     sys.stdout.flush()
 
 
-def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = &#39;run&#39;, machine_name = &#39;JaxRBM&#39;, sampler = &#39;Local&#39;, hamiltonian_name = &#39;transformed_Heisenberg&#39;, n_samples =10000, n_iterations = 20):
+def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = &#39;run&#39;, machine_name = &#39;JaxRBM&#39;, sampler = &#39;Local&#39;, hamiltonian_name = &#39;transformed_Heisenberg&#39;, n_samples =10000, n_iterations = 20, append = False):
     &#34;&#34;&#34;Method to measure th observables with a trained machine.
 
             The sampler can be chosen.
@@ -193,6 +194,7 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = &#39;run
                     hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
                     n_samples (int) : The number of samples used in every iteration step
                     n_iterations (int) : The number of iterations (training steps)
+                    append (bool) : If True, the old .csv file is deleted. If False, the results are appended to the old .csv file
 
                     &#34;&#34;&#34;
     if (dataname == None):
@@ -203,13 +205,18 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = &#39;run
     ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
     ma.load(&#39;&#39;.join((dataname, &#39;.wf&#39;)))
     op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer=&#39;Adamax&#39;, lr=0.001, sampler=sampler)
-    observables = {**functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=False),
-                   **functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=True)}
-    #save_dict = {}
+    #observables = {**functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=False),
+    #               **functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=True)}
+    observables = functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=False)
+    start = time.time()
+    time_per_iteration = 0
     for i in range(n_iterations):
+        before = time.time()
         measurement = nk.variational.estimate_expectations(observables, sa, n_samples=n_samples)
+        after = time.time()
+        time_per_iteration += after - before
         #save_dict[&#39;&#39;.join((&#39;Iteration&#39;, str(i)))] = measurement
-        if(i == 0):
+        if(i == 0 and append == False):
             w = csv.writer(open(&#39;&#39;.join((dataname, &#39;_observables&#39;, &#39;.csv&#39;)), &#34;w&#34;))
             for key, val in measurement.items():
                 w.writerow([key, val])
@@ -217,7 +224,19 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = &#39;run
             w = csv.writer(open(&#39;&#39;.join((dataname, &#39;_observables&#39;, &#39;.csv&#39;)), &#34;a&#34;))
             for key, val in measurement.items():
                 w.writerow([key, val])
-        print(measurement)
+        #print(measurement)
+        if i%10 == 0:
+            time_per_iteration = time_per_iteration / 10
+            print(&#39;Progress: &#39;, float(i)/n_iterations*100, &#39;%&#39;, &#39;;  Time per iteration: &#39;, time_per_iteration)
+            sys.stdout.flush()
+            time_per_iteration = 0
+
+    end = time.time()
+    with open(&#39;&#39;.join((dataname, &#39;_observables&#39;, &#39;.time&#39;)), &#39;w&#39;) as reader:
+        reader.write(str(end - start))
+    # print(gs2.estimate(observables))
+    print(&#39;Time&#39;, end - start)
+    sys.stdout.flush()
 
 
 
@@ -297,9 +316,10 @@ def exact(L = __L__, symmetric = True, dataname = None, path = &#39;run&#39;, ha
 #jax.config.update(&#39;jax_disable_jit&#39;, True)
 #run(L=4, alpha=2, n_samples=300, n_iterations=300, machine_name=&#39;JaxFFNN&#39;, sampler=&#39;VBS&#39;)
 
-#run(L=12, alpha=6, machine_name=&#39;JaxDeepFFNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=500, n_iterations=150)
-#load(L=12, alpha=6, machine_name=&#39;JaxDeepFFNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=100, n_iterations=100)
-#measureObservable(L=12, alpha=6, machine_name=&#39;JaxDeepFFNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=2000, n_iterations=100)
+#run(L=30, alpha=10, machine_name=&#39;JaxDeepFFNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=2000, n_iterations=150)
+#run(L=10, alpha=2, machine_name=&#39;JaxDeepFFNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=100, n_iterations=100)
+#measureObservable(L=10, alpha=2, machine_name=&#39;JaxDeepFFNN&#39;, sampler=&#39;Local&#39;, hamiltonian_name=&#39;transformed_Heisenberg&#39;, n_samples=200, n_iterations=100)
+
 
 
 
@@ -702,7 +722,7 @@ Use this only for small lattices, because it needs an awful lot of RAM.</p>
 </details>
 </dd>
 <dt id="test.measureObservable"><code class="name flex">
-<span>def <span class="ident">measureObservable</span></span>(<span>L=50, alpha=4, dataname=None, path='run', machine_name='JaxRBM', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=10000, n_iterations=20)</span>
+<span>def <span class="ident">measureObservable</span></span>(<span>L=50, alpha=4, dataname=None, path='run', machine_name='JaxRBM', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=10000, n_iterations=20, append=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Method to measure th observables with a trained machine.</p>
@@ -717,12 +737,13 @@ Use this only for small lattices, because it needs an awful lot of RAM.</p>
     hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
     n_samples (int) : The number of samples used in every iteration step
     n_iterations (int) : The number of iterations (training steps)
+    append (bool) : If True, the old .csv file is deleted. If False, the results are appended to the old .csv file
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = &#39;run&#39;, machine_name = &#39;JaxRBM&#39;, sampler = &#39;Local&#39;, hamiltonian_name = &#39;transformed_Heisenberg&#39;, n_samples =10000, n_iterations = 20):
+<pre><code class="python">def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = &#39;run&#39;, machine_name = &#39;JaxRBM&#39;, sampler = &#39;Local&#39;, hamiltonian_name = &#39;transformed_Heisenberg&#39;, n_samples =10000, n_iterations = 20, append = False):
     &#34;&#34;&#34;Method to measure th observables with a trained machine.
 
             The sampler can be chosen.
@@ -737,6 +758,7 @@ Use this only for small lattices, because it needs an awful lot of RAM.</p>
                     hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
                     n_samples (int) : The number of samples used in every iteration step
                     n_iterations (int) : The number of iterations (training steps)
+                    append (bool) : If True, the old .csv file is deleted. If False, the results are appended to the old .csv file
 
                     &#34;&#34;&#34;
     if (dataname == None):
@@ -747,13 +769,18 @@ Use this only for small lattices, because it needs an awful lot of RAM.</p>
     ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
     ma.load(&#39;&#39;.join((dataname, &#39;.wf&#39;)))
     op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer=&#39;Adamax&#39;, lr=0.001, sampler=sampler)
-    observables = {**functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=False),
-                   **functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=True)}
-    #save_dict = {}
+    #observables = {**functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=False),
+    #               **functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=True)}
+    observables = functions.get_operator(hilbert=hi, L=L, operator=&#39;FerroCorr&#39;, symmetric=False)
+    start = time.time()
+    time_per_iteration = 0
     for i in range(n_iterations):
+        before = time.time()
         measurement = nk.variational.estimate_expectations(observables, sa, n_samples=n_samples)
+        after = time.time()
+        time_per_iteration += after - before
         #save_dict[&#39;&#39;.join((&#39;Iteration&#39;, str(i)))] = measurement
-        if(i == 0):
+        if(i == 0 and append == False):
             w = csv.writer(open(&#39;&#39;.join((dataname, &#39;_observables&#39;, &#39;.csv&#39;)), &#34;w&#34;))
             for key, val in measurement.items():
                 w.writerow([key, val])
@@ -761,7 +788,19 @@ Use this only for small lattices, because it needs an awful lot of RAM.</p>
             w = csv.writer(open(&#39;&#39;.join((dataname, &#39;_observables&#39;, &#39;.csv&#39;)), &#34;a&#34;))
             for key, val in measurement.items():
                 w.writerow([key, val])
-        print(measurement)</code></pre>
+        #print(measurement)
+        if i%10 == 0:
+            time_per_iteration = time_per_iteration / 10
+            print(&#39;Progress: &#39;, float(i)/n_iterations*100, &#39;%&#39;, &#39;;  Time per iteration: &#39;, time_per_iteration)
+            sys.stdout.flush()
+            time_per_iteration = 0
+
+    end = time.time()
+    with open(&#39;&#39;.join((dataname, &#39;_observables&#39;, &#39;.time&#39;)), &#39;w&#39;) as reader:
+        reader.write(str(end - start))
+    # print(gs2.estimate(observables))
+    print(&#39;Time&#39;, end - start)
+    sys.stdout.flush()</code></pre>
 </details>
 </dd>
 <dt id="test.run"><code class="name flex">
