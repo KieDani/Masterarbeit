@@ -35,6 +35,7 @@ import csv
 
 
 
+
 __L__ = 50
 __number_samples__ = 700
 __number_iterations__ = 500
@@ -135,7 +136,7 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
     sys.stdout.flush()
 
 
-def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples =10000, n_iterations = 20):
+def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples =10000, n_iterations = 20, append = False):
     """Method to measure th observables with a trained machine.
 
             The sampler can be chosen.
@@ -150,6 +151,7 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
                     hamiltonian_name (str) : A string to choose the hamiltonian. Possible inputs: see get_hamiltonian in my_models.py
                     n_samples (int) : The number of samples used in every iteration step
                     n_iterations (int) : The number of iterations (training steps)
+                    append (bool) : If True, the old .csv file is deleted. If False, the results are appended to the old .csv file
 
                     """
     if (dataname == None):
@@ -171,7 +173,7 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
         after = time.time()
         time_per_iteration += after - before
         #save_dict[''.join(('Iteration', str(i)))] = measurement
-        if(i == 0):
+        if(i == 0 and append == False):
             w = csv.writer(open(''.join((dataname, '_observables', '.csv')), "w"))
             for key, val in measurement.items():
                 w.writerow([key, val])
@@ -272,8 +274,8 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 #run(L=4, alpha=2, n_samples=300, n_iterations=300, machine_name='JaxFFNN', sampler='VBS')
 
 #run(L=30, alpha=10, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=2000, n_iterations=150)
-#load(L=12, alpha=6, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=100, n_iterations=100)
-#measureObservable(L=12, alpha=6, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=2000, n_iterations=100)
+#run(L=10, alpha=2, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=100, n_iterations=100)
+#measureObservable(L=10, alpha=2, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=200, n_iterations=100)
 
 
 
