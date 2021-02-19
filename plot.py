@@ -610,5 +610,4 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
 
 
-
-plotObservables('run/L12_observables.csv', 12)
+plotObservables('run/secondResults/JaxDeepConvNN/L60_observables.csv', 60)
