@@ -610,4 +610,13 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
 
 
-plotObservables('run/secondResults/JaxDeepConvNN/L60_observables.csv', 60)
+
+#plotObservables('run/secondResults/JaxDeepConvNN/L16_observables.csv', 16)
+#plotObservables('run/secondResults/JaxDeepFFNN/L16_observables.csv', 16)
+#plotObservables('run/secondResults/JaxDeepConvNN/L30_observables.csv', 30)
+#plotObservables('run/secondResults/JaxDeepFFNN/L40_observables.csv', 40)
+#plotObservables('run/secondResults/JaxDeepConvNN/L60_observables.csv', 60)
+
+#plot(dataname='run/secondResults/JaxDeepConvNN/L60.log', L=60)
+
+#https://journals.aps.org/prb/abstract/10.1103/PhysRevB.91.045121
