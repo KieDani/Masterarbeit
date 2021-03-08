@@ -617,7 +617,7 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #plotObservables('run/secondResults/JaxDeepFFNN/L40_observables.csv', 40)
 #plotObservables('run/secondResults/JaxDeepConvNN/L60_observables.csv', 60)
 
-#plotObservables('run/secondResults/JaxFFNN/L16_observables.csv', 16)
+plotObservables('run/numberSamples_small/JaxDeepConvNN/L16_observables.csv', 16)
 
 #plot(dataname='run/secondResults/JaxDeepConvNN/L60.log', L=60)
 
