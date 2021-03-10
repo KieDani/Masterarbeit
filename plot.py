@@ -611,4 +611,16 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 
 
 
-plotObservables('run/L12_observables.csv', 12)
+#plotObservables('run/secondResults/JaxDeepConvNN/L16_observables.csv', 16)
+#plotObservables('run/secondResults/JaxDeepFFNN/L16_observables.csv', 16)
+#plotObservables('run/secondResults/JaxDeepConvNN/L30_observables.csv', 30)
+#plotObservables('run/secondResults/JaxDeepFFNN/L40_observables.csv', 40)
+#plotObservables('run/secondResults/JaxDeepConvNN/L60_observables.csv', 60)
+
+
+#plotObservables('run/thirdResults/JaxDeepFFNN/L12_observables.csv', 12)
+#plotObservables('run/numberSamples_small/JaxDeepConvNN/L16_observables.csv', 16)
+
+#plot(dataname='run/secondResults/JaxDeepConvNN/L60.log', L=60)
+
+#https://journals.aps.org/prb/abstract/10.1103/PhysRevB.91.045121
