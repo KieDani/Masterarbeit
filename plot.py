@@ -24,7 +24,7 @@ import csv
 
 
 
-def plot(dataname, L, observables=True, symmetric_operator = False, periodic=False, transformed_or_original = 'transformed'):
+def plot(dataname, L, observables=True, symmetric_operator = False, periodic=False, transformed_or_original = 'transformed', title=None):
     """Function to plot the results of the calculations
         Multiple possibilities to plot the results
 
@@ -69,7 +69,7 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
                 sf.append(iteration['Ferro_correlation_function' + str(i)]["Mean"])
         return calcMean(sf)
 
-    plt.plot(iters, energy)
+    plt.plot(iters, energy, label='VMC energy')
     if(periodic == False):
         tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
     else:
@@ -85,10 +85,14 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
         factor = (L - 1) * (-1.4)
     expected_energy = np.ones_like(np.asarray(iters)) * factor
     print(dataname + '; (E_exact - E)/E_exact = ' + str((factor - np.mean(energy[-int(1./3 * len(energy)):])) / factor))
-    plt.plot(iters, expected_energy, color='red')
-    plt.title(dataname)
+    plt.plot(iters, expected_energy, color='red', label='exact energy')
+    if title==None:
+        plt.title(dataname)
+    else:
+        plt.title(title)
     plt.xlabel('Iteration')
     plt.ylabel('Energy')
+    plt.legend()
     plt.show()
 
     if(observables == True):
@@ -127,13 +131,14 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
 
 
 
-def plotObservables(dataname, L):
+def plotObservables(dataname, L, operator='FerroCorr', title = None):
     """Function to plot the results of the function measureObservables().
         The csv file is loaded and evaluated.
 
             Args:
                 dataname (str) : the dataname (including the relative path)
                 L (int) : Lattice size
+                operator (str): allowed inputs are 'FerroCorr' and 'StringCorr'
                                                         """
     #observable 1 at position 0, etc
     numbers = np.zeros(L-1, dtype=np.int32)
@@ -143,7 +148,14 @@ def plotObservables(dataname, L):
         spamreader = csv.reader(csvfile)
         for row in spamreader:
             for i in range(0, L-1):
-                if row[0] == ''.join(('Ferro_correlation_function', str(i+1))):
+                if operator == 'FerroCorr':
+                    name_operator = 'Ferro_correlation_function'
+                elif operator == 'StringCorr':
+                    name_operator = 'String_correlation_function'
+                else:
+                    name_operator = None
+                    print('wrong input for parameter operator')
+                if row[0] == ''.join((name_operator, str(i+1))):
                     value = row[1].split('+')[0]
                     if value[-1] == 'e':
                         value = ''.join((value, row[1].split('+')[1]))
@@ -153,7 +165,7 @@ def plotObservables(dataname, L):
         print(values)
         print(numbers)
         print(values/numbers)
-        plt.plot(range(1, L), values/numbers)
+        plt.plot(range(1, L), values/numbers, label='VMC value')
         dataname_operator = ''.join(('run/exact_', 'transformed', '/L', str(L), '_exact.csv'))
         try:
             operator = 1 * np.loadtxt(dataname_operator)
@@ -162,8 +174,17 @@ def plotObservables(dataname, L):
             print(dataname_operator)
             operator = 0.374 * np.ones(len(values))
             x_operator = range(1, L)
-        plt.plot(x_operator, operator, color='red')
-        plt.title(dataname)
+        plt.plot(x_operator, operator, color='red', label='exact value')
+        plt.xlabel('site distance')
+        if operator == 'FerroCorr':
+            plt.ylabel('Ferromagnetic correlation operator')
+        else:
+            plt.ylabel('String correlation operator')
+        if title == None:
+            plt.title(dataname)
+        else:
+            plt.title(title)
+        plt.legend()
         plt.show()
 
 
@@ -624,3 +645,13 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #plot(dataname='run/secondResults/JaxDeepConvNN/L60.log', L=60)
 
 #https://journals.aps.org/prb/abstract/10.1103/PhysRevB.91.045121
+
+
+
+#----------------------------------------------------------------------------------------------------------------------
+
+
+#plot('results/problems/RBM/L12.log', L = 12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original')
+#plot('results/problems/FFNN/L12.log', L = 12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title='VMC energy of the Haldane chain (N=12)')
+#plotObservables('results/problems/FFNN/L12_observables.csv', 12, operator='StringCorr', title='String correlation operator for the Haldane chain (N=12)')
+#plotObservables('results/problems/FFNN/L12_observables.csv', 12, operator='FerroCorr', title='Ferromagnetic correlation operator for the Haldane chain (N=12)')

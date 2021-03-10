@@ -136,7 +136,7 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
     sys.stdout.flush()
 
 
-def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples =10000, n_iterations = 20, append = False):
+def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples =10000, n_iterations = 20, append = False, operator='FerroCorr'):
     """Method to measure th observables with a trained machine.
 
             The sampler can be chosen.
@@ -152,6 +152,7 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
                     n_samples (int) : The number of samples used in every iteration step
                     n_iterations (int) : The number of iterations (training steps)
                     append (bool) : If True, the old .csv file is deleted. If False, the results are appended to the old .csv file
+                    operator (str) : allowed inputs are 'FerroCorr' and 'StringCorr'
 
                     """
     if (dataname == None):
@@ -164,7 +165,7 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
     op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer='Adamax', lr=0.001, sampler=sampler)
     #observables = {**functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=False),
     #               **functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)}
-    observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=False)
+    observables = functions.get_operator(hilbert=hi, L=L, operator=operator, symmetric=False)
     start = time.time()
     time_per_iteration = 0
     for i in range(n_iterations):
@@ -509,3 +510,17 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 # generate_machine = machines.get_machine(machine_name)
 # ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
 # print(machine_name, ma.n_par, compare/ma.n_par)
+
+
+
+#---------------------------------------------------------------------------------------------------------------------
+
+
+#Show that the original Heisenberg model and AKLT model can not be solved properly
+#run(L=12, alpha=20, machine_name='JaxRBM', sampler='Local', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=200, path='results/problems/RBM')
+#run(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=500, path='results/problems/FFNN')
+#measureObservable(L=12, alpha=20, machine_name='JaxRBM', sampler='Local', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=20, path='results/problems/RBM', append=False)
+#measureObservable(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=100, path='results/problems/FFNN', append=False, operator='StringCorr')
+#measureObservable(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=100, path='results/problems/FFNN', append=True, operator='FerroCorr')
+#run(L=12, alpha=20, machine_name='JaxRBM', sampler='Local', hamiltonian_name='original_AKLT', n_samples=1000, n_iterations=200, path='results/problemsAKLT/RBM')
+#run(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='original_AKLT', n_samples=1000, n_iterations=500, path='results/problemsAKLT/FFNN')
