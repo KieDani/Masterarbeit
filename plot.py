@@ -663,3 +663,7 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #plotObservables('results/transformedHamiltonian/L16_observables.csv', 16, title='String correlation operator for the transformed Haldane chain (N=16)')
 #plot('results/transformedHamiltonian/L60.log', L=60, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title='VMC energy of the transformed Haldane chain (N=60)')
 #plotObservables('results/transformedHamiltonian/L60_observables.csv', 60, title='String correlation operator for the transformed Haldane chain (N=16)')
+
+
+#Comparison of architectures
+#compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
