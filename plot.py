@@ -651,7 +651,15 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #----------------------------------------------------------------------------------------------------------------------
 
 
+#Show that the original Heisenberg model and AKLT model can not be solved properly
 #plot('results/problems/RBM/L12.log', L = 12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original')
 #plot('results/problems/FFNN/L12.log', L = 12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title='VMC energy of the Haldane chain (N=12)')
 #plotObservables('results/problems/FFNN/L12_observables.csv', 12, operator='StringCorr', title='String correlation operator for the Haldane chain (N=12)')
 #plotObservables('results/problems/FFNN/L12_observables.csv', 12, operator='FerroCorr', title='Ferromagnetic correlation operator for the Haldane chain (N=12)')
+
+
+#Results for transformed hamiltonian
+#plot('results/transformedHamiltonian/L16.log', L=16, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title ='VMC energy of the transformed Haldane chain (N=16)')
+#plotObservables('results/transformedHamiltonian/L16_observables.csv', 16, title='String correlation operator for the transformed Haldane chain (N=16)')
+#plot('results/transformedHamiltonian/L60.log', L=60, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title='VMC energy of the transformed Haldane chain (N=60)')
+#plotObservables('results/transformedHamiltonian/L60_observables.csv', 60, title='String correlation operator for the transformed Haldane chain (N=16)')
