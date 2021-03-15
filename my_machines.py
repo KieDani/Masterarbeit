@@ -140,6 +140,8 @@ def TransformedLayer():
 
         for j in range(inputs.shape[0]):
             counter = +1
+            #print('------------------')
+            #print(inputs[j, :])
             #flips every second nonzero spin
             for i in range(inputs.shape[1]):
                 val = inputs[j, i]
@@ -149,6 +151,7 @@ def TransformedLayer():
                 #     inputs = jax.ops.index_update(inputs, jax.ops.index[j, i], counter*val)
                 #     counter *= -1
             #inputs, counter = jax.lax.fori_loop(0, inputs.shape[1], inner_loop_body, (inputs, counter))
+            #print(inputs[j, :])
         return inputs
 
     return init_fun, apply_fun
