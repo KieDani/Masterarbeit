@@ -33,7 +33,7 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
                 L (int) : Lattice size
                 symmetric_operator (bool) : if the observable is measured symmetrically to the center
                 periodic (bool) : if exact results of the periodic lattice are plotted
-                transformed_or_original (str) : which hamiltonian is used. 'transformed' or 'original'
+                transformed_or_original (str) : which hamiltonian is used. 'transformed' or 'original' or 'AKLT'
                                                     """
     data=json.load(open(dataname))
     # Extract the relevant information
@@ -79,8 +79,10 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
         else:
             #energy of the normal hamiltonian
             tmp = [None, None, None, None, -5.999, -6.531, -8.617, -9.572, -11.337, -12.480, -14.094, -15.337, -16.870, -18.170, -19.655, -20.991, -22.447 ]
-    if (L < len(tmp)):
+    if (L < len(tmp) and transformed_or_original != 'AKLT'):
         factor = tmp[L]
+    elif(transformed_or_original == 'AKLT'):
+        factor = -2./3 * (L - 1)
     else:
         factor = (L - 1) * (-1.4)
     expected_energy = np.ones_like(np.asarray(iters)) * factor
@@ -131,7 +133,7 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
 
 
 
-def plotObservables(dataname, L, operator='FerroCorr', title = None):
+def plotObservables(dataname, L, operator='FerroCorr', title = None, hamiltonian = 'Heisenberg'):
     """Function to plot the results of the function measureObservables().
         The csv file is loaded and evaluated.
 
@@ -167,19 +169,24 @@ def plotObservables(dataname, L, operator='FerroCorr', title = None):
         print(values/numbers)
         plt.plot(range(1, L), values/numbers, label='VMC value')
         dataname_operator = ''.join(('run/exact_', 'transformed', '/L', str(L), '_exact.csv'))
-        try:
-            operator = 1 * np.loadtxt(dataname_operator)
-            x_operator = np.arange(1, len(operator) + 1)
-        except:
-            print(dataname_operator)
-            operator = 0.374 * np.ones(len(values))
+        if(hamiltonian == 'AKLT'):
+            operator = 4./9 * np.ones(len(values))
             x_operator = range(1, L)
+        else:
+            try:
+                operator = 1 * np.loadtxt(dataname_operator)
+                x_operator = np.arange(1, len(operator) + 1)
+            except:
+                print(dataname_operator)
+                operator = 0.374 * np.ones(len(values))
+                x_operator = range(1, L)
         plt.plot(x_operator, operator, color='red', label='exact value')
         plt.xlabel('site distance')
         if operator == 'FerroCorr':
             plt.ylabel('Ferromagnetic correlation operator')
         else:
             plt.ylabel('String correlation operator')
+        plt.ylabel('Ferromagnetic correlation operator')
         if title == None:
             plt.title(dataname)
         else:
@@ -664,7 +671,9 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #plotObservables('results/transformedHamiltonian/L16_observables.csv', 16, title='String correlation operator for the transformed Haldane chain (N=16)')
 #plot('results/transformedHamiltonian/L60.log', L=60, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title='VMC energy of the transformed Haldane chain (N=60)')
 #plotObservables('results/transformedHamiltonian/L60_observables.csv', 60, title='String correlation operator for the transformed Haldane chain (N=16)')
+#plot('results/transformedAKLT/FFNN/L12.log', L=12, transformed_or_original='AKLT', observables=False, periodic = False)
+#plotObservables('results/transformedAKLT/FFNN/L12_observables.csv', L=12, hamiltonian='AKLT')
 
 
 #Comparison of architectures
-compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
+#compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
