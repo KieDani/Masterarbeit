@@ -515,15 +515,16 @@ def compareArchitectures(machine_names, path, L):
             except:
                 #Results not yet finished
                 pass
+        #print(deviations_energy)
         mean = np.mean(deviations_energy)
         median = np.median(deviations_energy)
-        variance = np.var(deviations_energy)
+        variance = np.var(deviations_energy, dtype=np.float64)
+        standard_deviation = np.sqrt(variance)
         minimum = np.amin(deviations_energy)
         maximum = np.amax(deviations_energy)
         meantime = np.mean(times)
         #mintime  = np.amin(times)
-        print(''.join((machine_name + '; mean=', str(mean), ' variance=', str(variance), ' median=', str(median), ' minimum=', str(minimum), ' maximum=', str(maximum), ' time=', str(meantime))))
-
+        print(''.join((machine_name + '; mean=', str(mean), ' variance=', str(variance), ' standard deviation=', str(standard_deviation), ' median=', str(median), ' minimum=', str(minimum), ' maximum=', str(maximum), ' time=', str(meantime))))
 
 
 
@@ -666,4 +667,4 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 
 
 #Comparison of architectures
-#compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
+compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
