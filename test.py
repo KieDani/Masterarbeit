@@ -529,5 +529,6 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 
 
 #Test VBSSampler and InverseSampler
-#run(L=12, alpha=20, machine_name='JaxFFNN', sampler='Inverse', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=500, path='results/InverseSampler/FFNN')
-#run(L=12, alpha=20, machine_name='JaxFFNN', sampler='Inverse', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=500, path='results/VBSSampler/FFNN')
+#run(L=12, alpha=20, machine_name='JaxFFNN', sampler='Inverse', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=1000, path='results/InverseSampler2/FFNN')
+#measureObservable(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=20, path='results/InverseSampler/FFNN', append=False)
+#run(L=12, alpha=20, machine_name='JaxFFNN', sampler='Inverse', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=1000, path='results/VBSSampler2/FFNN')

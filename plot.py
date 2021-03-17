@@ -677,3 +677,9 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 
 #Comparison of architectures
 #compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
+
+
+#Test VBSSampler and InverseSampler
+#plot('results/InverseSampler/FFNN/L12.log', L=12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title ='VMC energy of the Haldane chain (N=12) with the InverseSampler')
+#plotObservables('results/InverseSampler/FFNN/L12_observables.csv', L=12, hamiltonian='transformed_Heisenberg', operator='StringCorr')
+#plot('results/VBSSampler/FFNN/L12.log', L=12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title ='VMC energy of the Haldane chain (N=12) with the VBSSampler')
