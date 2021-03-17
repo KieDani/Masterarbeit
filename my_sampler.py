@@ -160,22 +160,24 @@ class _JaxInverseKernel:
             return state, counter
 
         #counts the number of none-0 spins to see, if number is even or odd
-        counter = 0
+        counter = 1
         for i in range(len(state)):
             condition = jnp.logical_or(state[i] > 0.5, state[i] < -0.5)
             state, counter = jax.lax.cond(condition, flip,
-                                          lambda xFalse: (xFalse[0], xFalse[1]), (state, i, counter))
+                                          lambda xFalse: (xFalse[0], xFalse[2]), (state, i, counter))
         return state
 
 
 
     def transition(self, key, state):
         """Here, the update of a state is performed"""
+        print(state)
         keys = jax.random.split(key, 2)
         si = jax.random.randint(keys[0], shape=(1,), minval=0, maxval=self.size)
         rs = jax.random.randint(keys[1], shape=(1,), minval=0, maxval=self.n_states - 1)
         state = jax.ops.index_update(
             state, si, self.local_states[rs + (self.local_states[rs] >= state[si])])
+        print(state)
         return self.inverse_transformation(state)
 
 
