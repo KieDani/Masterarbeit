@@ -22,7 +22,7 @@ import netket as nk
 class _JaxVBSKernel:
     """A Monte Carlo Kernel to use with netket.sampler.jax.MetropolisHastings.
 
-    Local spinflips are performed and with a propbability of 20% the state is repaired, so that it is a VBS state again.
+    Local spinflips are performed and with a propbability of 20% the state is turned into a VBS state again.
     It only works with Spin-1 hilbert spaces.
     """
     def __init__(self, local_states, size):
@@ -65,7 +65,7 @@ class _JaxVBSKernel:
 
         keys = jax.random.split(key, 2)
         rand_num = jax.random.randint(keys[0], shape=(1,), minval=1, maxval=11)[0]
-        #print(rand_num)
+        print(rand_num)
         return jax.lax.cond(rand_num < 9, local_update, VBS_update , (keys[1], state))
 
 
