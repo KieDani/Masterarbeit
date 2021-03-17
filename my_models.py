@@ -159,7 +159,7 @@ def build_AKLTchain_transformed(L, periodic = False):
                 L (int) : The number of sites of the lattice
                 periodic (bool) : True, if we have a periodic lattice. False, if we have an open lattice.
                 """
-    print('Building the normal AKLT chain')
+    print('Building the transformed AKLT chain')
     J = [1]
     gnx = nx.Graph()
     if (periodic == False):
