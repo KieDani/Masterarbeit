@@ -133,7 +133,7 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
 
 
 
-def plotObservables(dataname, L, operator='FerroCorr', title = None, hamiltonian = 'Heisenberg'):
+def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltonian = 'Heisenberg'):
     """Function to plot the results of the function measureObservables().
         The csv file is loaded and evaluated.
 
@@ -150,14 +150,14 @@ def plotObservables(dataname, L, operator='FerroCorr', title = None, hamiltonian
         spamreader = csv.reader(csvfile)
         for row in spamreader:
             for i in range(0, L-1):
-                if operator == 'FerroCorr':
-                    name_operator = 'Ferro_correlation_function'
-                elif operator == 'StringCorr':
-                    name_operator = 'String_correlation_function'
+                if observable == 'FerroCorr':
+                    name_observable = 'Ferro_correlation_function'
+                elif observable == 'StringCorr':
+                    name_observable = 'String_correlation_function'
                 else:
-                    name_operator = None
-                    print('wrong input for parameter operator')
-                if row[0] == ''.join((name_operator, str(i+1))):
+                    name_observable = None
+                    print('wrong input for parameter observable')
+                if row[0] == ''.join((name_observable, str(i+1))):
                     value = row[1].split('+')[0]
                     if value[-1] == 'e':
                         value = ''.join((value, row[1].split('+')[1]))
@@ -168,21 +168,21 @@ def plotObservables(dataname, L, operator='FerroCorr', title = None, hamiltonian
         print(numbers)
         print(values/numbers)
         plt.plot(range(1, L), values/numbers, label='VMC value')
-        dataname_operator = ''.join(('run/exact_', 'transformed', '/L', str(L), '_exact.csv'))
+        dataname_observable = ''.join(('run/exact_', 'transformed', '/L', str(L), '_exact.csv'))
         if(hamiltonian == 'AKLT'):
             operator = 4./9 * np.ones(len(values))
             x_operator = range(1, L)
         else:
             try:
-                operator = 1 * np.loadtxt(dataname_operator)
+                operator = 1 * np.loadtxt(dataname_observable)
                 x_operator = np.arange(1, len(operator) + 1)
             except:
-                print(dataname_operator)
+                print(dataname_observable)
                 operator = 0.374 * np.ones(len(values))
                 x_operator = range(1, L)
         plt.plot(x_operator, operator, color='red', label='exact value')
         plt.xlabel('site distance')
-        if operator == 'FerroCorr':
+        if(observable == 'FerroCorr'):
             plt.ylabel('Ferromagnetic correlation operator')
         else:
             plt.ylabel('String correlation operator')
@@ -662,8 +662,8 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #Show that the original Heisenberg model and AKLT model can not be solved properly
 #plot('results/problems/RBM/L12.log', L = 12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original')
 #plot('results/problems/FFNN/L12.log', L = 12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title='VMC energy of the Haldane chain (N=12)')
-#plotObservables('results/problems/FFNN/L12_observables.csv', 12, operator='StringCorr', title='String correlation operator for the Haldane chain (N=12)')
-#plotObservables('results/problems/FFNN/L12_observables.csv', 12, operator='FerroCorr', title='Ferromagnetic correlation operator for the Haldane chain (N=12)')
+#plotObservables('results/problems/FFNN/L12_observables.csv', 12, observable='StringCorr', title='String correlation operator for the Haldane chain (N=12)')
+#plotObservables('results/problems/FFNN/L12_observables.csv', 12, observable='FerroCorr', title='Ferromagnetic correlation operator for the Haldane chain (N=12)')
 
 
 #Results for transformed hamiltonian
@@ -674,6 +674,9 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #plot('results/transformedAKLT/FFNN/L12.log', L=12, transformed_or_original='AKLT', observables=False, periodic = False)
 #plotObservables('results/transformedAKLT/FFNN/L12_observables.csv', L=12, hamiltonian='AKLT')
 
+#plot('run/fifthResults/JaxFFNN/L16.log', L=16, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title ='VMC energy of the transformed Haldane chain (N=16)')
+#plotObservables('run/fifthResults/JaxFFNN/L16_observables.csv', 16, title='String correlation operator for the transformed Haldane chain (N=16)')
+
 
 #Comparison of architectures
 #compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
@@ -681,5 +684,5 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 
 #Test VBSSampler and InverseSampler
 #plot('results/InverseSampler/FFNN/L12.log', L=12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title ='VMC energy of the Haldane chain (N=12) with the InverseSampler')
-#plotObservables('results/InverseSampler/FFNN/L12_observables.csv', L=12, hamiltonian='transformed_Heisenberg', operator='StringCorr')
+#plotObservables('results/InverseSampler/FFNN/L12_observables.csv', L=12, hamiltonian='transformed_Heisenberg', observable='StringCorr')
 #plot('results/VBSSampler/FFNN/L12.log', L=12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title ='VMC energy of the Haldane chain (N=12) with the VBSSampler')
