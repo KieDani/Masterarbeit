@@ -140,7 +140,7 @@ def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltoni
             Args:
                 dataname (str) : the dataname (including the relative path)
                 L (int) : Lattice size
-                operator (str): allowed inputs are 'FerroCorr' and 'StringCorr'
+                observable (str): allowed inputs are 'FerroCorr' and 'StringCorr'
                                                         """
     #observable 1 at position 0, etc
     numbers = np.zeros(L-1, dtype=np.int32)
@@ -670,7 +670,7 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #plot('results/transformedHamiltonian/L16.log', L=16, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title ='VMC energy of the transformed Haldane chain (N=16)')
 #plotObservables('results/transformedHamiltonian/L16_observables.csv', 16, title='String correlation operator for the transformed Haldane chain (N=16)')
 #plot('results/transformedHamiltonian/L60.log', L=60, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title='VMC energy of the transformed Haldane chain (N=60)')
-#plotObservables('results/transformedHamiltonian/L60_observables.csv', 60, title='String correlation operator for the transformed Haldane chain (N=16)')
+#plotObservables('results/transformedHamiltonian/L60_observables.csv', 60, title='String correlation operator for the transformed Haldane chain (N=60)')
 #plot('results/transformedAKLT/FFNN/L12.log', L=12, transformed_or_original='AKLT', observables=False, periodic = False)
 #plotObservables('results/transformedAKLT/FFNN/L12_observables.csv', L=12, hamiltonian='AKLT')
 
@@ -686,3 +686,11 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #plot('results/InverseSampler/FFNN/L12.log', L=12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title ='VMC energy of the Haldane chain (N=12) with the InverseSampler')
 #plotObservables('results/InverseSampler/FFNN/L12_observables.csv', L=12, hamiltonian='transformed_Heisenberg', observable='StringCorr')
 #plot('results/VBSSampler/FFNN/L12.log', L=12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title ='VMC energy of the Haldane chain (N=12) with the VBSSampler')
+
+
+#transformed AKLT results
+#plot('run/transformedAKLT/FFNN/L40.log', L=40, symmetric_operator=False, observables=False, transformed_or_original='AKLT', title='VMC energy of transformed AKLT model (N=)')
+#plotObservables('run/transformedAKLT/FFNN/L40_observables.csv', L=40, hamiltonian='AKLT')
+
+
+
