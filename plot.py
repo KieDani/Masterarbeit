@@ -535,6 +535,24 @@ def compareArchitectures(machine_names, path, L):
 
 
 
+def plotEnergyPerSite():
+    lanczosEnergy = np.asarray([-1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626])
+    Ls = np.asarray(range(2, len(lanczosEnergy) + 2))
+    DMRG_Energy = lanczosEnergy / Ls
+    adjusted_Energy = lanczosEnergy / (Ls - np.ones_like(Ls))
+    energy_per_site = -1.401 * np.ones_like(Ls)
+    plt.plot(Ls, energy_per_site, color='red', label='exact value')
+    plt.plot(Ls, DMRG_Energy, color='blue', label='E/N')
+    plt.plot(Ls, adjusted_Energy, color='black', label='E/(N-1)')
+    plt.title('Scaling of the ground state energy')
+    plt.xlabel('Lattice sites')
+    plt.xlabel('Energy')
+    plt.legend()
+    plt.show()
+    print(DMRG_Energy)
+    print(adjusted_Energy)
+
+
 #plot(dataname='run/L100.log', L=100)
 #plot(dataname='run/L20_estimate.log', L=20, observables=True)
 
@@ -691,6 +709,10 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #transformed AKLT results
 #plot('run/transformedAKLT/DeepConvNN/L40.log', L=40, symmetric_operator=False, observables=False, transformed_or_original='AKLT', title='VMC energy of transformed AKLT model (N=40)')
 #plotObservables('run/transformedAKLT/DeepConvNN/L40_observables.csv', L=40, hamiltonian='AKLT', title='String correlation operator for the transformed AKLT chain (N=40)')
+
+
+#Scaling of Lanczos Energy
+#plotEnergyPerSite()
 
 
 
