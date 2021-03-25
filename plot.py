@@ -689,8 +689,8 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 
 
 #transformed AKLT results
-#plot('run/transformedAKLT/FFNN/L40.log', L=40, symmetric_operator=False, observables=False, transformed_or_original='AKLT', title='VMC energy of transformed AKLT model (N=)')
-#plotObservables('run/transformedAKLT/FFNN/L40_observables.csv', L=40, hamiltonian='AKLT')
+#plot('run/transformedAKLT/DeepConvNN/L40.log', L=40, symmetric_operator=False, observables=False, transformed_or_original='AKLT', title='VMC energy of transformed AKLT model (N=40)')
+#plotObservables('run/transformedAKLT/DeepConvNN/L40_observables.csv', L=40, hamiltonian='AKLT', title='String correlation operator for the transformed AKLT chain (N=40)')
 
 
 
