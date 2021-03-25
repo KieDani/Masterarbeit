@@ -525,3 +525,10 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 #run(L=12, alpha=20, machine_name='JaxRBM', sampler='Local', hamiltonian_name='original_AKLT', n_samples=1000, n_iterations=200, path='results/problemsAKLT/RBM')
 #run(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='transformed_AKLT', n_samples=1000, n_iterations=200, path='results/transformedAKLT/FFNN')
 #measureObservable(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='transformed_AKLT', n_samples=1000, n_iterations=1000, path='results/transformedAKLT/FFNN', append=True, operator='FerroCorr')
+
+
+
+#Test VBSSampler and InverseSampler
+#run(L=12, alpha=20, machine_name='JaxFFNN', sampler='Inverse', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=1000, path='results/InverseSampler2/FFNN')
+#measureObservable(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=20, path='results/InverseSampler/FFNN', append=False)
+#run(L=12, alpha=20, machine_name='JaxFFNN', sampler='Inverse', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=1000, path='results/VBSSampler2/FFNN')

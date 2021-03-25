@@ -133,14 +133,14 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
 
 
 
-def plotObservables(dataname, L, operator='FerroCorr', title = None, hamiltonian = 'Heisenberg'):
+def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltonian = 'Heisenberg'):
     """Function to plot the results of the function measureObservables().
         The csv file is loaded and evaluated.
 
             Args:
                 dataname (str) : the dataname (including the relative path)
                 L (int) : Lattice size
-                operator (str): allowed inputs are 'FerroCorr' and 'StringCorr'
+                observable (str): allowed inputs are 'FerroCorr' and 'StringCorr'
                                                         """
     #observable 1 at position 0, etc
     numbers = np.zeros(L-1, dtype=np.int32)
@@ -150,14 +150,14 @@ def plotObservables(dataname, L, operator='FerroCorr', title = None, hamiltonian
         spamreader = csv.reader(csvfile)
         for row in spamreader:
             for i in range(0, L-1):
-                if operator == 'FerroCorr':
-                    name_operator = 'Ferro_correlation_function'
-                elif operator == 'StringCorr':
-                    name_operator = 'String_correlation_function'
+                if observable == 'FerroCorr':
+                    name_observable = 'Ferro_correlation_function'
+                elif observable == 'StringCorr':
+                    name_observable = 'String_correlation_function'
                 else:
-                    name_operator = None
-                    print('wrong input for parameter operator')
-                if row[0] == ''.join((name_operator, str(i+1))):
+                    name_observable = None
+                    print('wrong input for parameter observable')
+                if row[0] == ''.join((name_observable, str(i+1))):
                     value = row[1].split('+')[0]
                     if value[-1] == 'e':
                         value = ''.join((value, row[1].split('+')[1]))
@@ -168,21 +168,21 @@ def plotObservables(dataname, L, operator='FerroCorr', title = None, hamiltonian
         print(numbers)
         print(values/numbers)
         plt.plot(range(1, L), values/numbers, label='VMC value')
-        dataname_operator = ''.join(('run/exact_', 'transformed', '/L', str(L), '_exact.csv'))
+        dataname_observable = ''.join(('run/exact_', 'transformed', '/L', str(L), '_exact.csv'))
         if(hamiltonian == 'AKLT'):
             operator = 4./9 * np.ones(len(values))
             x_operator = range(1, L)
         else:
             try:
-                operator = 1 * np.loadtxt(dataname_operator)
+                operator = 1 * np.loadtxt(dataname_observable)
                 x_operator = np.arange(1, len(operator) + 1)
             except:
-                print(dataname_operator)
+                print(dataname_observable)
                 operator = 0.374 * np.ones(len(values))
                 x_operator = range(1, L)
         plt.plot(x_operator, operator, color='red', label='exact value')
         plt.xlabel('site distance')
-        if operator == 'FerroCorr':
+        if(observable == 'FerroCorr'):
             plt.ylabel('Ferromagnetic correlation operator')
         else:
             plt.ylabel('String correlation operator')
@@ -535,6 +535,24 @@ def compareArchitectures(machine_names, path, L):
 
 
 
+def plotEnergyPerSite():
+    lanczosEnergy = np.asarray([-1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626])
+    Ls = np.asarray(range(2, len(lanczosEnergy) + 2))
+    DMRG_Energy = lanczosEnergy / Ls
+    adjusted_Energy = lanczosEnergy / (Ls - np.ones_like(Ls))
+    energy_per_site = -1.401 * np.ones_like(Ls)
+    plt.plot(Ls, energy_per_site, color='red', label='exact value')
+    plt.plot(Ls, DMRG_Energy, color='blue', label='E/N')
+    plt.plot(Ls, adjusted_Energy, color='black', label='E/(N-1)')
+    plt.title('Scaling of the ground state energy')
+    plt.xlabel('Lattice sites')
+    plt.xlabel('Energy')
+    plt.legend()
+    plt.show()
+    print(DMRG_Energy)
+    print(adjusted_Energy)
+
+
 #plot(dataname='run/L100.log', L=100)
 #plot(dataname='run/L20_estimate.log', L=20, observables=True)
 
@@ -662,18 +680,39 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #Show that the original Heisenberg model and AKLT model can not be solved properly
 #plot('results/problems/RBM/L12.log', L = 12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original')
 #plot('results/problems/FFNN/L12.log', L = 12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title='VMC energy of the Haldane chain (N=12)')
-#plotObservables('results/problems/FFNN/L12_observables.csv', 12, operator='StringCorr', title='String correlation operator for the Haldane chain (N=12)')
-#plotObservables('results/problems/FFNN/L12_observables.csv', 12, operator='FerroCorr', title='Ferromagnetic correlation operator for the Haldane chain (N=12)')
+#plotObservables('results/problems/FFNN/L12_observables.csv', 12, observable='StringCorr', title='String correlation operator for the Haldane chain (N=12)')
+#plotObservables('results/problems/FFNN/L12_observables.csv', 12, observable='FerroCorr', title='Ferromagnetic correlation operator for the Haldane chain (N=12)')
 
 
 #Results for transformed hamiltonian
 #plot('results/transformedHamiltonian/L16.log', L=16, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title ='VMC energy of the transformed Haldane chain (N=16)')
 #plotObservables('results/transformedHamiltonian/L16_observables.csv', 16, title='String correlation operator for the transformed Haldane chain (N=16)')
 #plot('results/transformedHamiltonian/L60.log', L=60, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title='VMC energy of the transformed Haldane chain (N=60)')
-#plotObservables('results/transformedHamiltonian/L60_observables.csv', 60, title='String correlation operator for the transformed Haldane chain (N=16)')
+#plotObservables('results/transformedHamiltonian/L60_observables.csv', 60, title='String correlation operator for the transformed Haldane chain (N=60)')
 #plot('results/transformedAKLT/FFNN/L12.log', L=12, transformed_or_original='AKLT', observables=False, periodic = False)
 #plotObservables('results/transformedAKLT/FFNN/L12_observables.csv', L=12, hamiltonian='AKLT')
+
+#plot('run/fifthResults/JaxFFNN/L16.log', L=16, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title ='VMC energy of the transformed Haldane chain (N=16)')
+#plotObservables('run/fifthResults/JaxFFNN/L16_observables.csv', 16, title='String correlation operator for the transformed Haldane chain (N=16)')
 
 
 #Comparison of architectures
 #compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
+
+
+#Test VBSSampler and InverseSampler
+#plot('results/InverseSampler/FFNN/L12.log', L=12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title ='VMC energy of the Haldane chain (N=12) with the InverseSampler')
+#plotObservables('results/InverseSampler/FFNN/L12_observables.csv', L=12, hamiltonian='transformed_Heisenberg', observable='StringCorr')
+#plot('results/VBSSampler/FFNN/L12.log', L=12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title ='VMC energy of the Haldane chain (N=12) with the VBSSampler')
+
+
+#transformed AKLT results
+#plot('run/transformedAKLT/DeepConvNN/L40.log', L=40, symmetric_operator=False, observables=False, transformed_or_original='AKLT', title='VMC energy of transformed AKLT model (N=40)')
+#plotObservables('run/transformedAKLT/DeepConvNN/L40_observables.csv', L=40, hamiltonian='AKLT', title='String correlation operator for the transformed AKLT chain (N=40)')
+
+
+#Scaling of Lanczos Energy
+#plotEnergyPerSite()
+
+
+
