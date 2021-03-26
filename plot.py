@@ -7,6 +7,7 @@ This file contains the following functions:
 
     * plot
     * plotObservable
+    * plotS_Z_squared
     * compare_original_transformed
     * present
     * plot_startingpoints
@@ -141,6 +142,7 @@ def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltoni
                 dataname (str) : the dataname (including the relative path)
                 L (int) : Lattice size
                 observable (str): allowed inputs are 'FerroCorr' and 'StringCorr'
+                title (str) : Title of the plot
                                                         """
     #observable 1 at position 0, etc
     numbers = np.zeros(L-1, dtype=np.int32)
@@ -193,6 +195,45 @@ def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltoni
             plt.title(title)
         plt.legend()
         plt.show()
+
+
+def plotS_Z_squared(dataname, L, title=None):
+    """Function to plot the results of the function measureObservables() for S_Z_squared.
+            The csv file is loaded and evaluated.
+
+                Args:
+                    dataname (str) : the dataname (including the relative path)
+                    L (int) : Lattice size
+                    title (str) : Title of the plot
+                                                            """
+    # observable 0 at position 0, etc
+    numbers = np.zeros(L, dtype=np.int32)
+    values = np.zeros(L, dtype=np.float64)
+
+    with open(dataname) as csvfile:
+        spamreader = csv.reader(csvfile)
+        name_observable = 'S_Z_squared'
+        for row in spamreader:
+            for i in range(0, L):
+                if row[0] == ''.join((name_observable, str(i))):
+                    value = row[1].split('+')[0]
+                    if value[-1] == 'e':
+                        value = ''.join((value, row[1].split('+')[1]))
+                    value = float(value)
+                    values[i] += value
+                    numbers[i] += 1
+        print(values)
+        print(numbers)
+        print(values/numbers)
+
+        plt.plot(range(0, L), values/numbers)
+        plt.show()
+
+        number_nonzero = values/numbers
+        number_nonzero = np.sum(number_nonzero)
+        print('Number non-zero', number_nonzero)
+        print('Number zero', L - number_nonzero)
+
 
 
 def compare_original_transformed(L, periodic=False):
@@ -714,5 +755,11 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #Scaling of Lanczos Energy
 #plotEnergyPerSite()
 
+
+
+
+
+
+#plotS_Z_squared('run/L10_observables.csv', L=10)
 
 
