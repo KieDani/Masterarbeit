@@ -55,7 +55,7 @@ def get_operator(hilbert, L, operator = None, symmetric = True):
             Args:
                 hilbert (netket.hilbert) : hilbert space
                 L (int) : Lattice size
-                operator (str) : allowed inputs are 'FerroCorr' and 'StringCorr'
+                operator (str) : allowed inputs are 'FerroCorr', 'StringCorr' and 'S_Z_squared'
                 symmetric (bool) : If True, the observable is measured symmetric to the center of the lattice.
                                     If False, the measurement is started at the 0-th site.
 
@@ -84,6 +84,11 @@ def get_operator(hilbert, L, operator = None, symmetric = True):
             observ = operators.FerroCorrelationZ_slow(hilbert, l = i)
             name = 'Ferro_correlation_function_slow' + str(i-1)
             observables[name] = observ
+    elif(operator == 'S_Z_squared'):
+        for i in range(0, L):
+            observ_fast = operators.S_Z_squared(hilbert=hilbert, j=i)
+            name_fast = 'S_Z_squared' + str(i)
+            observables[name_fast] = observ_fast
     return observables
 
 
