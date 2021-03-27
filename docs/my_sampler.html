@@ -61,7 +61,7 @@ import netket as nk
 class _JaxVBSKernel:
     &#34;&#34;&#34;A Monte Carlo Kernel to use with netket.sampler.jax.MetropolisHastings.
 
-    Local spinflips are performed and with a propbability of 20% the state is repaired, so that it is a VBS state again.
+    Local spinflips are performed and with a propbability of 20% the state is turned into a VBS state again.
     It only works with Spin-1 hilbert spaces.
     &#34;&#34;&#34;
     def __init__(self, local_states, size):
@@ -104,7 +104,7 @@ class _JaxVBSKernel:
 
         keys = jax.random.split(key, 2)
         rand_num = jax.random.randint(keys[0], shape=(1,), minval=1, maxval=11)[0]
-        #print(rand_num)
+        print(rand_num)
         return jax.lax.cond(rand_num &lt; 9, local_update, VBS_update , (keys[1], state))
 
 
@@ -162,7 +162,7 @@ def getVBSSampler(machine):
 class _JaxInverseKernel:
     &#34;&#34;&#34;A Monte Carlo Kernel to use with netket.sampler.jax.MetropolisHastings.
 
-    Inverse VBS-transformation of the states sampled with local spinflips.
+    A local spin is changed and, then, every second non-zero spin is flipped.
     It only works with Spin-1 hilbert spaces.
     &#34;&#34;&#34;
     def __init__(self, local_states, size):
@@ -189,6 +189,8 @@ class _JaxInverseKernel:
         return keys[0], self.local_states[rs]
 
     def inverse_transformation(self, state):
+        &#34;&#34;&#34;Here, every second non-zero spin is flipped.&#34;&#34;&#34;
+        #if counter is odd, the spin at position i is flipped.
         def flip(val):
             state = val[0]
             i = val[1]
@@ -198,18 +200,18 @@ class _JaxInverseKernel:
             state = jax.lax.cond(counter % 2 == 1, lambda xTrue: jax.ops.index_update(state, jax.ops.index[i], -1 * state[i]), lambda xFalse: state, None)
             return state, counter
 
-        #counts the number of none-0 spins to see, if number is even or odd
-        counter = 0
+        #looks at every lattice site. If there is no zero, flip() is applied.
+        counter = 1
         for i in range(len(state)):
             condition = jnp.logical_or(state[i] &gt; 0.5, state[i] &lt; -0.5)
             state, counter = jax.lax.cond(condition, flip,
-                                          lambda xFalse: (xFalse[0], xFalse[1]), (state, i, counter))
+                                          lambda xFalse: (xFalse[0], xFalse[2]), (state, i, counter))
         return state
 
 
 
     def transition(self, key, state):
-        &#34;&#34;&#34;Here, the update of a state is performed&#34;&#34;&#34;
+        &#34;&#34;&#34;Here, a local update of the state is performed and the transformation is applied.&#34;&#34;&#34;
         keys = jax.random.split(key, 2)
         si = jax.random.randint(keys[0], shape=(1,), minval=0, maxval=self.size)
         rs = jax.random.randint(keys[1], shape=(1,), minval=0, maxval=self.n_states - 1)
@@ -220,7 +222,7 @@ class _JaxInverseKernel:
 
 
     def random_state(self, key, state):
-        &#34;&#34;&#34;Here, a random VBS state is created.&#34;&#34;&#34;
+        &#34;&#34;&#34;Here, a random state is created and the transformation is applied.&#34;&#34;&#34;
         keys = jax.random.split(key, 2)
 
         rs = jax.random.randint(
