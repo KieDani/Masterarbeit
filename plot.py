@@ -724,6 +724,11 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #plotObservables('results/problems/FFNN/L12_observables.csv', 12, observable='StringCorr', title='String correlation operator for the Haldane chain (N=12)')
 #plotObservables('results/problems/FFNN/L12_observables.csv', 12, observable='FerroCorr', title='Ferromagnetic correlation operator for the Haldane chain (N=12)')
 
+#plot('results/problemsAKLT/FFNN/L12.log', L=12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='AKLT', title='VMC energy of the AKLT model (N=12)')
+#plotObservables('results/problemsAKLT/FFNN/L12_observables.csv', 12, observable='StringCorr', title='String correlation operator for the AKLT model (N=12)')
+#plotObservables('results/problemsAKLT/FFNN/L12_observables.csv', 12, observable='FerroCorr', title='Ferromagnetic correlation operator for the AKLT model (N=12)')
+
+
 
 #Results for transformed hamiltonian
 #plot('results/transformedHamiltonian/L16.log', L=16, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title ='VMC energy of the transformed Haldane chain (N=16)')
@@ -762,4 +767,5 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #plotS_Z_squared('run/transformedAKLT/DeepConvNN/L60_observables.csv', L=60)
 #plotS_Z_squared('run/secondResults/JaxDeepConvNN/L60_observables.csv', L=60)
 
-
+#plotS_Z_squared('results/problemsAKLT/FFNN/L12_observables.csv', L=12)
+#plotS_Z_squared('results/problems/FFNN/L12_observables.csv', L=12)

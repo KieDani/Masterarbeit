@@ -523,8 +523,9 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 #measureObservable(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=100, path='results/problems/FFNN', append=False, operator='StringCorr')
 #measureObservable(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=100, path='results/problems/FFNN', append=True, operator='FerroCorr')
 #run(L=12, alpha=20, machine_name='JaxRBM', sampler='Local', hamiltonian_name='original_AKLT', n_samples=1000, n_iterations=200, path='results/problemsAKLT/RBM')
-#run(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='transformed_AKLT', n_samples=1000, n_iterations=200, path='results/transformedAKLT/FFNN')
-#measureObservable(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='transformed_AKLT', n_samples=1000, n_iterations=1000, path='results/transformedAKLT/FFNN', append=True, operator='FerroCorr')
+#run(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='original_AKLT', n_samples=1000, n_iterations=500, path='results/problemsAKLT/FFNN')
+#measureObservable(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='original_AKLT', n_samples=1000, n_iterations=100, path='results/problemsAKLT/FFNN', append=False, operator='FerroCorr')
+#measureObservable(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='original_AKLT', n_samples=1000, n_iterations=100, path='results/problemsAKLT/FFNN', append=True, operator='StringCorr')
 
 
 
@@ -532,3 +533,8 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 #run(L=12, alpha=20, machine_name='JaxFFNN', sampler='Inverse', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=1000, path='results/InverseSampler2/FFNN')
 #measureObservable(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=20, path='results/InverseSampler/FFNN', append=False)
 #run(L=12, alpha=20, machine_name='JaxFFNN', sampler='Inverse', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=1000, path='results/VBSSampler2/FFNN')
+
+
+#measure S_Z_squared for original Hamiltonians
+#measureObservable(L=12, path='results/problems/FFNN', machine_name='JaxFFNN', hamiltonian_name='transformed_Heisenberg', n_samples=1000, n_iterations=100, append=True, operator='S_Z_squared')
+#measureObservable(L=12, path='results/problemsAKLT/FFNN', machine_name='JaxFFNN', hamiltonian_name='transformed_AKLT', n_samples=1000, n_iterations=100, append=True, operator='S_Z_squared')
