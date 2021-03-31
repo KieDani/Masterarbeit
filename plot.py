@@ -755,8 +755,8 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #transformed AKLT results
 #plot('run/transformedAKLT/DeepConvNN/L40.log', L=40, symmetric_operator=False, observables=False, transformed_or_original='AKLT', title='VMC energy of transformed AKLT model (N=40)')
 #plotObservables('run/transformedAKLT/DeepConvNN/L40_observables.csv', L=40, hamiltonian='AKLT', title='String correlation operator for the transformed AKLT chain (N=40)')
-#plot('run/transformedAKLT/DeepConvNN/L60.log', L=60, symmetric_operator=False, observables=False, transformed_or_original='AKLT', title='VMC energy of transformed AKLT model (N=60)')
-#plotObservables('run/transformedAKLT/DeepConvNN/L60_observables.csv', L=60, hamiltonian='AKLT', title='String correlation operator for the transformed AKLT chain (N=60)')
+#plot('results/transformedAKLT/DeepConvNN/L60.log', L=60, symmetric_operator=False, observables=False, transformed_or_original='AKLT', title='VMC energy of transformed AKLT model (N=60)')
+#plotObservables('results/transformedAKLT/DeepConvNN/L60_observables.csv', L=60, hamiltonian='AKLT', title='String correlation operator for the transformed AKLT chain (N=60)')
 
 
 #Scaling of Lanczos Energy
@@ -764,8 +764,8 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 
 
 #Compare number of zeros
-#plotS_Z_squared('run/transformedAKLT/DeepConvNN/L60_observables.csv', L=60)
-#plotS_Z_squared('run/secondResults/JaxDeepConvNN/L60_observables.csv', L=60)
+#plotS_Z_squared('results/transformedAKLT/DeepConvNN/L60_observables.csv', L=60)
+#plotS_Z_squared('results/transformedHamiltonian//L60_observables.csv', L=60)
 
 #plotS_Z_squared('results/problemsAKLT/FFNN/L12_observables.csv', L=12)
 #plotS_Z_squared('results/problems/FFNN/L12_observables.csv', L=12)
