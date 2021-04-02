@@ -370,6 +370,147 @@ class FerroCorrelationZ(AbstractOperator):
         return self._flattened_kernel(x, sections, self._edges, self._j, self._k)
 
 
+class S_Z_squared(AbstractOperator):
+    r&#34;&#34;&#34;
+    Measures the squared Spin operator in z direction at site j
+    &#34;&#34;&#34;
+
+    def __init__(self, hilbert, j):
+        r&#34;&#34;&#34;
+        Constructs a new squared Spin operator in z direction at site j
+
+        Args:
+           hilbert (netket.hilbert.Boson): Hilbert space the operator acts on.
+           j (int): The site where the operator is measured.
+
+        &#34;&#34;&#34;
+        self._j = j
+        self._hilbert = hilbert
+        self._n_sites = hilbert.size
+        self._section = hilbert.size + 1
+        #self._edges = _np.asarray(hilbert.graph.edges())
+        self._edges = None
+        super().__init__()
+
+    @property
+    def hilbert(self):
+        r&#34;&#34;&#34;AbstractHilbert: The hilbert space associated to this operator.&#34;&#34;&#34;
+        return self._hilbert
+
+    @property
+    def size(self):
+        return self._n_sites
+
+    @staticmethod
+    @jit(nopython=True)
+    def n_conn(x, out):
+        r&#34;&#34;&#34;Return the number of states connected to x.
+
+            Args:
+                x (matrix): A matrix of shape (batch_size,hilbert.size) containing
+                            the batch of quantum numbers x.
+                out (array): If None an output array is allocated.
+
+            Returns:
+                array: The number of connected states x&#39; for each x[i].
+
+        &#34;&#34;&#34;
+        if out is None:
+            out = _np.empty(x.shape[0], dtype=_np.int32)
+
+        out.fill(x.shape[1] + 1)
+
+        return out
+
+    def get_conn(self, x):
+        r&#34;&#34;&#34;Finds the connected elements of the Operator. Starting
+            from a given quantum number x, it finds all other quantum numbers x&#39; such
+            that the matrix element :math:`O(x,x&#39;)` is different from zero. In general there
+            will be several different connected states x&#39; satisfying this
+            condition, and they are denoted here :math:`x&#39;(k)`, for :math:`k=0,1...N_{\mathrm{connected}}`.
+
+            This is a batched version, where x is a matrix of shape (batch_size,hilbert.size).
+
+            Args:
+                x (array): An array of shape (hilbert.size) containing the quantum numbers x.
+
+            Returns:
+                matrix: The connected states x&#39; of shape (N_connected,hilbert.size)
+                array: An array containing the matrix elements :math:`O(x,x&#39;)` associated to each x&#39;.
+
+        &#34;&#34;&#34;
+        return self._flattened_kernel(
+            x.reshape((1, -1)), _np.ones(1), self._edges, self._j,
+        )
+
+    @staticmethod
+    @jit(nopython=True)
+    def _flattened_kernel(x, sections, edges, j):
+        n_sites = x.shape[1]
+        n_conn = n_sites + 1
+        # n_conn = 1
+
+        x_prime = _np.empty((x.shape[0] * n_conn, n_sites))
+        mels = _np.empty(x.shape[0] * n_conn)
+
+        diag_ind = 0
+
+        for i in range(x.shape[0]):
+
+            mels[diag_ind] = 1
+            if(x[i, j] &gt;= 1):
+                mels[diag_ind] = 1
+            elif(x[i, j] &lt;= -1):
+                mels[diag_ind] = 1
+            else:
+                mels[diag_ind] = 0
+
+
+
+            # This might be wrong, because x in [+2, -2] instead of [+1, -1] ?
+            #mels[diag_ind] = x[i, j] * x[i, k]
+
+            odiag_ind = 1 + diag_ind
+
+            mels[odiag_ind: (odiag_ind + n_sites)].fill(0.)
+
+            x_prime[diag_ind: (diag_ind + n_conn)] = _np.copy(x[i])
+
+            # for j2 in range(n_sites):
+            #    x_prime[j2 + odiag_ind][j2] *= -1.0
+
+            diag_ind += n_conn
+
+            sections[i] = diag_ind
+
+        return x_prime, mels
+
+    def get_conn_flattened(self, x, sections, pad=False):
+        r&#34;&#34;&#34;Finds the connected elements of the Operator. Starting
+            from a given quantum number x, it finds all other quantum numbers x&#39; such
+            that the matrix element :math:`O(x,x&#39;)` is different from zero. In general there
+            will be several different connected states x&#39; satisfying this
+            condition, and they are denoted here :math:`x&#39;(k)`, for :math:`k=0,1...N_{\mathrm{connected}}`.
+
+            This is a batched version, where x is a matrix of shape (batch_size,hilbert.size).
+
+            Args:
+                x (matrix): A matrix of shape (batch_size,hilbert.size) containing
+                            the batch of quantum numbers x.
+                sections (array): An array of size (batch_size) useful to unflatten
+                            the output of this function.
+                            See numpy.split for the meaning of sections.
+                pad (bool): no effect here
+
+            Returns:
+                matrix: The connected states x&#39;, flattened together in a single matrix.
+                array: An array containing the matrix elements :math:`O(x,x&#39;)` associated to each x&#39;.
+
+        &#34;&#34;&#34;
+
+        return self._flattened_kernel(x, sections, self._edges, self._j)
+
+
 
 #copied from my old code. Maybe I can make the code look nicer. But I only needed it to compare it to the fast version.
 def FerroCorrelationZ_slow(hilbert, j, k):
@@ -885,6 +1026,355 @@ See numpy.split for the meaning of sections.</dd>
 </dd>
 </dl>
 </dd>
+<dt id="my_operators.S_Z_squared"><code class="flex name class">
+<span>class <span class="ident">S_Z_squared</span></span>
+<span>(</span><span>hilbert, j)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Measures the squared Spin operator in z direction at site j</p>
+<p>Constructs a new squared Spin operator in z direction at site j</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>hilbert</code></strong> :&ensp;<code>netket.hilbert.Boson</code></dt>
+<dd>Hilbert space the operator acts on.</dd>
+<dt><strong><code>j</code></strong> :&ensp;<code>int</code></dt>
+<dd>The site where the operator is measured.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class S_Z_squared(AbstractOperator):
+    r&#34;&#34;&#34;
+    Measures the squared Spin operator in z direction at site j
+    &#34;&#34;&#34;
+
+    def __init__(self, hilbert, j):
+        r&#34;&#34;&#34;
+        Constructs a new squared Spin operator in z direction at site j
+
+        Args:
+           hilbert (netket.hilbert.Boson): Hilbert space the operator acts on.
+           j (int): The site where the operator is measured.
+
+        &#34;&#34;&#34;
+        self._j = j
+        self._hilbert = hilbert
+        self._n_sites = hilbert.size
+        self._section = hilbert.size + 1
+        #self._edges = _np.asarray(hilbert.graph.edges())
+        self._edges = None
+        super().__init__()
+
+    @property
+    def hilbert(self):
+        r&#34;&#34;&#34;AbstractHilbert: The hilbert space associated to this operator.&#34;&#34;&#34;
+        return self._hilbert
+
+    @property
+    def size(self):
+        return self._n_sites
+
+    @staticmethod
+    @jit(nopython=True)
+    def n_conn(x, out):
+        r&#34;&#34;&#34;Return the number of states connected to x.
+
+            Args:
+                x (matrix): A matrix of shape (batch_size,hilbert.size) containing
+                            the batch of quantum numbers x.
+                out (array): If None an output array is allocated.
+
+            Returns:
+                array: The number of connected states x&#39; for each x[i].
+
+        &#34;&#34;&#34;
+        if out is None:
+            out = _np.empty(x.shape[0], dtype=_np.int32)
+
+        out.fill(x.shape[1] + 1)
+
+        return out
+
+    def get_conn(self, x):
+        r&#34;&#34;&#34;Finds the connected elements of the Operator. Starting
+            from a given quantum number x, it finds all other quantum numbers x&#39; such
+            that the matrix element :math:`O(x,x&#39;)` is different from zero. In general there
+            will be several different connected states x&#39; satisfying this
+            condition, and they are denoted here :math:`x&#39;(k)`, for :math:`k=0,1...N_{\mathrm{connected}}`.
+
+            This is a batched version, where x is a matrix of shape (batch_size,hilbert.size).
+
+            Args:
+                x (array): An array of shape (hilbert.size) containing the quantum numbers x.
+
+            Returns:
+                matrix: The connected states x&#39; of shape (N_connected,hilbert.size)
+                array: An array containing the matrix elements :math:`O(x,x&#39;)` associated to each x&#39;.
+
+        &#34;&#34;&#34;
+        return self._flattened_kernel(
+            x.reshape((1, -1)), _np.ones(1), self._edges, self._j,
+        )
+
+    @staticmethod
+    @jit(nopython=True)
+    def _flattened_kernel(x, sections, edges, j):
+        n_sites = x.shape[1]
+        n_conn = n_sites + 1
+        # n_conn = 1
+
+        x_prime = _np.empty((x.shape[0] * n_conn, n_sites))
+        mels = _np.empty(x.shape[0] * n_conn)
+
+        diag_ind = 0
+
+        for i in range(x.shape[0]):
+
+            mels[diag_ind] = 1
+            if(x[i, j] &gt;= 1):
+                mels[diag_ind] = 1
+            elif(x[i, j] &lt;= -1):
+                mels[diag_ind] = 1
+            else:
+                mels[diag_ind] = 0
+
+
+
+            # This might be wrong, because x in [+2, -2] instead of [+1, -1] ?
+            #mels[diag_ind] = x[i, j] * x[i, k]
+
+            odiag_ind = 1 + diag_ind
+
+            mels[odiag_ind: (odiag_ind + n_sites)].fill(0.)
+
+            x_prime[diag_ind: (diag_ind + n_conn)] = _np.copy(x[i])
+
+            # for j2 in range(n_sites):
+            #    x_prime[j2 + odiag_ind][j2] *= -1.0
+
+            diag_ind += n_conn
+
+            sections[i] = diag_ind
+
+        return x_prime, mels
+
+    def get_conn_flattened(self, x, sections, pad=False):
+        r&#34;&#34;&#34;Finds the connected elements of the Operator. Starting
+            from a given quantum number x, it finds all other quantum numbers x&#39; such
+            that the matrix element :math:`O(x,x&#39;)` is different from zero. In general there
+            will be several different connected states x&#39; satisfying this
+            condition, and they are denoted here :math:`x&#39;(k)`, for :math:`k=0,1...N_{\mathrm{connected}}`.
+
+            This is a batched version, where x is a matrix of shape (batch_size,hilbert.size).
+
+            Args:
+                x (matrix): A matrix of shape (batch_size,hilbert.size) containing
+                            the batch of quantum numbers x.
+                sections (array): An array of size (batch_size) useful to unflatten
+                            the output of this function.
+                            See numpy.split for the meaning of sections.
+                pad (bool): no effect here
+
+            Returns:
+                matrix: The connected states x&#39;, flattened together in a single matrix.
+                array: An array containing the matrix elements :math:`O(x,x&#39;)` associated to each x&#39;.
+
+        &#34;&#34;&#34;
+
+        return self._flattened_kernel(x, sections, self._edges, self._j)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>netket.operator._abstract_operator.AbstractOperator</li>
+<li>abc.ABC</li>
+</ul>
+<h3>Static methods</h3>
+<dl>
+<dt id="my_operators.S_Z_squared.n_conn"><code class="name flex">
+<span>def <span class="ident">n_conn</span></span>(<span>x, out)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the number of states connected to x.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>matrix</code></dt>
+<dd>A matrix of shape (batch_size,hilbert.size) containing
+the batch of quantum numbers x.</dd>
+<dt><strong><code>out</code></strong> :&ensp;<code>array</code></dt>
+<dd>If None an output array is allocated.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>array</code></dt>
+<dd>The number of connected states x' for each x[i].</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+@jit(nopython=True)
+def n_conn(x, out):
+    r&#34;&#34;&#34;Return the number of states connected to x.
+
+        Args:
+            x (matrix): A matrix of shape (batch_size,hilbert.size) containing
+                        the batch of quantum numbers x.
+            out (array): If None an output array is allocated.
+
+        Returns:
+            array: The number of connected states x&#39; for each x[i].
+
+    &#34;&#34;&#34;
+    if out is None:
+        out = _np.empty(x.shape[0], dtype=_np.int32)
+
+    out.fill(x.shape[1] + 1)
+
+    return out</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="my_operators.S_Z_squared.hilbert"><code class="name">var <span class="ident">hilbert</span></code></dt>
+<dd>
+<div class="desc"><p>AbstractHilbert: The hilbert space associated to this operator.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def hilbert(self):
+    r&#34;&#34;&#34;AbstractHilbert: The hilbert space associated to this operator.&#34;&#34;&#34;
+    return self._hilbert</code></pre>
+</details>
+</dd>
+<dt id="my_operators.S_Z_squared.size"><code class="name">var <span class="ident">size</span></code></dt>
+<dd>
+<div class="desc"><p>int: The total number number of local degrees of freedom.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def size(self):
+    return self._n_sites</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="my_operators.S_Z_squared.get_conn"><code class="name flex">
+<span>def <span class="ident">get_conn</span></span>(<span>self, x)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds the connected elements of the Operator. Starting
+from a given quantum number x, it finds all other quantum numbers x' such
+that the matrix element :math:<code>O(x,x')</code> is different from zero. In general there
+will be several different connected states x' satisfying this
+condition, and they are denoted here :math:<code>x'(k)</code>, for :math:<code>k=0,1...N_{\mathrm{connected}}</code>.</p>
+<p>This is a batched version, where x is a matrix of shape (batch_size,hilbert.size).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>array</code></dt>
+<dd>An array of shape (hilbert.size) containing the quantum numbers x.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>matrix</code></dt>
+<dd>The connected states x' of shape (N_connected,hilbert.size)</dd>
+<dt><code>array</code></dt>
+<dd>An array containing the matrix elements :math:<code>O(x,x')</code> associated to each x'.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_conn(self, x):
+    r&#34;&#34;&#34;Finds the connected elements of the Operator. Starting
+        from a given quantum number x, it finds all other quantum numbers x&#39; such
+        that the matrix element :math:`O(x,x&#39;)` is different from zero. In general there
+        will be several different connected states x&#39; satisfying this
+        condition, and they are denoted here :math:`x&#39;(k)`, for :math:`k=0,1...N_{\mathrm{connected}}`.
+
+        This is a batched version, where x is a matrix of shape (batch_size,hilbert.size).
+
+        Args:
+            x (array): An array of shape (hilbert.size) containing the quantum numbers x.
+
+        Returns:
+            matrix: The connected states x&#39; of shape (N_connected,hilbert.size)
+            array: An array containing the matrix elements :math:`O(x,x&#39;)` associated to each x&#39;.
+
+    &#34;&#34;&#34;
+    return self._flattened_kernel(
+        x.reshape((1, -1)), _np.ones(1), self._edges, self._j,
+    )</code></pre>
+</details>
+</dd>
+<dt id="my_operators.S_Z_squared.get_conn_flattened"><code class="name flex">
+<span>def <span class="ident">get_conn_flattened</span></span>(<span>self, x, sections, pad=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds the connected elements of the Operator. Starting
+from a given quantum number x, it finds all other quantum numbers x' such
+that the matrix element :math:<code>O(x,x')</code> is different from zero. In general there
+will be several different connected states x' satisfying this
+condition, and they are denoted here :math:<code>x'(k)</code>, for :math:<code>k=0,1...N_{\mathrm{connected}}</code>.</p>
+<p>This is a batched version, where x is a matrix of shape (batch_size,hilbert.size).</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>x</code></strong> :&ensp;<code>matrix</code></dt>
+<dd>A matrix of shape (batch_size,hilbert.size) containing
+the batch of quantum numbers x.</dd>
+<dt><strong><code>sections</code></strong> :&ensp;<code>array</code></dt>
+<dd>An array of size (batch_size) useful to unflatten
+the output of this function.
+See numpy.split for the meaning of sections.</dd>
+<dt><strong><code>pad</code></strong> :&ensp;<code>bool</code></dt>
+<dd>no effect here</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>matrix</code></dt>
+<dd>The connected states x', flattened together in a single matrix.</dd>
+<dt><code>array</code></dt>
+<dd>An array containing the matrix elements :math:<code>O(x,x')</code> associated to each x'.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_conn_flattened(self, x, sections, pad=False):
+    r&#34;&#34;&#34;Finds the connected elements of the Operator. Starting
+        from a given quantum number x, it finds all other quantum numbers x&#39; such
+        that the matrix element :math:`O(x,x&#39;)` is different from zero. In general there
+        will be several different connected states x&#39; satisfying this
+        condition, and they are denoted here :math:`x&#39;(k)`, for :math:`k=0,1...N_{\mathrm{connected}}`.
+
+        This is a batched version, where x is a matrix of shape (batch_size,hilbert.size).
+
+        Args:
+            x (matrix): A matrix of shape (batch_size,hilbert.size) containing
+                        the batch of quantum numbers x.
+            sections (array): An array of size (batch_size) useful to unflatten
+                        the output of this function.
+                        See numpy.split for the meaning of sections.
+            pad (bool): no effect here
+
+        Returns:
+            matrix: The connected states x&#39;, flattened together in a single matrix.
+            array: An array containing the matrix elements :math:`O(x,x&#39;)` associated to each x&#39;.
+
+    &#34;&#34;&#34;
+
+    return self._flattened_kernel(x, sections, self._edges, self._j)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
 <dt id="my_operators.StringCorrelation"><code class="flex name class">
 <span>class <span class="ident">StringCorrelation</span></span>
 <span>(</span><span>hilbert, j, k)</span>
@@ -1269,6 +1759,16 @@ See numpy.split for the meaning of sections.</dd>
 <li><code><a title="my_operators.FerroCorrelationZ.hilbert" href="#my_operators.FerroCorrelationZ.hilbert">hilbert</a></code></li>
 <li><code><a title="my_operators.FerroCorrelationZ.n_conn" href="#my_operators.FerroCorrelationZ.n_conn">n_conn</a></code></li>
 <li><code><a title="my_operators.FerroCorrelationZ.size" href="#my_operators.FerroCorrelationZ.size">size</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="my_operators.S_Z_squared" href="#my_operators.S_Z_squared">S_Z_squared</a></code></h4>
+<ul class="">
+<li><code><a title="my_operators.S_Z_squared.get_conn" href="#my_operators.S_Z_squared.get_conn">get_conn</a></code></li>
+<li><code><a title="my_operators.S_Z_squared.get_conn_flattened" href="#my_operators.S_Z_squared.get_conn_flattened">get_conn_flattened</a></code></li>
+<li><code><a title="my_operators.S_Z_squared.hilbert" href="#my_operators.S_Z_squared.hilbert">hilbert</a></code></li>
+<li><code><a title="my_operators.S_Z_squared.n_conn" href="#my_operators.S_Z_squared.n_conn">n_conn</a></code></li>
+<li><code><a title="my_operators.S_Z_squared.size" href="#my_operators.S_Z_squared.size">size</a></code></li>
 </ul>
 </li>
 <li>

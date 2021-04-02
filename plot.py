@@ -7,6 +7,7 @@ This file contains the following functions:
 
     * plot
     * plotObservable
+    * plotS_Z_squared
     * compare_original_transformed
     * present
     * plot_startingpoints
@@ -141,6 +142,7 @@ def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltoni
                 dataname (str) : the dataname (including the relative path)
                 L (int) : Lattice size
                 observable (str): allowed inputs are 'FerroCorr' and 'StringCorr'
+                title (str) : Title of the plot
                                                         """
     #observable 1 at position 0, etc
     numbers = np.zeros(L-1, dtype=np.int32)
@@ -193,6 +195,45 @@ def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltoni
             plt.title(title)
         plt.legend()
         plt.show()
+
+
+def plotS_Z_squared(dataname, L, title=None):
+    """Function to plot the results of the function measureObservables() for S_Z_squared.
+            The csv file is loaded and evaluated.
+
+                Args:
+                    dataname (str) : the dataname (including the relative path)
+                    L (int) : Lattice size
+                    title (str) : Title of the plot
+                                                            """
+    # observable 0 at position 0, etc
+    numbers = np.zeros(L, dtype=np.int32)
+    values = np.zeros(L, dtype=np.float64)
+
+    with open(dataname) as csvfile:
+        spamreader = csv.reader(csvfile)
+        name_observable = 'S_Z_squared'
+        for row in spamreader:
+            for i in range(0, L):
+                if row[0] == ''.join((name_observable, str(i))):
+                    value = row[1].split('+')[0]
+                    if value[-1] == 'e':
+                        value = ''.join((value, row[1].split('+')[1]))
+                    value = float(value)
+                    values[i] += value
+                    numbers[i] += 1
+        print(values)
+        print(numbers)
+        print(values/numbers)
+
+        plt.plot(range(0, L), values/numbers)
+        plt.show()
+
+        number_nonzero = values/numbers
+        number_nonzero = np.sum(number_nonzero)
+        print('Number non-zero', number_nonzero)
+        print('Number zero', L - number_nonzero)
+
 
 
 def compare_original_transformed(L, periodic=False):
@@ -683,12 +724,19 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #plotObservables('results/problems/FFNN/L12_observables.csv', 12, observable='StringCorr', title='String correlation operator for the Haldane chain (N=12)')
 #plotObservables('results/problems/FFNN/L12_observables.csv', 12, observable='FerroCorr', title='Ferromagnetic correlation operator for the Haldane chain (N=12)')
 
+#plot('results/problemsAKLT/FFNN/L12.log', L=12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='AKLT', title='VMC energy of the AKLT model (N=12)')
+#plotObservables('results/problemsAKLT/FFNN/L12_observables.csv', 12, observable='StringCorr', title='String correlation operator for the AKLT model (N=12)')
+#plotObservables('results/problemsAKLT/FFNN/L12_observables.csv', 12, observable='FerroCorr', title='Ferromagnetic correlation operator for the AKLT model (N=12)')
+
+
 
 #Results for transformed hamiltonian
 #plot('results/transformedHamiltonian/L16.log', L=16, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title ='VMC energy of the transformed Haldane chain (N=16)')
 #plotObservables('results/transformedHamiltonian/L16_observables.csv', 16, title='String correlation operator for the transformed Haldane chain (N=16)')
 #plot('results/transformedHamiltonian/L60.log', L=60, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title='VMC energy of the transformed Haldane chain (N=60)')
 #plotObservables('results/transformedHamiltonian/L60_observables.csv', 60, title='String correlation operator for the transformed Haldane chain (N=60)')
+#plot('results/transformedHamiltonian/L80.log', L=80, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title='VMC energy of the transformed Haldane chain (N=80)')
+#plotObservables('results/transformedHamiltonian/L80_observables.csv', 80, title='String correlation operator for the transformed Haldane chain (N=80)')
 #plot('results/transformedAKLT/FFNN/L12.log', L=12, transformed_or_original='AKLT', observables=False, periodic = False)
 #plotObservables('results/transformedAKLT/FFNN/L12_observables.csv', L=12, hamiltonian='AKLT')
 
@@ -709,10 +757,17 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 #transformed AKLT results
 #plot('run/transformedAKLT/DeepConvNN/L40.log', L=40, symmetric_operator=False, observables=False, transformed_or_original='AKLT', title='VMC energy of transformed AKLT model (N=40)')
 #plotObservables('run/transformedAKLT/DeepConvNN/L40_observables.csv', L=40, hamiltonian='AKLT', title='String correlation operator for the transformed AKLT chain (N=40)')
+#plot('results/transformedAKLT/DeepConvNN/L60.log', L=60, symmetric_operator=False, observables=False, transformed_or_original='AKLT', title='VMC energy of transformed AKLT model (N=60)')
+#plotObservables('results/transformedAKLT/DeepConvNN/L60_observables.csv', L=60, hamiltonian='AKLT', title='String correlation operator for the transformed AKLT chain (N=60)')
 
 
 #Scaling of Lanczos Energy
 #plotEnergyPerSite()
 
 
+#Compare number of zeros
+#plotS_Z_squared('results/transformedAKLT/DeepConvNN/L60_observables.csv', L=60)
+#plotS_Z_squared('results/transformedHamiltonian//L60_observables.csv', L=60)
 
+#plotS_Z_squared('results/problemsAKLT/FFNN/L12_observables.csv', L=12)
+#plotS_Z_squared('results/problems/FFNN/L12_observables.csv', L=12)

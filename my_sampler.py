@@ -81,27 +81,17 @@ class _JaxVBSKernel:
         keys = jax.random.split(key, self.size)
         state = jnp.empty(shape=(self.size,))
         rand_qnum = 2 * jax.random.randint(keys[0], shape=(1,), minval=-1, maxval=2)[0]
-        #print('rand_qnum', rand_qnum)
         state = jax.ops.index_update(state, jax.ops.index[0], rand_qnum)
-        #print('state', state)
         save_direction = 0
         save_direction = jax.lax.cond(jnp.logical_or(rand_qnum > 1., rand_qnum < -1.), lambda xTrue: xTrue[0], lambda xFalse: xFalse[1], (rand_qnum, save_direction))
 
         for i in range(1, self.size):
             rand_qnum = 2 * jax.random.randint(keys[i], shape=(1,), minval=-1, maxval=2)[0]
-            #prikeys = jax.random.split(key, 2)nt('rand_qnum', rand_qnum)
             new_key = keys[i]
-            # while(jnp.logical_or(jnp.logical_and(rand_qnum > 1., save_direction > 1.), jnp.logical_and(rand_qnum < -1., save_direction < -1.))):
-            #     new_key = jax.random.split(new_key, 1)[0]
-            #     #print('new key', new_key)
-            #     rand_qnum = 2 * jax.random.randint(new_key, shape=(1,), minval=-1, maxval=2)[0]
-            #     #print(rand_qnum)
             new_key, rand_qnum, save_direction = jax.lax.while_loop(helper_while_cond, helper_while_body, (new_key, rand_qnum, save_direction))
             save_direction = jax.lax.cond(jnp.logical_or(rand_qnum > 1., rand_qnum < -1.), lambda xTrue: xTrue[0],
                                           lambda xFalse: xFalse[1], (rand_qnum, save_direction))
             state = jax.ops.index_update(state, jax.ops.index[i], rand_qnum)
-            # print('state', state)
-        #print('state', state)
         return keys[0], state
 
 def getVBSSampler(machine):

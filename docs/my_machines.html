@@ -828,7 +828,7 @@ def JaxDeepConvNN(hilbert, hamiltonian, alpha=1, optimizer=&#39;Sgd&#39;, lr=0.1
         sa = my_sampler.getInverseSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
-    machine_name = &#39;JaxResConvNN&#39;
+    machine_name = &#39;JaxDeepConvNN&#39;
     return ma, op, sa, machine_name
 
 
@@ -1416,7 +1416,7 @@ Returns:
         sa = my_sampler.getInverseSampler(machine=ma)
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
-    machine_name = &#39;JaxResConvNN&#39;
+    machine_name = &#39;JaxDeepConvNN&#39;
     return ma, op, sa, machine_name</code></pre>
 </details>
 </dd>
