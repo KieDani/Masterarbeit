@@ -576,7 +576,7 @@ def compareArchitectures(machine_names, path, L):
 
 
 
-def plotEnergyPerSite():
+def plotEnergyPerSize():
     lanczosEnergy = np.asarray([-1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626])
     Ls = np.asarray(range(2, len(lanczosEnergy) + 2))
     DMRG_Energy = lanczosEnergy / Ls
@@ -586,8 +586,8 @@ def plotEnergyPerSite():
     plt.plot(Ls, DMRG_Energy, color='blue', label='E/N')
     plt.plot(Ls, adjusted_Energy, color='black', label='E/(N-1)')
     plt.title('Scaling of the ground state energy')
-    plt.xlabel('Lattice sites')
-    plt.xlabel('Energy')
+    plt.xlabel('Lattice size')
+    plt.ylabel('Energy')
     plt.legend()
     plt.show()
     print(DMRG_Energy)
@@ -762,7 +762,7 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 
 
 #Scaling of Lanczos Energy
-#plotEnergyPerSite()
+#plotEnergyPerSize()
 
 
 #Compare number of zeros
