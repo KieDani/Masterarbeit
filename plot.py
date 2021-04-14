@@ -227,6 +227,9 @@ def plotS_Z_squared(dataname, L, title=None):
         print(values/numbers)
 
         plt.plot(range(0, L), values/numbers)
+        plt.title(title)
+        plt.xlabel(r'lattice site $i$')
+        plt.ylabel(r'$< \left( S_i^{(z)} \right) ^2 >$')
         plt.show()
 
         number_nonzero = values/numbers
@@ -767,8 +770,8 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 
 
 #Compare number of zeros
-#plotS_Z_squared('results/transformedAKLT/DeepConvNN/L60_observables.csv', L=60)
-#plotS_Z_squared('results/transformedHamiltonian//L60_observables.csv', L=60)
+#plotS_Z_squared('results/transformedAKLT/DeepConvNN/L60_observables.csv', L=60, title=r'$< \left( S_i^{(z)} \right) ^2 >$ for the AKLT model (N=60)')
+#plotS_Z_squared('results/transformedHamiltonian//L60_observables.csv', L=60, title=r'$< \left( S_i^{(z)} \right) ^2 >$ for the Haldane chain (N=60)')
 
 #plotS_Z_squared('results/problemsAKLT/FFNN/L12_observables.csv', L=12)
 #plotS_Z_squared('results/problems/FFNN/L12_observables.csv', L=12)
