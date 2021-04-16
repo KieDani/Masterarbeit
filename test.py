@@ -271,8 +271,8 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 
 #exact(L=10, symmetric=False, transformed=True)
 
-#jax.config.update('jax_disable_jit', True)
-#run(L=4, alpha=2, n_samples=300, n_iterations=300, machine_name='JaxFFNN', sampler='VBS')
+jax.config.update('jax_disable_jit', True)
+run(L=4, alpha=2, n_samples=100, n_iterations=300, machine_name='JaxTransformedFFNN', sampler='Local', hamiltonian_name='original_Heisenberg')
 
 #run(L=30, alpha=10, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=2000, n_iterations=150)
 #run(L=10, alpha=2, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=100, n_iterations=200)
