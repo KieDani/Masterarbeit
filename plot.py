@@ -775,3 +775,7 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 
 #plotS_Z_squared('results/problemsAKLT/FFNN/L12_observables.csv', L=12)
 #plotS_Z_squared('results/problems/FFNN/L12_observables.csv', L=12)
+
+
+#TransformedFFNN
+#plot('results/TransformedFFNN/L4.log', L=4, symmetric_operator=False, observables=False, transformed_or_original='original', title='VMC energy of the Haldane chain (N=4) with the TransformedFFNN')

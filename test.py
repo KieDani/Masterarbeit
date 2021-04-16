@@ -271,9 +271,6 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 
 #exact(L=10, symmetric=False, transformed=True)
 
-jax.config.update('jax_disable_jit', True)
-run(L=4, alpha=2, n_samples=100, n_iterations=300, machine_name='JaxTransformedFFNN', sampler='Local', hamiltonian_name='original_Heisenberg')
-
 #run(L=30, alpha=10, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=2000, n_iterations=150)
 #run(L=10, alpha=2, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=100, n_iterations=200)
 #measureObservable(L=10, alpha=2, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=200, n_iterations=100, operator='S_Z_squared')
@@ -538,3 +535,8 @@ run(L=4, alpha=2, n_samples=100, n_iterations=300, machine_name='JaxTransformedF
 #measure S_Z_squared for original Hamiltonians
 #measureObservable(L=12, path='results/problems/FFNN', machine_name='JaxFFNN', hamiltonian_name='transformed_Heisenberg', n_samples=1000, n_iterations=100, append=True, operator='S_Z_squared')
 #measureObservable(L=12, path='results/problemsAKLT/FFNN', machine_name='JaxFFNN', hamiltonian_name='transformed_AKLT', n_samples=1000, n_iterations=100, append=True, operator='S_Z_squared')
+
+
+#Transformed machine
+#jax.config.update('jax_disable_jit', True)
+#run(L=4, alpha=2, n_samples=50, n_iterations=100, machine_name='JaxTransformedFFNN', sampler='Local', hamiltonian_name='original_Heisenberg', path='results/TransformedFFNN')
