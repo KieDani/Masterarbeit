@@ -185,6 +185,45 @@ def SumLayer():
 SumLayer = SumLayer()
 
 
+def TransformedLayer():
+    &#34;&#34;&#34;Layer to apply the transformation to the input data
+        The transformation from 10.1103/physrevb.46.3486 is applied
+                &#34;&#34;&#34;
+    def init_fun(rng, input_shape):
+        output_shape = input_shape
+        return output_shape, ()
+
+    @jax.jit
+    def apply_fun(params, inputs, **kwargs):
+        def inner_loop_body(i, inputs_and_counter):
+            inputs = inputs_and_counter[0]
+            counter = inputs_and_counter[1]
+            val = inputs[j, i]
+            condition = jnp.logical_or(val &lt; -0.5, val &gt; 0.5)
+            inputs, counter = jax.lax.cond(condition, lambda xTrue: (
+            jax.ops.index_update(inputs, jax.ops.index[j, i], counter * val), counter * -1),
+                                           lambda xFalse: (inputs, counter), (None))
+            return inputs, counter
+
+        for j in range(inputs.shape[0]):
+            counter = +1
+            #print(&#39;------------------&#39;)
+            #print(inputs[j, :])
+            #flips every second nonzero spin
+            for i in range(inputs.shape[1]):
+                val = inputs[j, i]
+                condition = jnp.logical_or(val &lt; -0.5, val &gt; 0.5)
+                inputs, counter = jax.lax.cond(condition, lambda xTrue: (jax.ops.index_update(inputs, jax.ops.index[j, i], counter*val), counter * -1), lambda xFalse: (inputs, counter), (None))
+                # if(val &lt; -0.5 or val &gt; 0.5):
+                #     inputs = jax.ops.index_update(inputs, jax.ops.index[j, i], counter*val)
+                #     counter *= -1
+            #inputs, counter = jax.lax.fori_loop(0, inputs.shape[1], inner_loop_body, (inputs, counter))
+            #print(inputs[j, :])
+        return inputs
+
+    return init_fun, apply_fun
+TransformedLayer = TransformedLayer()
+
 def FormatLayer():
     &#34;&#34;&#34;Ensures the correct dimension of the output of a network.
         It was needed in an old version of NetKet. I do not know, if this is still needed
@@ -582,6 +621,57 @@ def JaxFFNN(hilbert, hamiltonian, alpha=1, optimizer=&#39;Sgd&#39;, lr=0.1, samp
     else:
         sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
     machine_name = &#39;JaxFFNN&#39;
+    return ma, op, sa, machine_name
+
+def JaxTransformedFFNN(hilbert, hamiltonian, alpha=1, optimizer=&#39;Sgd&#39;, lr=0.1, sampler=&#39;Local&#39;):
+    &#34;&#34;&#34;Complex Feed Forward Neural Network (fully connected) Machine implemented in Jax. One hidden layer.
+
+        The input data is transformed in the beginning by the transformation 10.1103/physrevb.46.3486
+        Dense, ComplexReLU, Dense
+
+            Args:
+                hilbert (netket.hilbert) : hilbert space
+                hamiltonian (netket.hamiltonian) : hamiltonian
+                alpha (int) : hidden layer density
+                optimizer (str) : possible choices are &#39;Sgd&#39;, &#39;Adam&#39;, or &#39;AdaMax&#39;
+                lr (float) : learning rate
+                sampler (str) : possible choices are &#39;Local&#39;, &#39;Exact&#39;, &#39;VBS&#39;, &#39;Inverse&#39;
+
+            Returns:
+                ma (netket.machine) : machine
+                op (netket.optimizer) : optimizer
+                sa (netket.sampler) : sampler
+                machine_name (str) : name of the machine, see get_operator
+                                                &#34;&#34;&#34;
+    print(&#39;JaxTransformedFFNN is used&#39;)
+    input_size = hilbert.size
+    init_fun, apply_fun = stax.serial(FixSrLayer, TransformedLayer,
+        Dense(input_size * alpha), ComplexReLu,
+        Dense(1), FormatLayer)
+    ma = nk.machine.Jax(
+        hilbert,
+        (init_fun, apply_fun), dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+    # Optimizer
+    if (optimizer == &#39;Sgd&#39;):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == &#39;Adam&#39;):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+    # Sampler
+    if (sampler == &#39;Local&#39;):
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == &#39;Exact&#39;):
+        sa = nk.sampler.ExactSampler(machine=ma)
+    elif(sampler == &#39;VBS&#39;):
+        sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == &#39;Inverse&#39;):
+        sa = my_sampler.getInverseSampler(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    machine_name = &#39;JaxTransformedFFNN&#39;
     return ma, op, sa, machine_name
 
 
@@ -1230,6 +1320,8 @@ def get_machine(machine_name):
         return JaxResConvNN
     elif (machine_name == &#39;JaxDeepConvNN&#39;):
         return  JaxDeepConvNN
+    elif (machine_name == &#39;JaxTransformedFFNN&#39;):
+        return  JaxTransformedFFNN
     else:
         print(&#39;The desired machine was spelled wrong!&#39;)
         sys.stdout.flush()
@@ -2005,6 +2097,83 @@ Returns:
     return ma, op, sa, machine_name</code></pre>
 </details>
 </dd>
+<dt id="my_machines.JaxTransformedFFNN"><code class="name flex">
+<span>def <span class="ident">JaxTransformedFFNN</span></span>(<span>hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Complex Feed Forward Neural Network (fully connected) Machine implemented in Jax. One hidden layer.</p>
+<p>The input data is transformed in the beginning by the transformation 10.1103/physrevb.46.3486
+Dense, ComplexReLU, Dense</p>
+<pre><code>Args:
+    hilbert (netket.hilbert) : hilbert space
+    hamiltonian (netket.hamiltonian) : hamiltonian
+    alpha (int) : hidden layer density
+    optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+    lr (float) : learning rate
+    sampler (str) : possible choices are 'Local', 'Exact', 'VBS', 'Inverse'
+
+Returns:
+    ma (netket.machine) : machine
+    op (netket.optimizer) : optimizer
+    sa (netket.sampler) : sampler
+    machine_name (str) : name of the machine, see get_operator
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def JaxTransformedFFNN(hilbert, hamiltonian, alpha=1, optimizer=&#39;Sgd&#39;, lr=0.1, sampler=&#39;Local&#39;):
+    &#34;&#34;&#34;Complex Feed Forward Neural Network (fully connected) Machine implemented in Jax. One hidden layer.
+
+        The input data is transformed in the beginning by the transformation 10.1103/physrevb.46.3486
+        Dense, ComplexReLU, Dense
+
+            Args:
+                hilbert (netket.hilbert) : hilbert space
+                hamiltonian (netket.hamiltonian) : hamiltonian
+                alpha (int) : hidden layer density
+                optimizer (str) : possible choices are &#39;Sgd&#39;, &#39;Adam&#39;, or &#39;AdaMax&#39;
+                lr (float) : learning rate
+                sampler (str) : possible choices are &#39;Local&#39;, &#39;Exact&#39;, &#39;VBS&#39;, &#39;Inverse&#39;
+
+            Returns:
+                ma (netket.machine) : machine
+                op (netket.optimizer) : optimizer
+                sa (netket.sampler) : sampler
+                machine_name (str) : name of the machine, see get_operator
+                                                &#34;&#34;&#34;
+    print(&#39;JaxTransformedFFNN is used&#39;)
+    input_size = hilbert.size
+    init_fun, apply_fun = stax.serial(FixSrLayer, TransformedLayer,
+        Dense(input_size * alpha), ComplexReLu,
+        Dense(1), FormatLayer)
+    ma = nk.machine.Jax(
+        hilbert,
+        (init_fun, apply_fun), dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+    # Optimizer
+    if (optimizer == &#39;Sgd&#39;):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == &#39;Adam&#39;):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+    # Sampler
+    if (sampler == &#39;Local&#39;):
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == &#39;Exact&#39;):
+        sa = nk.sampler.ExactSampler(machine=ma)
+    elif(sampler == &#39;VBS&#39;):
+        sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == &#39;Inverse&#39;):
+        sa = my_sampler.getInverseSampler(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    machine_name = &#39;JaxTransformedFFNN&#39;
+    return ma, op, sa, machine_name</code></pre>
+</details>
+</dd>
 <dt id="my_machines.JaxUnaryFFNN"><code class="name flex">
 <span>def <span class="ident">JaxUnaryFFNN</span></span>(<span>hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local')</span>
 </code></dt>
@@ -2436,6 +2605,8 @@ If the machine is spelled wrong, None is returned!</p>
         return JaxResConvNN
     elif (machine_name == &#39;JaxDeepConvNN&#39;):
         return  JaxDeepConvNN
+    elif (machine_name == &#39;JaxTransformedFFNN&#39;):
+        return  JaxTransformedFFNN
     else:
         print(&#39;The desired machine was spelled wrong!&#39;)
         sys.stdout.flush()
@@ -2844,6 +3015,7 @@ def modrelu(x):
 <li><code><a title="my_machines.JaxResFFNN" href="#my_machines.JaxResFFNN">JaxResFFNN</a></code></li>
 <li><code><a title="my_machines.JaxSymmFFNN" href="#my_machines.JaxSymmFFNN">JaxSymmFFNN</a></code></li>
 <li><code><a title="my_machines.JaxSymmRBM" href="#my_machines.JaxSymmRBM">JaxSymmRBM</a></code></li>
+<li><code><a title="my_machines.JaxTransformedFFNN" href="#my_machines.JaxTransformedFFNN">JaxTransformedFFNN</a></code></li>
 <li><code><a title="my_machines.JaxUnaryFFNN" href="#my_machines.JaxUnaryFFNN">JaxUnaryFFNN</a></code></li>
 <li><code><a title="my_machines.JaxUnaryRBM" href="#my_machines.JaxUnaryRBM">JaxUnaryRBM</a></code></li>
 <li><code><a title="my_machines.ResConvLayer" href="#my_machines.ResConvLayer">ResConvLayer</a></code></li>

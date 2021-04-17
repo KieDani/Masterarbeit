@@ -30,11 +30,11 @@ netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib</p>
 * plotObservable
 * plotS_Z_squared
 * compare_original_transformed
-* present
 * plot_startingpoints
 * plot_Sr
 * plot_operator_both_sides
 * compareArchitectures
+* plotEnergyPerSize
 </code></pre>
 <details class="source">
 <summary>
@@ -51,18 +51,15 @@ This file contains the following functions:
     * plotObservable
     * plotS_Z_squared
     * compare_original_transformed
-    * present
     * plot_startingpoints
     * plot_Sr
     * plot_operator_both_sides
     * compareArchitectures
+    * plotEnergyPerSize
 &#34;&#34;&#34;
-# Load the data from the .log file
 import json
 import matplotlib.pyplot as plt
 import numpy as np
-import helping_functions as functions
-from multiprocessing import Pool
 import csv
 
 
@@ -77,6 +74,7 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
                 symmetric_operator (bool) : if the observable is measured symmetrically to the center
                 periodic (bool) : if exact results of the periodic lattice are plotted
                 transformed_or_original (str) : which hamiltonian is used. &#39;transformed&#39; or &#39;original&#39; or &#39;AKLT&#39;
+                title (str): title of the plot
                                                     &#34;&#34;&#34;
     data=json.load(open(dataname))
     # Extract the relevant information
@@ -134,9 +132,9 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
     if title==None:
         plt.title(dataname)
     else:
-        plt.title(title)
-    plt.xlabel(&#39;Iteration&#39;)
-    plt.ylabel(&#39;Energy&#39;)
+        plt.title(title, fontsize=14)
+    plt.xlabel(&#39;Iteration&#39;, fontsize = 14)
+    plt.ylabel(&#39;Energy&#39;, fontsize = 14)
     plt.legend()
     plt.show()
 
@@ -176,7 +174,7 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
 
 
 
-def plotObservables(dataname, L, observable=&#39;FerroCorr&#39;, title = None, hamiltonian = &#39;Heisenberg&#39;):
+def plotObservables(dataname, L, observable=&#39;FerroCorr&#39;, title = None, hamiltonian = &#39;Heisenberg&#39;, yLabel = None):
     &#34;&#34;&#34;Function to plot the results of the function measureObservables().
         The csv file is loaded and evaluated.
 
@@ -185,6 +183,8 @@ def plotObservables(dataname, L, observable=&#39;FerroCorr&#39;, title = None, h
                 L (int) : Lattice size
                 observable (str): allowed inputs are &#39;FerroCorr&#39; and &#39;StringCorr&#39;
                 title (str) : Title of the plot
+                hamiltonian (str): allowed inputs are &#39;Heisenberg&#39; or &#39;AKLT&#39;
+                yLabel (str): ylabel of the plot
                                                         &#34;&#34;&#34;
     #observable 1 at position 0, etc
     numbers = np.zeros(L-1, dtype=np.int32)
@@ -225,16 +225,17 @@ def plotObservables(dataname, L, observable=&#39;FerroCorr&#39;, title = None, h
                 operator = 0.374 * np.ones(len(values))
                 x_operator = range(1, L)
         plt.plot(x_operator, operator, color=&#39;red&#39;, label=&#39;exact value&#39;)
-        plt.xlabel(&#39;site distance&#39;)
-        if(observable == &#39;FerroCorr&#39;):
-            plt.ylabel(&#39;Ferromagnetic correlation operator&#39;)
+        plt.xlabel(&#39;Site distance&#39;, fontsize = 14)
+        if(observable == &#39;FerroCorr&#39; and yLabel == None):
+            plt.ylabel(&#39;Ferromagnetic order parameter&#39;, fontsize=14)
+        elif(yLabel == None):
+            plt.ylabel(&#39;String order parameter&#39;, fontsize=14)
         else:
-            plt.ylabel(&#39;String correlation operator&#39;)
-        plt.ylabel(&#39;Ferromagnetic correlation operator&#39;)
+            plt.ylabel(yLabel, fontsize=14)
         if title == None:
             plt.title(dataname)
         else:
-            plt.title(title)
+            plt.title(title, fontsize = 14)
         plt.legend()
         plt.show()
 
@@ -269,6 +270,9 @@ def plotS_Z_squared(dataname, L, title=None):
         print(values/numbers)
 
         plt.plot(range(0, L), values/numbers)
+        plt.title(title, fontsize=14)
+        plt.xlabel(r&#39;lattice site $i$&#39;, fontsize=14)
+        plt.ylabel(r&#39;$&lt; { S_i^{(z)} } ^2 &gt;$&#39;, fontsize=14)
         plt.show()
 
         number_nonzero = values/numbers
@@ -303,88 +307,6 @@ def compare_original_transformed(L, periodic=False):
     plt.ylabel(&#39;Observable&#39;)
     plt.legend()
     plt.show()
-
-
-# Ls should be an array with 4 Elements
-def present(Ls, path):
-    &#34;&#34;&#34;function to visalize multiple plots at once&#34;&#34;&#34;
-
-    #a = x data, b = f(x), c = expected energy
-    def plot4me(a, b, c, text=&#39;Energy-Iterations&#39;):
-        plt.subplot(221)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
-        plt.plot(a[0], b[0])
-        if(c != None): plt.plot(a[0], c[0])
-        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[0]))))
-        plt.subplot(222)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
-        plt.plot(a[1], b[1])
-        if (c != None): plt.plot(a[1], c[1])
-        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[1]))))
-        plt.subplot(223)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
-        plt.plot(a[2], b[2])
-        if (c != None): plt.plot(a[2], c[2])
-        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[2]))))
-        plt.subplot(224)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
-        plt.plot(a[3], b[3])
-        if (c != None): plt.plot(a[3], c[3])
-        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[3]))))
-        plt.show()
-
-    iters_list = []
-    energy_list = []
-    sfs_fast_list = []
-    xAxis_fast_list = []
-    expected_energy_list = []
-    for j in range(0, len(Ls)):
-        l = Ls[j]
-        print(&#39;&#39;.join((path, &#39;/L&#39;, str(l), &#39;.log&#39;)))
-        data_energy = json.load(open(&#39;&#39;.join((path, &#39;/L&#39;, str(l), &#39;.log&#39;))))
-        data_observ = json.load(open(&#39;&#39;.join((path, &#39;/L&#39;, str(l), &#39;_estimate.log&#39;))))
-        # Extract the relevant information
-
-        length = l
-
-        iters = []
-        energy = []
-        sfs_fast = list()
-        xAxis_fast = list()
-
-        for iteration in data_energy[&#34;Output&#34;]:
-            iters.append(iteration[&#34;Iteration&#34;])
-            energy.append(iteration[&#34;Energy&#34;][&#34;Mean&#34;])
-
-        def calcMean(array):
-            length = np.minimum(15, len(array))
-            print(length)
-            sum = 0.
-            for i in range(length):
-                sum += array[-i + 0]
-            return sum / float(length)
-
-        def getsf(i):
-            sf = list()
-            for iteration in data_observ[&#34;Output&#34;]:
-                sf.append(iteration[&#39;Ferro_correlation_function&#39; + str(i)][&#34;Mean&#34;])
-            return calcMean(sf)
-
-        for i in range(1, length):
-            sfs_fast.append(getsf(i))
-            xAxis_fast.append(i)
-
-        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
-        if(l &lt; len(tmp)):
-            factor = tmp[l]
-        else:
-            factor = (l-1) * (-1.4)
-        expected_energy = np.ones_like(np.asarray(iters)) * factor
-
-        expected_energy_list.append(expected_energy)
-        iters_list.append(np.asarray(iters))
-        energy_list.append(np.asarray(energy))
-        sfs_fast_list.append(np.asarray(sfs_fast))
-        xAxis_fast_list.append(np.asarray(xAxis_fast))
-
-    plot4me(iters_list, energy_list, expected_energy_list, text=&#39;Energy-Iteration&#39;)
-    plot4me(xAxis_fast_list, sfs_fast_list, None, text=&#39;operator-site&#39;)
 
 
 
@@ -551,7 +473,6 @@ def plot_operator_both_sides(dataname, L):
     for index, mirrored in enumerate([&#39;&#39;, &#39;_mirrored&#39;]):
         sfs_fast = list()
         xAxis_fast = list()
-        max_range = L
         for i in range(1, int(L/2.)):
             sfs_fast.append(getsf(int(L/2.), int(L/2.) + i, mirrored=mirrored))
             xAxis_fast.append(i)
@@ -564,8 +485,8 @@ def plot_operator_both_sides(dataname, L):
 
 
 def compareArchitectures(machine_names, path, L):
-    &#34;&#34;&#34;Function to compare the results of defferent architectures.
-        Mean energy, variance, mean time, and so on are evaluated
+    &#34;&#34;&#34;Function to compare the results of different architectures.
+        Mean energy, variance, mean time, and so on are evaluated.
 
             Args:
                 machine_names (list) : list with machine names (str) as elements
@@ -592,7 +513,7 @@ def compareArchitectures(machine_names, path, L):
                     factor = tmp[L]
                 else:
                     factor = (L - 1) * (-1.401484)
-                deviation_energy = (factor - np.mean(energy[-int(1./3*len(energy)):])) / factor
+                deviation_energy = (factor - np.mean(energy[350-int(1./3*len(energy)):350])) / factor
                 deviations_energy.append(deviation_energy)
                 # Time data is created at the end of the simulation -&gt; There might be no .time data yet
                 try:
@@ -618,7 +539,13 @@ def compareArchitectures(machine_names, path, L):
 
 
 
-def plotEnergyPerSite():
+def plotEnergyPerSize():
+    &#34;&#34;&#34;Function to plot the scaling of the energy of the Haldane chain.
+            Scaling per lattice site and scaling per bond are compared.
+
+                Args:
+
+                                                            &#34;&#34;&#34;
     lanczosEnergy = np.asarray([-1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626])
     Ls = np.asarray(range(2, len(lanczosEnergy) + 2))
     DMRG_Energy = lanczosEnergy / Ls
@@ -627,160 +554,45 @@ def plotEnergyPerSite():
     plt.plot(Ls, energy_per_site, color=&#39;red&#39;, label=&#39;exact value&#39;)
     plt.plot(Ls, DMRG_Energy, color=&#39;blue&#39;, label=&#39;E/N&#39;)
     plt.plot(Ls, adjusted_Energy, color=&#39;black&#39;, label=&#39;E/(N-1)&#39;)
-    plt.title(&#39;Scaling of the ground state energy&#39;)
-    plt.xlabel(&#39;Lattice sites&#39;)
-    plt.xlabel(&#39;Energy&#39;)
+    plt.title(&#39;Scaling of the ground state energy&#39;, fontsize=14)
+    plt.xlabel(&#39;Lattice size&#39;, fontsize=14)
+    plt.ylabel(&#39;Energy&#39;, fontsize=14)
     plt.legend()
     plt.show()
     print(DMRG_Energy)
     print(adjusted_Energy)
 
 
-#plot(dataname=&#39;run/L100.log&#39;, L=100)
-#plot(dataname=&#39;run/L20_estimate.log&#39;, L=20, observables=True)
-
-#present(Ls=[6, 10, 15, 20], path=&#39;results/Sr&#39;)
-
-#plot_startingpoints(&#39;run/startingpoint_superpower/L30_estimate.log&#39;, 30, fast=True)
-
-
-
-#results operator both sides
-
-
-#RBM
-L=40
-machine = &#39;_RBM&#39;
-#plot(dataname=&#39;run/operator_both_sides&#39;+ machine + &#39;/L&#39; + str(L) + &#39;.log&#39;, L=L, observables=False)
-#plot_operator_both_sides(dataname=&#39;run/operator_both_sides&#39; + machine + &#39;/L&#39; + str(L) + &#39;_estimate.log&#39;, L=L)
-
-#SymRBM
-L=40
-machine = &#39;_SymRBM&#39;
-#plot(dataname=&#39;run/operator_both_sides&#39;+ machine + &#39;/L&#39; + str(L) + &#39;.log&#39;, L=L, observables=False)
-#plot_operator_both_sides(dataname=&#39;run/operator_both_sides&#39; + machine + &#39;/L&#39; + str(L) + &#39;_estimate.log&#39;, L=L)
-
-
-#DeepFFNN
-L=40
-machine = &#39;_DeepFFNN&#39;
-#plot(dataname=&#39;run/operator_both_sides&#39;+ machine + &#39;/L&#39; + str(L) + &#39;.log&#39;, L=L, observables=False)
-#plot_operator_both_sides(dataname=&#39;run/operator_both_sides&#39; + machine + &#39;/L&#39; + str(L) + &#39;_estimate.log&#39;, L=L)
-
-
-
-#results with symmetric operator
-
-
-#RBM
-L=40
-machine = &#39;_RBM&#39;
-#plot(dataname=&#39;run/symmetric_operator&#39;+ machine + &#39;/L&#39; + str(L) + &#39;.log&#39;, L=L, observables=False)
-#plot(&#39;run/symmetric_operator&#39;+ machine + &#39;/L&#39; + str(L) + &#39;_estimate.log&#39;, L=L, symmetric_operator=True, observables=True)
-
-
-#FFNN
-L=45
-machine = &#39;_FFNN&#39;
-#plot(dataname=&#39;run/symmetric_operator&#39;+ machine + &#39;/L&#39; + str(L) + &#39;.log&#39;, L=L, observables=False)
-#plot(&#39;run/symmetric_operator&#39;+ machine + &#39;/L&#39; + str(L) + &#39;_estimate.log&#39;, L=L, symmetric_operator=True, observables=True)
-
-
-
-#DeepFFNN
-L=60
-machine = &#39;_DeepFFNN&#39;
-#plot(dataname=&#39;run/symmetric_operator&#39;+ machine + &#39;/L&#39; + str(L) + &#39;.log&#39;, L=L, observables=False)
-#plot(&#39;run/symmetric_operator&#39;+ machine + &#39;/L&#39; + str(L) + &#39;_estimate.log&#39;, L=L, symmetric_operator=True, observables=True)
-
-
-
-#results test_sr
-
-
-#Compare Sr RBM
-#plot_Sr(path=&#39;run/test_sr/&#39;, L=40)
-
-#Compare Sr FFNN
-#plot_Sr(path=&#39;run/test_sr_ffnn/&#39;, L=40)
-#plot_Sr(path=&#39;run/test_sr_FFNN/&#39;, L=12)
-
-
-#plot(&#39;run/small_RBM/SrNoneL14_estimate.log&#39;, L = 14 ,symmetric_operator=False, observables=True)
-
-#compare_original_transformed(L=16, periodic=True)
-
-#plot(&#39;run/small_FFNN_periodic/SrNoneL8_estimate.log&#39;, L = 8 ,symmetric_operator=False, observables=True, periodic=True, transformed_or_original=&#39;original&#39;)
-
-#plot(&#39;run/small_FFNN/SrNoneL30_estimate.log&#39;, L = 30 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original=&#39;transformed&#39;)
-
-
-
-
-#plot(&#39;run/firstResults_FFNN/L16_estimate.log&#39;, L = 16 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original=&#39;transformed&#39;)
-#plot(&#39;run/firstResults_FFNN/L16_estimate.log&#39;, L = 16 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original=&#39;transformed&#39;)
-#plot(&#39;run/firstResults_FFNN/L32_estimate.log&#39;, L = 32 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original=&#39;transformed&#39;)
-#plot(&#39;run/firstResults_FFNN/L32_estimate.log&#39;, L = 32 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original=&#39;transformed&#39;)
-
-def wrapper(i):
-    machine_names = [&#39;JaxRBM&#39;, &#39;JaxSymmRBM&#39;, &#39;JaxFFNN&#39;, &#39;JaxDeepFFNN&#39;, &#39;JaxDeepConvNN&#39;, &#39;JaxSymmFFNN&#39;, &#39;JaxUnaryFFNN&#39;, &#39;JaxConv3NN&#39;, &#39;JaxResFFNN&#39;, &#39;JaxResConvNN&#39;]
-    #plot(&#39;run/compareArchitectures/CPU/Iterations/&#39; + machine_names[i] + &#39;/L16.log&#39;, L = 16 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original=&#39;transformed&#39;)
-    plot(&#39;run/compareArchitectures/CPU/Iterations/&#39; + machine_names[i] + &#39;/1L30.log&#39;, L = 30 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original=&#39;transformed&#39;)
-
-
-with Pool(8) as p:
-    pass
-    #p.map(wrapper, [0, 2, 3, 4, 5, 6, 7, 8, 9])
-
-
-#plot(&#39;run/observableArchitekture/JaxDeepConvNN/L14_estimate.log&#39;, L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original=&#39;transformed&#39;)
-#plot(&#39;run/observableArchitekture/JaxDeepFFNN/L14_estimate.log&#39;, L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original=&#39;transformed&#39;)
-
-machine_names = [&#39;JaxRBM&#39;, &#39;JaxFFNN&#39;, &#39;JaxDeepFFNN&#39;, &#39;JaxDeepConvNN&#39;, &#39;JaxSymmFFNN&#39;, &#39;JaxUnaryFFNN&#39;, &#39;JaxConv3NN&#39;, &#39;JaxResFFNN&#39;, &#39;JaxResConvNN&#39;]
-#compareArchitectures(machine_names, path=&#39;run/compareArchitectures/CPU/Iterations/&#39;, L=16)
-
-
-
-#plotObservables(&#39;run/secondResults/JaxDeepConvNN/L16_observables.csv&#39;, 16)
-#plotObservables(&#39;run/secondResults/JaxDeepFFNN/L16_observables.csv&#39;, 16)
-#plotObservables(&#39;run/secondResults/JaxDeepConvNN/L30_observables.csv&#39;, 30)
-#plotObservables(&#39;run/secondResults/JaxDeepFFNN/L40_observables.csv&#39;, 40)
-#plotObservables(&#39;run/secondResults/JaxDeepConvNN/L60_observables.csv&#39;, 60)
-
-
-#plotObservables(&#39;run/thirdResults/JaxDeepFFNN/L12_observables.csv&#39;, 12)
-#plotObservables(&#39;run/numberSamples_small/JaxDeepConvNN/L16_observables.csv&#39;, 16)
-
-#plot(dataname=&#39;run/secondResults/JaxDeepConvNN/L60.log&#39;, L=60)
-
-#https://journals.aps.org/prb/abstract/10.1103/PhysRevB.91.045121
-
-
-
-#----------------------------------------------------------------------------------------------------------------------
-
-
 #Show that the original Heisenberg model and AKLT model can not be solved properly
-#plot(&#39;results/problems/RBM/L12.log&#39;, L = 12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original=&#39;original&#39;)
 #plot(&#39;results/problems/FFNN/L12.log&#39;, L = 12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original=&#39;original&#39;, title=&#39;VMC energy of the Haldane chain (N=12)&#39;)
-#plotObservables(&#39;results/problems/FFNN/L12_observables.csv&#39;, 12, observable=&#39;StringCorr&#39;, title=&#39;String correlation operator for the Haldane chain (N=12)&#39;)
-#plotObservables(&#39;results/problems/FFNN/L12_observables.csv&#39;, 12, observable=&#39;FerroCorr&#39;, title=&#39;Ferromagnetic correlation operator for the Haldane chain (N=12)&#39;)
+#plotObservables(&#39;results/problems/FFNN/L12_observables.csv&#39;, 12, observable=&#39;StringCorr&#39;, title=&#39;String order parameter for the Haldane chain (N=12)&#39;)
+#plotObservables(&#39;results/problems/FFNN/L12_observables.csv&#39;, 12, observable=&#39;FerroCorr&#39;, title=&#39;Ferromagnetic order parameter for the Haldane chain (N=12)&#39;)
+
+#plot(&#39;results/problemsAKLT/FFNN/L12.log&#39;, L=12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original=&#39;AKLT&#39;, title=&#39;VMC energy of the AKLT model (N=12)&#39;)
+#plotObservables(&#39;results/problemsAKLT/FFNN/L12_observables.csv&#39;, 12, observable=&#39;StringCorr&#39;, title=&#39;String order parameter for the AKLT model (N=12)&#39;)
+#plotObservables(&#39;results/problemsAKLT/FFNN/L12_observables.csv&#39;, 12, observable=&#39;FerroCorr&#39;, title=&#39;Ferromagnetic order parameter for the AKLT model (N=12)&#39;)
+
 
 
 #Results for transformed hamiltonian
 #plot(&#39;results/transformedHamiltonian/L16.log&#39;, L=16, symmetric_operator=False, observables=False, periodic=False, transformed_or_original=&#39;transformed&#39;, title =&#39;VMC energy of the transformed Haldane chain (N=16)&#39;)
-#plotObservables(&#39;results/transformedHamiltonian/L16_observables.csv&#39;, 16, title=&#39;String correlation operator for the transformed Haldane chain (N=16)&#39;)
+#plotObservables(&#39;results/transformedHamiltonian/L16_observables.csv&#39;, 16, title=&#39;String order parameter for the transformed Haldane chain (N=16)&#39;, yLabel=&#39;String order parameter&#39;)
 #plot(&#39;results/transformedHamiltonian/L60.log&#39;, L=60, symmetric_operator=False, observables=False, periodic=False, transformed_or_original=&#39;transformed&#39;, title=&#39;VMC energy of the transformed Haldane chain (N=60)&#39;)
-#plotObservables(&#39;results/transformedHamiltonian/L60_observables.csv&#39;, 60, title=&#39;String correlation operator for the transformed Haldane chain (N=60)&#39;)
+#plotObservables(&#39;results/transformedHamiltonian/L60_observables.csv&#39;, 60, title=&#39;String order parameter for the transformed Haldane chain (N=60)&#39;, yLabel=&#39;String order parameter&#39;)
+#plot(&#39;results/transformedHamiltonian/L80.log&#39;, L=80, symmetric_operator=False, observables=False, periodic=False, transformed_or_original=&#39;transformed&#39;, title=&#39;VMC energy of the transformed Haldane chain (N=80)&#39;)
+#plotObservables(&#39;results/transformedHamiltonian/L80_observables.csv&#39;, 80, title=&#39;String order parameter for the transformed Haldane chain (N=80)&#39;, yLabel=&#39;String order parameter&#39;)
+#plotObservables(&#39;results/transformedHamiltonian/L80_load_observables.csv&#39;, 80, title=&#39;String order parameter for the transformed Haldane chain (N=80)&#39;, yLabel=&#39;String order parameter&#39;)
 #plot(&#39;results/transformedAKLT/FFNN/L12.log&#39;, L=12, transformed_or_original=&#39;AKLT&#39;, observables=False, periodic = False)
 #plotObservables(&#39;results/transformedAKLT/FFNN/L12_observables.csv&#39;, L=12, hamiltonian=&#39;AKLT&#39;)
 
 #plot(&#39;run/fifthResults/JaxFFNN/L16.log&#39;, L=16, symmetric_operator=False, observables=False, periodic=False, transformed_or_original=&#39;transformed&#39;, title =&#39;VMC energy of the transformed Haldane chain (N=16)&#39;)
-#plotObservables(&#39;run/fifthResults/JaxFFNN/L16_observables.csv&#39;, 16, title=&#39;String correlation operator for the transformed Haldane chain (N=16)&#39;)
+#plotObservables(&#39;run/fifthResults/JaxFFNN/L16_observables.csv&#39;, 16, title=&#39;String order parameter for the transformed Haldane chain (N=16)&#39;, yLabel=&#39;String order parameter&#39;)
 
 
 #Comparison of architectures
 #compareArchitectures(machine_names, path=&#39;run/compareArchitectures/CPU/Iterations/&#39;, L=16)
+#machine_names = [&#39;JaxResFFNN&#39;, &#39;JaxResConvNN&#39;, &#39;JaxDeepConvNN&#39;, &#39;JaxSymmFFNN&#39;, &#39;JaxDeepFFNN&#39;, &#39;JaxFFNN&#39;, &#39;JaxRBM&#39;]
+#compareArchitectures(machine_names, path=&#39;results/compareArchitectures/&#39;, L=16)
 
 
 #Test VBSSampler and InverseSampler
@@ -791,18 +603,25 @@ machine_names = [&#39;JaxRBM&#39;, &#39;JaxFFNN&#39;, &#39;JaxDeepFFNN&#39;, &#3
 
 #transformed AKLT results
 #plot(&#39;run/transformedAKLT/DeepConvNN/L40.log&#39;, L=40, symmetric_operator=False, observables=False, transformed_or_original=&#39;AKLT&#39;, title=&#39;VMC energy of transformed AKLT model (N=40)&#39;)
-#plotObservables(&#39;run/transformedAKLT/DeepConvNN/L40_observables.csv&#39;, L=40, hamiltonian=&#39;AKLT&#39;, title=&#39;String correlation operator for the transformed AKLT chain (N=40)&#39;)
+#plotObservables(&#39;run/transformedAKLT/DeepConvNN/L40_observables.csv&#39;, L=40, hamiltonian=&#39;AKLT&#39;, title=&#39;String order parameter for the transformed AKLT chain (N=40)&#39;, yLabel=&#39;String order parameter&#39;)
+#plot(&#39;results/transformedAKLT/DeepConvNN/L60.log&#39;, L=60, symmetric_operator=False, observables=False, transformed_or_original=&#39;AKLT&#39;, title=&#39;VMC energy of transformed AKLT model (N=60)&#39;)
+#plotObservables(&#39;results/transformedAKLT/DeepConvNN/L60_observables.csv&#39;, L=60, hamiltonian=&#39;AKLT&#39;, title=&#39;String order parameter for the transformed AKLT chain (N=60)&#39;, yLabel=&#39;String order parameter&#39;)
 
 
 #Scaling of Lanczos Energy
-#plotEnergyPerSite()
+#plotEnergyPerSize()
 
 
+#Compare number of zeros
+#plotS_Z_squared(&#39;results/transformedAKLT/DeepConvNN/L60_observables.csv&#39;, L=60, title=r&#39;$&lt; \left( S_i^{(z)} \right) ^2 &gt;$ for the AKLT model (N=60)&#39;)
+#plotS_Z_squared(&#39;results/transformedHamiltonian//L60_observables.csv&#39;, L=60, title=r&#39;$&lt; \left( S_i^{(z)} \right) ^2 &gt;$ for the Haldane chain (N=60)&#39;)
+
+#plotS_Z_squared(&#39;results/problemsAKLT/FFNN/L12_observables.csv&#39;, L=12)
+#plotS_Z_squared(&#39;results/problems/FFNN/L12_observables.csv&#39;, L=12)
 
 
-
-
-#plotS_Z_squared(&#39;run/L10_observables.csv&#39;, L=10)</code></pre>
+#TransformedFFNN
+#plot(&#39;results/TransformedFFNN/L4.log&#39;, L=4, symmetric_operator=False, observables=False, transformed_or_original=&#39;original&#39;, title=&#39;VMC energy of the Haldane chain (N=4) with the TransformedFFNN&#39;)</code></pre>
 </details>
 </section>
 <section>
@@ -816,8 +635,8 @@ machine_names = [&#39;JaxRBM&#39;, &#39;JaxFFNN&#39;, &#39;JaxDeepFFNN&#39;, &#3
 <span>def <span class="ident">compareArchitectures</span></span>(<span>machine_names, path, L)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Function to compare the results of defferent architectures.
-Mean energy, variance, mean time, and so on are evaluated</p>
+<div class="desc"><p>Function to compare the results of different architectures.
+Mean energy, variance, mean time, and so on are evaluated.</p>
 <pre><code>Args:
     machine_names (list) : list with machine names (str) as elements
     path (str) : path to the data folder
@@ -828,8 +647,8 @@ Mean energy, variance, mean time, and so on are evaluated</p>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def compareArchitectures(machine_names, path, L):
-    &#34;&#34;&#34;Function to compare the results of defferent architectures.
-        Mean energy, variance, mean time, and so on are evaluated
+    &#34;&#34;&#34;Function to compare the results of different architectures.
+        Mean energy, variance, mean time, and so on are evaluated.
 
             Args:
                 machine_names (list) : list with machine names (str) as elements
@@ -856,7 +675,7 @@ Mean energy, variance, mean time, and so on are evaluated</p>
                     factor = tmp[L]
                 else:
                     factor = (L - 1) * (-1.401484)
-                deviation_energy = (factor - np.mean(energy[-int(1./3*len(energy)):])) / factor
+                deviation_energy = (factor - np.mean(energy[350-int(1./3*len(energy)):350])) / factor
                 deviations_energy.append(deviation_energy)
                 # Time data is created at the end of the simulation -&gt; There might be no .time data yet
                 try:
@@ -929,6 +748,7 @@ Multiple possibilities to plot the results</p>
     symmetric_operator (bool) : if the observable is measured symmetrically to the center
     periodic (bool) : if exact results of the periodic lattice are plotted
     transformed_or_original (str) : which hamiltonian is used. 'transformed' or 'original' or 'AKLT'
+    title (str): title of the plot
 </code></pre></div>
 <details class="source">
 <summary>
@@ -944,6 +764,7 @@ Multiple possibilities to plot the results</p>
                 symmetric_operator (bool) : if the observable is measured symmetrically to the center
                 periodic (bool) : if exact results of the periodic lattice are plotted
                 transformed_or_original (str) : which hamiltonian is used. &#39;transformed&#39; or &#39;original&#39; or &#39;AKLT&#39;
+                title (str): title of the plot
                                                     &#34;&#34;&#34;
     data=json.load(open(dataname))
     # Extract the relevant information
@@ -1001,9 +822,9 @@ Multiple possibilities to plot the results</p>
     if title==None:
         plt.title(dataname)
     else:
-        plt.title(title)
-    plt.xlabel(&#39;Iteration&#39;)
-    plt.ylabel(&#39;Energy&#39;)
+        plt.title(title, fontsize=14)
+    plt.xlabel(&#39;Iteration&#39;, fontsize = 14)
+    plt.ylabel(&#39;Energy&#39;, fontsize = 14)
     plt.legend()
     plt.show()
 
@@ -1042,16 +863,25 @@ Multiple possibilities to plot the results</p>
         plt.show()</code></pre>
 </details>
 </dd>
-<dt id="plot.plotEnergyPerSite"><code class="name flex">
-<span>def <span class="ident">plotEnergyPerSite</span></span>(<span>)</span>
+<dt id="plot.plotEnergyPerSize"><code class="name flex">
+<span>def <span class="ident">plotEnergyPerSize</span></span>(<span>)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Function to plot the scaling of the energy of the Haldane chain.
+Scaling per lattice site and scaling per bond are compared.</p>
+<pre><code>Args:
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def plotEnergyPerSite():
+<pre><code class="python">def plotEnergyPerSize():
+    &#34;&#34;&#34;Function to plot the scaling of the energy of the Haldane chain.
+            Scaling per lattice site and scaling per bond are compared.
+
+                Args:
+
+                                                            &#34;&#34;&#34;
     lanczosEnergy = np.asarray([-1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626])
     Ls = np.asarray(range(2, len(lanczosEnergy) + 2))
     DMRG_Energy = lanczosEnergy / Ls
@@ -1060,9 +890,9 @@ Multiple possibilities to plot the results</p>
     plt.plot(Ls, energy_per_site, color=&#39;red&#39;, label=&#39;exact value&#39;)
     plt.plot(Ls, DMRG_Energy, color=&#39;blue&#39;, label=&#39;E/N&#39;)
     plt.plot(Ls, adjusted_Energy, color=&#39;black&#39;, label=&#39;E/(N-1)&#39;)
-    plt.title(&#39;Scaling of the ground state energy&#39;)
-    plt.xlabel(&#39;Lattice sites&#39;)
-    plt.xlabel(&#39;Energy&#39;)
+    plt.title(&#39;Scaling of the ground state energy&#39;, fontsize=14)
+    plt.xlabel(&#39;Lattice size&#39;, fontsize=14)
+    plt.ylabel(&#39;Energy&#39;, fontsize=14)
     plt.legend()
     plt.show()
     print(DMRG_Energy)
@@ -1070,7 +900,7 @@ Multiple possibilities to plot the results</p>
 </details>
 </dd>
 <dt id="plot.plotObservables"><code class="name flex">
-<span>def <span class="ident">plotObservables</span></span>(<span>dataname, L, observable='FerroCorr', title=None, hamiltonian='Heisenberg')</span>
+<span>def <span class="ident">plotObservables</span></span>(<span>dataname, L, observable='FerroCorr', title=None, hamiltonian='Heisenberg', yLabel=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Function to plot the results of the function measureObservables().
@@ -1080,12 +910,14 @@ The csv file is loaded and evaluated.</p>
     L (int) : Lattice size
     observable (str): allowed inputs are 'FerroCorr' and 'StringCorr'
     title (str) : Title of the plot
+    hamiltonian (str): allowed inputs are 'Heisenberg' or 'AKLT'
+    yLabel (str): ylabel of the plot
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def plotObservables(dataname, L, observable=&#39;FerroCorr&#39;, title = None, hamiltonian = &#39;Heisenberg&#39;):
+<pre><code class="python">def plotObservables(dataname, L, observable=&#39;FerroCorr&#39;, title = None, hamiltonian = &#39;Heisenberg&#39;, yLabel = None):
     &#34;&#34;&#34;Function to plot the results of the function measureObservables().
         The csv file is loaded and evaluated.
 
@@ -1094,6 +926,8 @@ The csv file is loaded and evaluated.</p>
                 L (int) : Lattice size
                 observable (str): allowed inputs are &#39;FerroCorr&#39; and &#39;StringCorr&#39;
                 title (str) : Title of the plot
+                hamiltonian (str): allowed inputs are &#39;Heisenberg&#39; or &#39;AKLT&#39;
+                yLabel (str): ylabel of the plot
                                                         &#34;&#34;&#34;
     #observable 1 at position 0, etc
     numbers = np.zeros(L-1, dtype=np.int32)
@@ -1134,16 +968,17 @@ The csv file is loaded and evaluated.</p>
                 operator = 0.374 * np.ones(len(values))
                 x_operator = range(1, L)
         plt.plot(x_operator, operator, color=&#39;red&#39;, label=&#39;exact value&#39;)
-        plt.xlabel(&#39;site distance&#39;)
-        if(observable == &#39;FerroCorr&#39;):
-            plt.ylabel(&#39;Ferromagnetic correlation operator&#39;)
+        plt.xlabel(&#39;Site distance&#39;, fontsize = 14)
+        if(observable == &#39;FerroCorr&#39; and yLabel == None):
+            plt.ylabel(&#39;Ferromagnetic order parameter&#39;, fontsize=14)
+        elif(yLabel == None):
+            plt.ylabel(&#39;String order parameter&#39;, fontsize=14)
         else:
-            plt.ylabel(&#39;String correlation operator&#39;)
-        plt.ylabel(&#39;Ferromagnetic correlation operator&#39;)
+            plt.ylabel(yLabel, fontsize=14)
         if title == None:
             plt.title(dataname)
         else:
-            plt.title(title)
+            plt.title(title, fontsize = 14)
         plt.legend()
         plt.show()</code></pre>
 </details>
@@ -1193,6 +1028,9 @@ The csv file is loaded and evaluated.</p>
         print(values/numbers)
 
         plt.plot(range(0, L), values/numbers)
+        plt.title(title, fontsize=14)
+        plt.xlabel(r&#39;lattice site $i$&#39;, fontsize=14)
+        plt.ylabel(r&#39;$&lt; { S_i^{(z)} } ^2 &gt;$&#39;, fontsize=14)
         plt.show()
 
         number_nonzero = values/numbers
@@ -1326,7 +1164,6 @@ The csv file is loaded and evaluated.</p>
     for index, mirrored in enumerate([&#39;&#39;, &#39;_mirrored&#39;]):
         sfs_fast = list()
         xAxis_fast = list()
-        max_range = L
         for i in range(1, int(L/2.)):
             sfs_fast.append(getsf(int(L/2.), int(L/2.) + i, mirrored=mirrored))
             xAxis_fast.append(i)
@@ -1403,111 +1240,6 @@ The csv file is loaded and evaluated.</p>
     plt.show()</code></pre>
 </details>
 </dd>
-<dt id="plot.present"><code class="name flex">
-<span>def <span class="ident">present</span></span>(<span>Ls, path)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>function to visalize multiple plots at once</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def present(Ls, path):
-    &#34;&#34;&#34;function to visalize multiple plots at once&#34;&#34;&#34;
-
-    #a = x data, b = f(x), c = expected energy
-    def plot4me(a, b, c, text=&#39;Energy-Iterations&#39;):
-        plt.subplot(221)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
-        plt.plot(a[0], b[0])
-        if(c != None): plt.plot(a[0], c[0])
-        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[0]))))
-        plt.subplot(222)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
-        plt.plot(a[1], b[1])
-        if (c != None): plt.plot(a[1], c[1])
-        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[1]))))
-        plt.subplot(223)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
-        plt.plot(a[2], b[2])
-        if (c != None): plt.plot(a[2], c[2])
-        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[2]))))
-        plt.subplot(224)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
-        plt.plot(a[3], b[3])
-        if (c != None): plt.plot(a[3], c[3])
-        plt.title(&#39;&#39;.join((text, &#39; &#39;, str(Ls[3]))))
-        plt.show()
-
-    iters_list = []
-    energy_list = []
-    sfs_fast_list = []
-    xAxis_fast_list = []
-    expected_energy_list = []
-    for j in range(0, len(Ls)):
-        l = Ls[j]
-        print(&#39;&#39;.join((path, &#39;/L&#39;, str(l), &#39;.log&#39;)))
-        data_energy = json.load(open(&#39;&#39;.join((path, &#39;/L&#39;, str(l), &#39;.log&#39;))))
-        data_observ = json.load(open(&#39;&#39;.join((path, &#39;/L&#39;, str(l), &#39;_estimate.log&#39;))))
-        # Extract the relevant information
-
-        length = l
-
-        iters = []
-        energy = []
-        sfs_fast = list()
-        xAxis_fast = list()
-
-        for iteration in data_energy[&#34;Output&#34;]:
-            iters.append(iteration[&#34;Iteration&#34;])
-            energy.append(iteration[&#34;Energy&#34;][&#34;Mean&#34;])
-
-        def calcMean(array):
-            length = np.minimum(15, len(array))
-            print(length)
-            sum = 0.
-            for i in range(length):
-                sum += array[-i + 0]
-            return sum / float(length)
-
-        def getsf(i):
-            sf = list()
-            for iteration in data_observ[&#34;Output&#34;]:
-                sf.append(iteration[&#39;Ferro_correlation_function&#39; + str(i)][&#34;Mean&#34;])
-            return calcMean(sf)
-
-        for i in range(1, length):
-            sfs_fast.append(getsf(i))
-            xAxis_fast.append(i)
-
-        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
-        if(l &lt; len(tmp)):
-            factor = tmp[l]
-        else:
-            factor = (l-1) * (-1.4)
-        expected_energy = np.ones_like(np.asarray(iters)) * factor
-
-        expected_energy_list.append(expected_energy)
-        iters_list.append(np.asarray(iters))
-        energy_list.append(np.asarray(energy))
-        sfs_fast_list.append(np.asarray(sfs_fast))
-        xAxis_fast_list.append(np.asarray(xAxis_fast))
-
-    plot4me(iters_list, energy_list, expected_energy_list, text=&#39;Energy-Iteration&#39;)
-    plot4me(xAxis_fast_list, sfs_fast_list, None, text=&#39;operator-site&#39;)</code></pre>
-</details>
-</dd>
-<dt id="plot.wrapper"><code class="name flex">
-<span>def <span class="ident">wrapper</span></span>(<span>i)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def wrapper(i):
-    machine_names = [&#39;JaxRBM&#39;, &#39;JaxSymmRBM&#39;, &#39;JaxFFNN&#39;, &#39;JaxDeepFFNN&#39;, &#39;JaxDeepConvNN&#39;, &#39;JaxSymmFFNN&#39;, &#39;JaxUnaryFFNN&#39;, &#39;JaxConv3NN&#39;, &#39;JaxResFFNN&#39;, &#39;JaxResConvNN&#39;]
-    #plot(&#39;run/compareArchitectures/CPU/Iterations/&#39; + machine_names[i] + &#39;/L16.log&#39;, L = 16 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original=&#39;transformed&#39;)
-    plot(&#39;run/compareArchitectures/CPU/Iterations/&#39; + machine_names[i] + &#39;/1L30.log&#39;, L = 30 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original=&#39;transformed&#39;)</code></pre>
-</details>
-</dd>
 </dl>
 </section>
 <section>
@@ -1524,14 +1256,12 @@ The csv file is loaded and evaluated.</p>
 <li><code><a title="plot.compareArchitectures" href="#plot.compareArchitectures">compareArchitectures</a></code></li>
 <li><code><a title="plot.compare_original_transformed" href="#plot.compare_original_transformed">compare_original_transformed</a></code></li>
 <li><code><a title="plot.plot" href="#plot.plot">plot</a></code></li>
-<li><code><a title="plot.plotEnergyPerSite" href="#plot.plotEnergyPerSite">plotEnergyPerSite</a></code></li>
+<li><code><a title="plot.plotEnergyPerSize" href="#plot.plotEnergyPerSize">plotEnergyPerSize</a></code></li>
 <li><code><a title="plot.plotObservables" href="#plot.plotObservables">plotObservables</a></code></li>
 <li><code><a title="plot.plotS_Z_squared" href="#plot.plotS_Z_squared">plotS_Z_squared</a></code></li>
 <li><code><a title="plot.plot_Sr" href="#plot.plot_Sr">plot_Sr</a></code></li>
 <li><code><a title="plot.plot_operator_both_sides" href="#plot.plot_operator_both_sides">plot_operator_both_sides</a></code></li>
 <li><code><a title="plot.plot_startingpoints" href="#plot.plot_startingpoints">plot_startingpoints</a></code></li>
-<li><code><a title="plot.present" href="#plot.present">present</a></code></li>
-<li><code><a title="plot.wrapper" href="#plot.wrapper">wrapper</a></code></li>
 </ul>
 </li>
 </ul>
