@@ -92,9 +92,9 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
     if title==None:
         plt.title(dataname)
     else:
-        plt.title(title)
-    plt.xlabel('Iteration')
-    plt.ylabel('Energy')
+        plt.title(title, fontsize=14)
+    plt.xlabel('Iteration', fontsize = 14)
+    plt.ylabel('Energy', fontsize = 14)
     plt.legend()
     plt.show()
 
@@ -134,7 +134,7 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
 
 
 
-def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltonian = 'Heisenberg'):
+def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltonian = 'Heisenberg', yLabel = None):
     """Function to plot the results of the function measureObservables().
         The csv file is loaded and evaluated.
 
@@ -183,16 +183,17 @@ def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltoni
                 operator = 0.374 * np.ones(len(values))
                 x_operator = range(1, L)
         plt.plot(x_operator, operator, color='red', label='exact value')
-        plt.xlabel('site distance')
-        if(observable == 'FerroCorr'):
-            plt.ylabel('Ferromagnetic correlation operator')
+        plt.xlabel('Site distance', fontsize = 14)
+        if(observable == 'FerroCorr' and yLabel == None):
+            plt.ylabel('Ferromagnetic order parameter', fontsize=14)
+        elif(yLabel == None):
+            plt.ylabel('String order parameter', fontsize=14)
         else:
-            plt.ylabel('String correlation operator')
-        plt.ylabel('Ferromagnetic correlation operator')
+            plt.ylabel(yLabel, fontsize=14)
         if title == None:
             plt.title(dataname)
         else:
-            plt.title(title)
+            plt.title(title, fontsize = 14)
         plt.legend()
         plt.show()
 
@@ -227,9 +228,9 @@ def plotS_Z_squared(dataname, L, title=None):
         print(values/numbers)
 
         plt.plot(range(0, L), values/numbers)
-        plt.title(title)
-        plt.xlabel(r'lattice site $i$')
-        plt.ylabel(r'$< \left( S_i^{(z)} \right) ^2 >$')
+        plt.title(title, fontsize=14)
+        plt.xlabel(r'lattice site $i$', fontsize=14)
+        plt.ylabel(r'$< { S_i^{(z)} } ^2 >$', fontsize=14)
         plt.show()
 
         number_nonzero = values/numbers
@@ -553,7 +554,7 @@ def compareArchitectures(machine_names, path, L):
                     factor = tmp[L]
                 else:
                     factor = (L - 1) * (-1.401484)
-                deviation_energy = (factor - np.mean(energy[-int(1./3*len(energy)):])) / factor
+                deviation_energy = (factor - np.mean(energy[350-int(1./3*len(energy)):350])) / factor
                 deviations_energy.append(deviation_energy)
                 # Time data is created at the end of the simulation -> There might be no .time data yet
                 try:
@@ -588,9 +589,9 @@ def plotEnergyPerSize():
     plt.plot(Ls, energy_per_site, color='red', label='exact value')
     plt.plot(Ls, DMRG_Energy, color='blue', label='E/N')
     plt.plot(Ls, adjusted_Energy, color='black', label='E/(N-1)')
-    plt.title('Scaling of the ground state energy')
-    plt.xlabel('Lattice size')
-    plt.ylabel('Energy')
+    plt.title('Scaling of the ground state energy', fontsize=14)
+    plt.xlabel('Lattice size', fontsize=14)
+    plt.ylabel('Energy', fontsize=14)
     plt.legend()
     plt.show()
     print(DMRG_Energy)
@@ -722,34 +723,35 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 
 
 #Show that the original Heisenberg model and AKLT model can not be solved properly
-#plot('results/problems/RBM/L12.log', L = 12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original')
 #plot('results/problems/FFNN/L12.log', L = 12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title='VMC energy of the Haldane chain (N=12)')
-#plotObservables('results/problems/FFNN/L12_observables.csv', 12, observable='StringCorr', title='String correlation operator for the Haldane chain (N=12)')
-#plotObservables('results/problems/FFNN/L12_observables.csv', 12, observable='FerroCorr', title='Ferromagnetic correlation operator for the Haldane chain (N=12)')
+#plotObservables('results/problems/FFNN/L12_observables.csv', 12, observable='StringCorr', title='String order parameter for the Haldane chain (N=12)')
+#plotObservables('results/problems/FFNN/L12_observables.csv', 12, observable='FerroCorr', title='Ferromagnetic order parameter for the Haldane chain (N=12)')
 
 #plot('results/problemsAKLT/FFNN/L12.log', L=12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='AKLT', title='VMC energy of the AKLT model (N=12)')
-#plotObservables('results/problemsAKLT/FFNN/L12_observables.csv', 12, observable='StringCorr', title='String correlation operator for the AKLT model (N=12)')
-#plotObservables('results/problemsAKLT/FFNN/L12_observables.csv', 12, observable='FerroCorr', title='Ferromagnetic correlation operator for the AKLT model (N=12)')
+#plotObservables('results/problemsAKLT/FFNN/L12_observables.csv', 12, observable='StringCorr', title='String order parameter for the AKLT model (N=12)')
+#plotObservables('results/problemsAKLT/FFNN/L12_observables.csv', 12, observable='FerroCorr', title='Ferromagnetic order parameter for the AKLT model (N=12)')
 
 
 
 #Results for transformed hamiltonian
 #plot('results/transformedHamiltonian/L16.log', L=16, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title ='VMC energy of the transformed Haldane chain (N=16)')
-#plotObservables('results/transformedHamiltonian/L16_observables.csv', 16, title='String correlation operator for the transformed Haldane chain (N=16)')
+#plotObservables('results/transformedHamiltonian/L16_observables.csv', 16, title='String order parameter for the transformed Haldane chain (N=16)', yLabel='String order parameter')
 #plot('results/transformedHamiltonian/L60.log', L=60, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title='VMC energy of the transformed Haldane chain (N=60)')
-#plotObservables('results/transformedHamiltonian/L60_observables.csv', 60, title='String correlation operator for the transformed Haldane chain (N=60)')
+#plotObservables('results/transformedHamiltonian/L60_observables.csv', 60, title='String order parameter for the transformed Haldane chain (N=60)', yLabel='String order parameter')
 #plot('results/transformedHamiltonian/L80.log', L=80, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title='VMC energy of the transformed Haldane chain (N=80)')
-#plotObservables('results/transformedHamiltonian/L80_observables.csv', 80, title='String correlation operator for the transformed Haldane chain (N=80)')
-#plotObservables('results/transformedHamiltonian/L80_load_observables.csv', 80, title='String correlation operator for the transformed Haldane chain (N=80)')
+#plotObservables('results/transformedHamiltonian/L80_observables.csv', 80, title='String order parameter for the transformed Haldane chain (N=80)', yLabel='String order parameter')
+#plotObservables('results/transformedHamiltonian/L80_load_observables.csv', 80, title='String order parameter for the transformed Haldane chain (N=80)', yLabel='String order parameter')
 #plot('results/transformedAKLT/FFNN/L12.log', L=12, transformed_or_original='AKLT', observables=False, periodic = False)
 #plotObservables('results/transformedAKLT/FFNN/L12_observables.csv', L=12, hamiltonian='AKLT')
 
 #plot('run/fifthResults/JaxFFNN/L16.log', L=16, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed', title ='VMC energy of the transformed Haldane chain (N=16)')
-#plotObservables('run/fifthResults/JaxFFNN/L16_observables.csv', 16, title='String correlation operator for the transformed Haldane chain (N=16)')
+#plotObservables('run/fifthResults/JaxFFNN/L16_observables.csv', 16, title='String order parameter for the transformed Haldane chain (N=16)', yLabel='String order parameter')
 
 
 #Comparison of architectures
 #compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
+machine_names = ['JaxResFFNN', 'JaxResConvNN', 'JaxDeepConvNN', 'JaxSymmFFNN', 'JaxDeepFFNN', 'JaxFFNN', 'JaxRBM']
+#compareArchitectures(machine_names, path='results/compareArchitectures/', L=16)
 
 
 #Test VBSSampler and InverseSampler
@@ -760,9 +762,9 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 
 #transformed AKLT results
 #plot('run/transformedAKLT/DeepConvNN/L40.log', L=40, symmetric_operator=False, observables=False, transformed_or_original='AKLT', title='VMC energy of transformed AKLT model (N=40)')
-#plotObservables('run/transformedAKLT/DeepConvNN/L40_observables.csv', L=40, hamiltonian='AKLT', title='String correlation operator for the transformed AKLT chain (N=40)')
+#plotObservables('run/transformedAKLT/DeepConvNN/L40_observables.csv', L=40, hamiltonian='AKLT', title='String order parameter for the transformed AKLT chain (N=40)', yLabel='String order parameter')
 #plot('results/transformedAKLT/DeepConvNN/L60.log', L=60, symmetric_operator=False, observables=False, transformed_or_original='AKLT', title='VMC energy of transformed AKLT model (N=60)')
-#plotObservables('results/transformedAKLT/DeepConvNN/L60_observables.csv', L=60, hamiltonian='AKLT', title='String correlation operator for the transformed AKLT chain (N=60)')
+#plotObservables('results/transformedAKLT/DeepConvNN/L60_observables.csv', L=60, hamiltonian='AKLT', title='String order parameter for the transformed AKLT chain (N=60)', yLabel='String order parameter')
 
 
 #Scaling of Lanczos Energy
@@ -775,3 +777,7 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 
 #plotS_Z_squared('results/problemsAKLT/FFNN/L12_observables.csv', L=12)
 #plotS_Z_squared('results/problems/FFNN/L12_observables.csv', L=12)
+
+
+#TransformedFFNN
+#plot('results/TransformedFFNN/L4.log', L=4, symmetric_operator=False, observables=False, transformed_or_original='original', title='VMC energy of the Haldane chain (N=4) with the TransformedFFNN')
