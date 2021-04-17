@@ -554,7 +554,7 @@ def compareArchitectures(machine_names, path, L):
                     factor = tmp[L]
                 else:
                     factor = (L - 1) * (-1.401484)
-                deviation_energy = (factor - np.mean(energy[-int(1./3*len(energy)):])) / factor
+                deviation_energy = (factor - np.mean(energy[350-int(1./3*len(energy)):350])) / factor
                 deviations_energy.append(deviation_energy)
                 # Time data is created at the end of the simulation -> There might be no .time data yet
                 try:
@@ -750,6 +750,8 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 
 #Comparison of architectures
 #compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
+machine_names = ['JaxResFFNN', 'JaxResConvNN', 'JaxDeepConvNN', 'JaxSymmFFNN', 'JaxDeepFFNN', 'JaxFFNN', 'JaxRBM']
+#compareArchitectures(machine_names, path='results/compareArchitectures/', L=16)
 
 
 #Test VBSSampler and InverseSampler
