@@ -9,10 +9,12 @@ netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib
 This file contains the following classes:
 
     * _JaxVBSKernel
+    * _JaxInverseKernel
 
 This file contains the following functions:
 
     *  getVBSSampler
+    * getInverseSampler
 """
 import jax
 import jax.numpy as jnp

@@ -16,7 +16,6 @@ This file contains the following functions:
 """
 import netket as nk
 import numpy as np
-import scipy
 import networkx as nx
 import sys
 
@@ -40,10 +39,6 @@ def build_Heisenbergchain_S1(L, periodic = False):
         gnx.add_edge(i, (i + 1) % L)
     g = nk.graph.Graph(nodes=list(gnx.nodes), edges=list(gnx.edges))
 
-    # Printing out the graph information
-    #print('This graph has ' + str(g.n_nodes) + ' sites')
-    #print('with the following set of edges: ' + str(g.n_edges))
-
     hi = nk.hilbert.Spin(s=1, N=g.n_nodes)
 
     # Pauli Matrices for Spin 1
@@ -64,7 +59,6 @@ def build_Heisenbergchain_S1(L, periodic = False):
     return ha, hi, g
 
 
-#TODO check, if the results are correct
 def build_AKLTchain(L, periodic = False):
     """Loading the AKLT chain
         The original AKLT chain is loaded
@@ -83,10 +77,6 @@ def build_AKLTchain(L, periodic = False):
     for i in range(L + tmp):
         gnx.add_edge(i, (i + 1) % L)
     g = nk.graph.Graph(nodes=list(gnx.nodes), edges=list(gnx.edges))
-
-    # Printing out the graph information
-    #print('This graph has ' + str(g.n_nodes) + ' sites')
-    #print('with the following set of edges: ' + str(g.n_edges))
 
     hi = nk.hilbert.Spin(s=1, N=g.n_nodes)
 
@@ -130,10 +120,6 @@ def build_Heisenbergchain_S1_transformed(L, periodic = False):
         print(str(i) + ' ' + str(i + 1))
     g = nk.graph.Graph(nodes=list(gnx.nodes), edges=list(gnx.edges))
 
-    # Printing out the graph information
-    #print('This graph has ' + str(g.n_nodes) + ' sites')
-    #print('with the following set of edges: ' + str(g.n_edges))
-
     hi = nk.hilbert.Spin(s=1, N=g.n_nodes)
 
     interaction = np.asarray([[-1, 0, 0, 0, -1, 0, 0, 0, 0], [0, 0, 0, -1, 0, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0, 0, 0, 0],
@@ -150,7 +136,6 @@ def build_Heisenbergchain_S1_transformed(L, periodic = False):
     return ha, hi, g
 
 
-#TODO check, if the results are correct
 def build_AKLTchain_transformed(L, periodic = False):
     """Loading the transformed Heisenberg chain. See https://doi.org/10.1007/BF02097239
         The transformed model is easier to solve with NetKet.
@@ -169,10 +154,6 @@ def build_AKLTchain_transformed(L, periodic = False):
     for i in range(L + tmp):
         gnx.add_edge(i, (i + 1) % L)
     g = nk.graph.Graph(nodes=list(gnx.nodes), edges=list(gnx.edges))
-
-    # Printing out the graph information
-    #print('This graph has ' + str(g.n_nodes) + ' sites')
-    #print('with the following set of edges: ' + str(g.n_edges))
 
     hi = nk.hilbert.Spin(s=1, N=g.n_nodes)
 

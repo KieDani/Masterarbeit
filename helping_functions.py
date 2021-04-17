@@ -15,7 +15,6 @@ This file contains the following functions:
     * test_operator_both_sides
     * power_method
 """
-import netket as nk
 import scipy
 import numpy as np
 import my_operators as operators
@@ -23,7 +22,6 @@ import os
 import sys
 
 
-#If possible, returns exact energy. Else, it returns None!
 def Lanczos(hamilton, L):
     """Lanczos method to calculate the ground state energy of a hamiltonian.
         It only works for L<= 12. If L is larger, it returns None to prevent memory overflow.
@@ -44,9 +42,6 @@ def Lanczos(hamilton, L):
         return None
 
 
-#ToDo if symmetric=True works fine, make it standard and remove parameter symmetric
-#symmetric=True works only for 'FerroCorr'g
-#allowed inputs for operator: 'FerroCorr', 'StringCorr', None
 def get_operator(hilbert, L, operator = None, symmetric = True):
     """Method to get the observable, that is measured.
         It works with FerroCorrelationZ and StringCorrelation. I recommend to use symmetric = False.
@@ -93,23 +88,42 @@ def get_operator(hilbert, L, operator = None, symmetric = True):
 
 
 def create_path(dataname, path='run'):
+    """Function to create new folders, if needed.
+            Simply create a new path with this function. It is ensured that all folders do exist.
+
+                Args:
+                    dataname (str) : the name of the file
+                    path (str) : the path to the file without the file
+
+                Returns:
+                    fullpath (str) : complete path
+                                                        """
     try:
         os.makedirs(path)
     except OSError:
         print("Creation of the directory %s failed" % path)
     else:
         print("Successfully created the directory %s" % path)
-    return '/'.join((path, dataname))
+    fullpath = '/'.join((path, dataname))
+    return fullpath
 
 
 def create_machinefile(machine_name, L, alpha, dataname, use_sr):
+    """Function to create new folders, if needed.
+                Simply create a new path with this function. It is ensured that all folders do exist.
+
+                    Args:
+                        machine_name (str) : the name of the machine
+                        L (int) : the lattice size
+                        alpha (int) : the hyperparameter alpha of the neural network
+                        dataname (str) : name of the file
+                        use_sr (float) : the diag shift. If Gd is used, use_sr = None
+                                                            """
     with open(''.join((dataname, '.machine')), 'w') as f:
         f.write(''.join((machine_name, '\n')))
         f.write(''.join(('L = ', str(L), '\n')))
         f.write(''.join(('Alpha = ', str(alpha), '\n')))
         f.write(''.join(('diag_shift = ', str(use_sr), '\n')))
-
-
 
 
 def test_operator_startingpoint(hilbert, L, fast=True):
@@ -139,6 +153,7 @@ def test_operator_startingpoint(hilbert, L, fast=True):
                 observables[name_fast] = observ_fast
     return observables
 
+
 def test_operator_both_sides(hilbert, L):
     """Method to check if the result is symmetric.
         Starting point is the center of the lattice. It goes from the center to the left
@@ -162,7 +177,6 @@ def test_operator_both_sides(hilbert, L):
     return observables
 
 
-#hamiltonian has to be a sparse matrix
 def power_method(hamiltonian, L, eigenvalue_lanczos):
     """Calculates the gound state vector.
 
@@ -179,7 +193,6 @@ def power_method(hamiltonian, L, eigenvalue_lanczos):
                                                             """
 
     #generate starting vector
-    #ToDo find out, why I need a real vector!!!
     x = np.random.random_sample(3**L) - 0.5 #+ np.random.random_sample(3**L) * 1j - 0.5j
     x = x / np.linalg.norm(x)
     #find the eigenvector

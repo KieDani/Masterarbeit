@@ -27,13 +27,7 @@ import time
 import numpy as np
 import scipy as sp
 import sys
-import jax
 import csv
-
-
-
-
-
 
 
 __L__ = 50
@@ -41,7 +35,7 @@ __number_samples__ = 700
 __number_iterations__ = 500
 __alpha__ = 4
 
-#use Gd, if Sr == None; otherwise, sr is the diag_shift
+
 def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples = __number_samples__, n_iterations = __number_iterations__):
     """Method to train a machine.
 
@@ -71,14 +65,13 @@ def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mach
         sr = nk.optimizer.SR(ma, diag_shift=sr)
         gs = nk.Vmc(hamiltonian=ha, sampler=sa, optimizer=op, n_samples=n_samples, sr=sr)
 
-    #observables = functions.get_operator(hilbert=hi, L=L, operator='FerroCorr')
     if(dataname == None):
         dataname = ''.join(('L', str(L)))
     dataname = functions.create_path(dataname, path=path)
     print('')
     functions.create_machinefile(machine_name, L, alpha, dataname, sr)
     start = time.time()
-    gs.run(n_iter=int(n_iterations), out=dataname)#, obs=observables)
+    gs.run(n_iter=int(n_iterations), out=dataname)
     end = time.time()
     with open(''.join((dataname, '.time')), 'w') as reader:
         reader.write(str(end - start))
@@ -86,7 +79,6 @@ def run(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mach
     sys.stdout.flush()
 
 
-#ensure, that the machine is the same as used before!
 def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', machine_name = 'JaxRBM', sampler = 'Local', hamiltonian_name = 'transformed_Heisenberg', n_samples =10000, n_iterations = 20):
     """Method to load a pretrained machine and continue the training.
 
@@ -131,7 +123,6 @@ def load(L=__L__, alpha=__alpha__, sr = None, dataname = None, path = 'run', mac
     end = time.time()
     with open(''.join((dataname, '.time')), 'a') as reader:
         reader.write(str(end - start))
-    #print(gs2.estimate(observables))
     print('Time', end - start)
     sys.stdout.flush()
 
@@ -163,8 +154,6 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
     ma, op, sa, machine_name = generate_machine(hilbert=hi, hamiltonian=ha, alpha=alpha)
     ma.load(''.join((dataname, '.wf')))
     op, sa = machines.load_machine(machine=ma, hamiltonian=ha, optimizer='Adamax', lr=0.001, sampler=sampler)
-    #observables = {**functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=False),
-    #               **functions.get_operator(hilbert=hi, L=L, operator='FerroCorr', symmetric=True)}
     observables = functions.get_operator(hilbert=hi, L=L, operator=operator, symmetric=False)
     start = time.time()
     time_per_iteration = 0
@@ -173,7 +162,6 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
         measurement = nk.variational.estimate_expectations(observables, sa, n_samples=n_samples)
         after = time.time()
         time_per_iteration += after - before
-        #save_dict[''.join(('Iteration', str(i)))] = measurement
         if(i == 0 and append == False):
             w = csv.writer(open(''.join((dataname, '_observables', '.csv')), "w"))
             for key, val in measurement.items():
@@ -182,7 +170,6 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
             w = csv.writer(open(''.join((dataname, '_observables', '.csv')), "a"))
             for key, val in measurement.items():
                 w.writerow([key, val])
-        #print(measurement)
         if i%10 == 0:
             time_per_iteration = time_per_iteration / 10
             print('Progress: ', float(i)/n_iterations*100, '%', ';  Time per iteration: ', time_per_iteration)
@@ -220,14 +207,9 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
     sys.stdout.flush()
 
     w, v_tmp = sp.sparse.linalg.eigsh(ha.to_sparse(), k=1, which='SR', return_eigenvectors=True)
-    #w, v_tmp = sp.linalg.eigh(ha.to_dense())
     print(v_tmp.shape)
     print('Energy:', w[0], 'Lattice size:', L)
     sys.stdout.flush()
-    # v = np.empty(3**L, dtype=np.complex128)
-    # print(v.shape)
-    # for index, i in enumerate(v_tmp[:, 0]):
-    #     v[index] = i
 
     v = functions.power_method(ha.to_sparse(), L, w[0])
 
@@ -249,11 +231,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
                 observable = operators.FerroCorrelationZ(hilbert=hi, j=0, k=i).to_sparse()
             else:
                 observable = operators.StringCorrelation(hilbert=hi, j=0, k=i).to_sparse()
-            #print(observable.shape)
-            #print(v.shape)
-            #result_l = np.dot(np.dot(v, observable), v).real
             result_l = observable.dot(v).dot(v).real
-            #print(result_l, '; ', result_l2)
             results[index] = result_l
     if(dataname == None):
         dataname = ''.join(('L', str(L), '_exact'))
@@ -264,17 +242,6 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
     print(results)
     sys.stdout.flush()
     return results
-
-
-#run(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=300, n_iterations=50, machine_name='JaxFFNN')
-#load(L=5, alpha=10, sr=0.01, path='test_sr', dataname='test_sr', n_samples=3000, n_iterations=20, machine_name='JaxFFNN')
-
-#exact(L=10, symmetric=False, transformed=True)
-
-#run(L=30, alpha=10, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=2000, n_iterations=150)
-#run(L=10, alpha=2, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=100, n_iterations=200)
-#measureObservable(L=10, alpha=2, machine_name='JaxDeepFFNN', sampler='Local', hamiltonian_name='transformed_Heisenberg', n_samples=200, n_iterations=100, operator='S_Z_squared')
-
 
 
 

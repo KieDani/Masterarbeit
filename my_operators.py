@@ -423,18 +423,11 @@ class S_Z_squared(AbstractOperator):
                 mels[diag_ind] = 0
 
 
-
-            # This might be wrong, because x in [+2, -2] instead of [+1, -1] ?
-            #mels[diag_ind] = x[i, j] * x[i, k]
-
             odiag_ind = 1 + diag_ind
 
             mels[odiag_ind: (odiag_ind + n_sites)].fill(0.)
 
             x_prime[diag_ind: (diag_ind + n_conn)] = _np.copy(x[i])
-
-            # for j2 in range(n_sites):
-            #    x_prime[j2 + odiag_ind][j2] *= -1.0
 
             diag_ind += n_conn
 
@@ -469,13 +462,11 @@ class S_Z_squared(AbstractOperator):
 
 
 
-#copied from my old code. Maybe I can make the code look nicer. But I only needed it to compare it to the fast version.
 def FerroCorrelationZ_slow(hilbert, j, k):
     r"""
         Slow implementation of the FerroCorrelationZ operator. I do not recommend to use this.
         """
     hi = hilbert
-    # We need to specify the local operators as a matrix acting on a local Hilbert space
     sf = []
     sites = []
     sigmaz = _np.asarray([[1, 0, 0], [0, 0, 0], [0, 0, -1]])
@@ -506,7 +497,6 @@ def StringCorrelation_slow(hilbert, j, k):
             Slow implementation of the StringCorrelation operator. I do not recommend to use this.
             """
     hi = hilbert
-    # We need to specify the local operators as a matrix acting on a local Hilbert space
     sf = []
     sites = []
     sigmaz = _np.asarray([[1, 0, 0], [0, 0, 0], [0, 0, -1]])
