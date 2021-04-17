@@ -9,18 +9,15 @@ This file contains the following functions:
     * plotObservable
     * plotS_Z_squared
     * compare_original_transformed
-    * present
     * plot_startingpoints
     * plot_Sr
     * plot_operator_both_sides
     * compareArchitectures
+    * plotEnergyPerSize
 """
-# Load the data from the .log file
 import json
 import matplotlib.pyplot as plt
 import numpy as np
-import helping_functions as functions
-from multiprocessing import Pool
 import csv
 
 
@@ -35,6 +32,7 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
                 symmetric_operator (bool) : if the observable is measured symmetrically to the center
                 periodic (bool) : if exact results of the periodic lattice are plotted
                 transformed_or_original (str) : which hamiltonian is used. 'transformed' or 'original' or 'AKLT'
+                title (str): title of the plot
                                                     """
     data=json.load(open(dataname))
     # Extract the relevant information
@@ -143,6 +141,8 @@ def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltoni
                 L (int) : Lattice size
                 observable (str): allowed inputs are 'FerroCorr' and 'StringCorr'
                 title (str) : Title of the plot
+                hamiltonian (str): allowed inputs are 'Heisenberg' or 'AKLT'
+                yLabel (str): ylabel of the plot
                                                         """
     #observable 1 at position 0, etc
     numbers = np.zeros(L-1, dtype=np.int32)
@@ -265,88 +265,6 @@ def compare_original_transformed(L, periodic=False):
     plt.ylabel('Observable')
     plt.legend()
     plt.show()
-
-
-# Ls should be an array with 4 Elements
-def present(Ls, path):
-    """function to visalize multiple plots at once"""
-
-    #a = x data, b = f(x), c = expected energy
-    def plot4me(a, b, c, text='Energy-Iterations'):
-        plt.subplot(221)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
-        plt.plot(a[0], b[0])
-        if(c != None): plt.plot(a[0], c[0])
-        plt.title(''.join((text, ' ', str(Ls[0]))))
-        plt.subplot(222)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
-        plt.plot(a[1], b[1])
-        if (c != None): plt.plot(a[1], c[1])
-        plt.title(''.join((text, ' ', str(Ls[1]))))
-        plt.subplot(223)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
-        plt.plot(a[2], b[2])
-        if (c != None): plt.plot(a[2], c[2])
-        plt.title(''.join((text, ' ', str(Ls[2]))))
-        plt.subplot(224)  # sublot(Anzahl Zeilen Anzahl Spalten Bild Nummer)
-        plt.plot(a[3], b[3])
-        if (c != None): plt.plot(a[3], c[3])
-        plt.title(''.join((text, ' ', str(Ls[3]))))
-        plt.show()
-
-    iters_list = []
-    energy_list = []
-    sfs_fast_list = []
-    xAxis_fast_list = []
-    expected_energy_list = []
-    for j in range(0, len(Ls)):
-        l = Ls[j]
-        print(''.join((path, '/L', str(l), '.log')))
-        data_energy = json.load(open(''.join((path, '/L', str(l), '.log'))))
-        data_observ = json.load(open(''.join((path, '/L', str(l), '_estimate.log'))))
-        # Extract the relevant information
-
-        length = l
-
-        iters = []
-        energy = []
-        sfs_fast = list()
-        xAxis_fast = list()
-
-        for iteration in data_energy["Output"]:
-            iters.append(iteration["Iteration"])
-            energy.append(iteration["Energy"]["Mean"])
-
-        def calcMean(array):
-            length = np.minimum(15, len(array))
-            print(length)
-            sum = 0.
-            for i in range(length):
-                sum += array[-i + 0]
-            return sum / float(length)
-
-        def getsf(i):
-            sf = list()
-            for iteration in data_observ["Output"]:
-                sf.append(iteration['Ferro_correlation_function' + str(i)]["Mean"])
-            return calcMean(sf)
-
-        for i in range(1, length):
-            sfs_fast.append(getsf(i))
-            xAxis_fast.append(i)
-
-        tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
-        if(l < len(tmp)):
-            factor = tmp[l]
-        else:
-            factor = (l-1) * (-1.4)
-        expected_energy = np.ones_like(np.asarray(iters)) * factor
-
-        expected_energy_list.append(expected_energy)
-        iters_list.append(np.asarray(iters))
-        energy_list.append(np.asarray(energy))
-        sfs_fast_list.append(np.asarray(sfs_fast))
-        xAxis_fast_list.append(np.asarray(xAxis_fast))
-
-    plot4me(iters_list, energy_list, expected_energy_list, text='Energy-Iteration')
-    plot4me(xAxis_fast_list, sfs_fast_list, None, text='operator-site')
 
 
 
@@ -513,7 +431,6 @@ def plot_operator_both_sides(dataname, L):
     for index, mirrored in enumerate(['', '_mirrored']):
         sfs_fast = list()
         xAxis_fast = list()
-        max_range = L
         for i in range(1, int(L/2.)):
             sfs_fast.append(getsf(int(L/2.), int(L/2.) + i, mirrored=mirrored))
             xAxis_fast.append(i)
@@ -526,8 +443,8 @@ def plot_operator_both_sides(dataname, L):
 
 
 def compareArchitectures(machine_names, path, L):
-    """Function to compare the results of defferent architectures.
-        Mean energy, variance, mean time, and so on are evaluated
+    """Function to compare the results of different architectures.
+        Mean energy, variance, mean time, and so on are evaluated.
 
             Args:
                 machine_names (list) : list with machine names (str) as elements
@@ -581,6 +498,12 @@ def compareArchitectures(machine_names, path, L):
 
 
 def plotEnergyPerSize():
+    """Function to plot the scaling of the energy of the Haldane chain.
+            Scaling per lattice site and scaling per bond are compared.
+
+                Args:
+
+                                                            """
     lanczosEnergy = np.asarray([-1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230, -15.674, -17.028, -18.459, -19.827, -21.250, -22.626])
     Ls = np.asarray(range(2, len(lanczosEnergy) + 2))
     DMRG_Energy = lanczosEnergy / Ls
@@ -596,130 +519,6 @@ def plotEnergyPerSize():
     plt.show()
     print(DMRG_Energy)
     print(adjusted_Energy)
-
-
-#plot(dataname='run/L100.log', L=100)
-#plot(dataname='run/L20_estimate.log', L=20, observables=True)
-
-#present(Ls=[6, 10, 15, 20], path='results/Sr')
-
-#plot_startingpoints('run/startingpoint_superpower/L30_estimate.log', 30, fast=True)
-
-
-
-#results operator both sides
-
-
-#RBM
-L=40
-machine = '_RBM'
-#plot(dataname='run/operator_both_sides'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
-#plot_operator_both_sides(dataname='run/operator_both_sides' + machine + '/L' + str(L) + '_estimate.log', L=L)
-
-#SymRBM
-L=40
-machine = '_SymRBM'
-#plot(dataname='run/operator_both_sides'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
-#plot_operator_both_sides(dataname='run/operator_both_sides' + machine + '/L' + str(L) + '_estimate.log', L=L)
-
-
-#DeepFFNN
-L=40
-machine = '_DeepFFNN'
-#plot(dataname='run/operator_both_sides'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
-#plot_operator_both_sides(dataname='run/operator_both_sides' + machine + '/L' + str(L) + '_estimate.log', L=L)
-
-
-
-#results with symmetric operator
-
-
-#RBM
-L=40
-machine = '_RBM'
-#plot(dataname='run/symmetric_operator'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
-#plot('run/symmetric_operator'+ machine + '/L' + str(L) + '_estimate.log', L=L, symmetric_operator=True, observables=True)
-
-
-#FFNN
-L=45
-machine = '_FFNN'
-#plot(dataname='run/symmetric_operator'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
-#plot('run/symmetric_operator'+ machine + '/L' + str(L) + '_estimate.log', L=L, symmetric_operator=True, observables=True)
-
-
-
-#DeepFFNN
-L=60
-machine = '_DeepFFNN'
-#plot(dataname='run/symmetric_operator'+ machine + '/L' + str(L) + '.log', L=L, observables=False)
-#plot('run/symmetric_operator'+ machine + '/L' + str(L) + '_estimate.log', L=L, symmetric_operator=True, observables=True)
-
-
-
-#results test_sr
-
-
-#Compare Sr RBM
-#plot_Sr(path='run/test_sr/', L=40)
-
-#Compare Sr FFNN
-#plot_Sr(path='run/test_sr_ffnn/', L=40)
-#plot_Sr(path='run/test_sr_FFNN/', L=12)
-
-
-#plot('run/small_RBM/SrNoneL14_estimate.log', L = 14 ,symmetric_operator=False, observables=True)
-
-#compare_original_transformed(L=16, periodic=True)
-
-#plot('run/small_FFNN_periodic/SrNoneL8_estimate.log', L = 8 ,symmetric_operator=False, observables=True, periodic=True, transformed_or_original='original')
-
-#plot('run/small_FFNN/SrNoneL30_estimate.log', L = 30 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
-
-
-
-
-#plot('run/firstResults_FFNN/L16_estimate.log', L = 16 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
-#plot('run/firstResults_FFNN/L16_estimate.log', L = 16 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original='transformed')
-#plot('run/firstResults_FFNN/L32_estimate.log', L = 32 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
-#plot('run/firstResults_FFNN/L32_estimate.log', L = 32 ,symmetric_operator=True, observables=True, periodic=False, transformed_or_original='transformed')
-
-def wrapper(i):
-    machine_names = ['JaxRBM', 'JaxSymmRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
-    #plot('run/compareArchitectures/CPU/Iterations/' + machine_names[i] + '/L16.log', L = 16 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed')
-    plot('run/compareArchitectures/CPU/Iterations/' + machine_names[i] + '/1L30.log', L = 30 ,symmetric_operator=False, observables=False, periodic=False, transformed_or_original='transformed')
-
-
-with Pool(8) as p:
-    pass
-    #p.map(wrapper, [0, 2, 3, 4, 5, 6, 7, 8, 9])
-
-
-#plot('run/observableArchitekture/JaxDeepConvNN/L14_estimate.log', L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
-#plot('run/observableArchitekture/JaxDeepFFNN/L14_estimate.log', L = 14 ,symmetric_operator=False, observables=True, periodic=False, transformed_or_original='transformed')
-
-machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFFNN', 'JaxUnaryFFNN', 'JaxConv3NN', 'JaxResFFNN', 'JaxResConvNN']
-#compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
-
-
-
-#plotObservables('run/secondResults/JaxDeepConvNN/L16_observables.csv', 16)
-#plotObservables('run/secondResults/JaxDeepFFNN/L16_observables.csv', 16)
-#plotObservables('run/secondResults/JaxDeepConvNN/L30_observables.csv', 30)
-#plotObservables('run/secondResults/JaxDeepFFNN/L40_observables.csv', 40)
-#plotObservables('run/secondResults/JaxDeepConvNN/L60_observables.csv', 60)
-
-
-#plotObservables('run/thirdResults_manySamples/JaxDeepFFNN/L16_observables.csv', 16)
-#plotObservables('run/numberSamples_small/JaxDeepConvNN/L16_observables.csv', 16)
-
-#plot(dataname='run/secondResults/JaxDeepConvNN/L60.log', L=60)
-
-#https://journals.aps.org/prb/abstract/10.1103/PhysRevB.91.045121
-
-
-
-#----------------------------------------------------------------------------------------------------------------------
 
 
 #Show that the original Heisenberg model and AKLT model can not be solved properly
@@ -750,7 +549,7 @@ machine_names = ['JaxRBM', 'JaxFFNN', 'JaxDeepFFNN', 'JaxDeepConvNN', 'JaxSymmFF
 
 #Comparison of architectures
 #compareArchitectures(machine_names, path='run/compareArchitectures/CPU/Iterations/', L=16)
-machine_names = ['JaxResFFNN', 'JaxResConvNN', 'JaxDeepConvNN', 'JaxSymmFFNN', 'JaxDeepFFNN', 'JaxFFNN', 'JaxRBM']
+#machine_names = ['JaxResFFNN', 'JaxResConvNN', 'JaxDeepConvNN', 'JaxSymmFFNN', 'JaxDeepFFNN', 'JaxFFNN', 'JaxRBM']
 #compareArchitectures(machine_names, path='results/compareArchitectures/', L=16)
 
 
