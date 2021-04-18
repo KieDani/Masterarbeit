@@ -35,12 +35,14 @@ netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib</p>
 * JaxSymmRBM
 * JaxUnaryRBM
 * JaxFFNN
+* JaxTransformedFFNN
 * JaxResFFNN
 * JaxUnaryFFNN
 * JaxSymmFFNN
 * JaxConv3NN
 * JaxResConvNN
 * JaxDeepFFNN
+* JaxDeepDropoutFFNN
 * TorchFFNN
 * TorchConvNN
 * logcosh
@@ -82,12 +84,14 @@ This file contains the following functions:
     * JaxSymmRBM
     * JaxUnaryRBM
     * JaxFFNN
+    * JaxTransformedFFNN
     * JaxResFFNN
     * JaxUnaryFFNN
     * JaxSymmFFNN
     * JaxConv3NN
     * JaxResConvNN
     * JaxDeepFFNN
+    * JaxDeepDropoutFFNN
     * TorchFFNN
     * TorchConvNN
     * logcosh
@@ -110,10 +114,9 @@ This file contains the following classes:
     * Torch_Conv1d_Layer
 &#34;&#34;&#34;
 import netket as nk
-import numpy as np
 import torch
 import jax
-from jax.experimental.stax import Dense, Relu, LogSoftmax, Dropout
+from jax.experimental.stax import Dense
 from jax.experimental import stax
 from netket.optimizer import Torch
 from torch.optim import SGD, Adam, Adamax
@@ -291,7 +294,6 @@ def InputForDenseLayer():
 InputForDenseLayer = InputForDenseLayer()
 
 
-#periodic padding
 def PaddingLayer():
     &#34;&#34;&#34;Periodic padding. Input dimension L -&gt; Output dimension 2*L-1.
         This is especially useful for lattices with periodic boundary conditions.
@@ -322,13 +324,9 @@ def ResFFLayer(W_init=jax.nn.initializers.glorot_normal(), b_init=jax.nn.initial
 
     def apply_fun(params, inputs, **kwargs):
         W, W2, b, b2 = params
-        # inputs_rightShape = jnp.empty((inputs.shape[0], alpha*inputs.shape[1]), dtype=jnp.complex128)
-        # for i in range(alpha):
-        #     inputs_rightShape = jax.ops.index_update(inputs_rightShape, jax.ops.index[:, alpha*inputs.shape[1]:(alpha+1)*inputs.shape[1]], inputs[:, :])
         outputs = jnp.dot(inputs, W) + b
         outputs = jax.vmap(complexrelu)(outputs)
         outputs = jnp.dot(outputs, W2) + b2 + inputs
-        #outputs = jax.vmap(complexrelu)(outputs)
         return outputs
 
     return init_fun, apply_fun
@@ -1245,8 +1243,9 @@ def TorchConvNN(hilbert, hamiltonian, alpha=1, optimizer=&#39;Sgd&#39;, lr=0.1, 
 # Only Jax-optimizers are used at the moment -&gt; watch out, if PyTorch is used!
 # Input: machine with already loaded parameters. Here, only optimizer and sampler are updated
 def load_machine(machine, hamiltonian, optimizer=&#39;Sgd&#39;, lr=0.1, sampler=&#39;Local&#39;):
-    &#34;&#34;&#34;Method to get an operator and sampler for a loaded machine. The machine is not loaded in this method!
-        The machine is not returned -&gt; Syntax is a bit different than in the other functions
+    &#34;&#34;&#34;Function to get an operator and sampler for a loaded machine. The machine is not loaded in this method!
+        The machine is not returned -&gt; Syntax is a bit different than in the other functions.
+        Only works with Jax-machines so far.
 
             Args:
                 machine (netket.machine) : loaded machine
@@ -1281,16 +1280,14 @@ def load_machine(machine, hamiltonian, optimizer=&#39;Sgd&#39;, lr=0.1, sampler=
     return op, sa
 
 
-
-#method to simply get the desired machine
 def get_machine(machine_name):
-    &#34;&#34;&#34;Method to easily get the desired machine.
+    &#34;&#34;&#34;Function to easily get the desired machine.
         If the machine is spelled wrong, None is returned!
 
             Args:
                 machine_name (str) : possible choices are &#39;JaxRBM&#39;, &#39;JaxSymmRBM&#39;, &#39;JaxFFNN&#39;, &#39;JaxDeepFFNN&#39;, &#39;TorchFFNN&#39;,
                    &#39;TorchConvNN&#39;, &#39;JaxSymmFFNN&#39;, &#39;JaxUnaryRBM&#39;, &#39;JaxUnaryFFNN&#39;, &#39;JaxResFFNN&#39;, &#39;JaxConv3NN&#39;,
-                   &#39;JaxResConvNN&#39;, or &#39;JaxDeepConvNN&#39;
+                   &#39;JaxResConvNN&#39;, &#39;JaxDeepConvNN&#39; or &#39;JaxTransformedFFNN&#39;
     &#34;&#34;&#34;
     if(machine_name == &#39;JaxRBM&#39;):
         return JaxRBM
@@ -2392,13 +2389,9 @@ filter_shape (int) : shape of the filter. Recommended: (3,)</p></div>
 
     def apply_fun(params, inputs, **kwargs):
         W, W2, b, b2 = params
-        # inputs_rightShape = jnp.empty((inputs.shape[0], alpha*inputs.shape[1]), dtype=jnp.complex128)
-        # for i in range(alpha):
-        #     inputs_rightShape = jax.ops.index_update(inputs_rightShape, jax.ops.index[:, alpha*inputs.shape[1]:(alpha+1)*inputs.shape[1]], inputs[:, :])
         outputs = jnp.dot(inputs, W) + b
         outputs = jax.vmap(complexrelu)(outputs)
         outputs = jnp.dot(outputs, W2) + b2 + inputs
-        #outputs = jax.vmap(complexrelu)(outputs)
         return outputs
 
     return init_fun, apply_fun</code></pre>
@@ -2557,25 +2550,25 @@ def complexrelu(x):
 <span>def <span class="ident">get_machine</span></span>(<span>machine_name)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Method to easily get the desired machine.
+<div class="desc"><p>Function to easily get the desired machine.
 If the machine is spelled wrong, None is returned!</p>
 <pre><code>Args:
     machine_name (str) : possible choices are 'JaxRBM', 'JaxSymmRBM', 'JaxFFNN', 'JaxDeepFFNN', 'TorchFFNN',
        'TorchConvNN', 'JaxSymmFFNN', 'JaxUnaryRBM', 'JaxUnaryFFNN', 'JaxResFFNN', 'JaxConv3NN',
-       'JaxResConvNN', or 'JaxDeepConvNN'
+       'JaxResConvNN', 'JaxDeepConvNN' or 'JaxTransformedFFNN'
 </code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_machine(machine_name):
-    &#34;&#34;&#34;Method to easily get the desired machine.
+    &#34;&#34;&#34;Function to easily get the desired machine.
         If the machine is spelled wrong, None is returned!
 
             Args:
                 machine_name (str) : possible choices are &#39;JaxRBM&#39;, &#39;JaxSymmRBM&#39;, &#39;JaxFFNN&#39;, &#39;JaxDeepFFNN&#39;, &#39;TorchFFNN&#39;,
                    &#39;TorchConvNN&#39;, &#39;JaxSymmFFNN&#39;, &#39;JaxUnaryRBM&#39;, &#39;JaxUnaryFFNN&#39;, &#39;JaxResFFNN&#39;, &#39;JaxConv3NN&#39;,
-                   &#39;JaxResConvNN&#39;, or &#39;JaxDeepConvNN&#39;
+                   &#39;JaxResConvNN&#39;, &#39;JaxDeepConvNN&#39; or &#39;JaxTransformedFFNN&#39;
     &#34;&#34;&#34;
     if(machine_name == &#39;JaxRBM&#39;):
         return JaxRBM
@@ -2617,8 +2610,9 @@ If the machine is spelled wrong, None is returned!</p>
 <span>def <span class="ident">load_machine</span></span>(<span>machine, hamiltonian, optimizer='Sgd', lr=0.1, sampler='Local')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Method to get an operator and sampler for a loaded machine. The machine is not loaded in this method!
-The machine is not returned -&gt; Syntax is a bit different than in the other functions</p>
+<div class="desc"><p>Function to get an operator and sampler for a loaded machine. The machine is not loaded in this method!
+The machine is not returned -&gt; Syntax is a bit different than in the other functions.
+Only works with Jax-machines so far.</p>
 <pre><code>Args:
     machine (netket.machine) : loaded machine
     hamiltonian (netket.hamiltonian) : hamiltonian
@@ -2635,8 +2629,9 @@ Returns:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def load_machine(machine, hamiltonian, optimizer=&#39;Sgd&#39;, lr=0.1, sampler=&#39;Local&#39;):
-    &#34;&#34;&#34;Method to get an operator and sampler for a loaded machine. The machine is not loaded in this method!
-        The machine is not returned -&gt; Syntax is a bit different than in the other functions
+    &#34;&#34;&#34;Function to get an operator and sampler for a loaded machine. The machine is not loaded in this method!
+        The machine is not returned -&gt; Syntax is a bit different than in the other functions.
+        Only works with Jax-machines so far.
 
             Args:
                 machine (netket.machine) : loaded machine

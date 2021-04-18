@@ -29,9 +29,11 @@ It is used with netket.sampler.jax.MetropolisHastings.</p>
 netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib</p>
 <p>This file contains the following classes:</p>
 <pre><code>* _JaxVBSKernel
+* _JaxInverseKernel
 </code></pre>
 <p>This file contains the following functions:</p>
 <pre><code>*  getVBSSampler
+* getInverseSampler
 </code></pre>
 <details class="source">
 <summary>
@@ -48,10 +50,12 @@ netket, numpy, scipy, jax, jaxlib, networkx, torch, tqdm, matplotlib
 This file contains the following classes:
 
     * _JaxVBSKernel
+    * _JaxInverseKernel
 
 This file contains the following functions:
 
     *  getVBSSampler
+    * getInverseSampler
 &#34;&#34;&#34;
 import jax
 import jax.numpy as jnp

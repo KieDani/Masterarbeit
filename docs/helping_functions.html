@@ -56,7 +56,6 @@ This file contains the following functions:
     * test_operator_both_sides
     * power_method
 &#34;&#34;&#34;
-import netket as nk
 import scipy
 import numpy as np
 import my_operators as operators
@@ -64,7 +63,6 @@ import os
 import sys
 
 
-#If possible, returns exact energy. Else, it returns None!
 def Lanczos(hamilton, L):
     &#34;&#34;&#34;Lanczos method to calculate the ground state energy of a hamiltonian.
         It only works for L&lt;= 12. If L is larger, it returns None to prevent memory overflow.
@@ -85,9 +83,6 @@ def Lanczos(hamilton, L):
         return None
 
 
-#ToDo if symmetric=True works fine, make it standard and remove parameter symmetric
-#symmetric=True works only for &#39;FerroCorr&#39;g
-#allowed inputs for operator: &#39;FerroCorr&#39;, &#39;StringCorr&#39;, None
 def get_operator(hilbert, L, operator = None, symmetric = True):
     &#34;&#34;&#34;Method to get the observable, that is measured.
         It works with FerroCorrelationZ and StringCorrelation. I recommend to use symmetric = False.
@@ -134,23 +129,42 @@ def get_operator(hilbert, L, operator = None, symmetric = True):
 
 
 def create_path(dataname, path=&#39;run&#39;):
+    &#34;&#34;&#34;Function to create new folders, if needed.
+            Simply create a new path with this function. It is ensured that all folders do exist.
+
+                Args:
+                    dataname (str) : the name of the file
+                    path (str) : the path to the file without the file
+
+                Returns:
+                    fullpath (str) : complete path
+                                                        &#34;&#34;&#34;
     try:
         os.makedirs(path)
     except OSError:
         print(&#34;Creation of the directory %s failed&#34; % path)
     else:
         print(&#34;Successfully created the directory %s&#34; % path)
-    return &#39;/&#39;.join((path, dataname))
+    fullpath = &#39;/&#39;.join((path, dataname))
+    return fullpath
 
 
 def create_machinefile(machine_name, L, alpha, dataname, use_sr):
+    &#34;&#34;&#34;Function to create new folders, if needed.
+                Simply create a new path with this function. It is ensured that all folders do exist.
+
+                    Args:
+                        machine_name (str) : the name of the machine
+                        L (int) : the lattice size
+                        alpha (int) : the hyperparameter alpha of the neural network
+                        dataname (str) : name of the file
+                        use_sr (float) : the diag shift. If Gd is used, use_sr = None
+                                                            &#34;&#34;&#34;
     with open(&#39;&#39;.join((dataname, &#39;.machine&#39;)), &#39;w&#39;) as f:
         f.write(&#39;&#39;.join((machine_name, &#39;\n&#39;)))
         f.write(&#39;&#39;.join((&#39;L = &#39;, str(L), &#39;\n&#39;)))
         f.write(&#39;&#39;.join((&#39;Alpha = &#39;, str(alpha), &#39;\n&#39;)))
         f.write(&#39;&#39;.join((&#39;diag_shift = &#39;, str(use_sr), &#39;\n&#39;)))
-
-
 
 
 def test_operator_startingpoint(hilbert, L, fast=True):
@@ -180,6 +194,7 @@ def test_operator_startingpoint(hilbert, L, fast=True):
                 observables[name_fast] = observ_fast
     return observables
 
+
 def test_operator_both_sides(hilbert, L):
     &#34;&#34;&#34;Method to check if the result is symmetric.
         Starting point is the center of the lattice. It goes from the center to the left
@@ -203,7 +218,6 @@ def test_operator_both_sides(hilbert, L):
     return observables
 
 
-#hamiltonian has to be a sparse matrix
 def power_method(hamiltonian, L, eigenvalue_lanczos):
     &#34;&#34;&#34;Calculates the gound state vector.
 
@@ -220,7 +234,6 @@ def power_method(hamiltonian, L, eigenvalue_lanczos):
                                                             &#34;&#34;&#34;
 
     #generate starting vector
-    #ToDo find out, why I need a real vector!!!
     x = np.random.random_sample(3**L) - 0.5 #+ np.random.random_sample(3**L) * 1j - 0.5j
     x = x / np.linalg.norm(x)
     #find the eigenvector
@@ -290,12 +303,30 @@ Returns:
 <span>def <span class="ident">create_machinefile</span></span>(<span>machine_name, L, alpha, dataname, use_sr)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Function to create new folders, if needed.
+Simply create a new path with this function. It is ensured that all folders do exist.</p>
+<pre><code>Args:
+    machine_name (str) : the name of the machine
+    L (int) : the lattice size
+    alpha (int) : the hyperparameter alpha of the neural network
+    dataname (str) : name of the file
+    use_sr (float) : the diag shift. If Gd is used, use_sr = None
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def create_machinefile(machine_name, L, alpha, dataname, use_sr):
+    &#34;&#34;&#34;Function to create new folders, if needed.
+                Simply create a new path with this function. It is ensured that all folders do exist.
+
+                    Args:
+                        machine_name (str) : the name of the machine
+                        L (int) : the lattice size
+                        alpha (int) : the hyperparameter alpha of the neural network
+                        dataname (str) : name of the file
+                        use_sr (float) : the diag shift. If Gd is used, use_sr = None
+                                                            &#34;&#34;&#34;
     with open(&#39;&#39;.join((dataname, &#39;.machine&#39;)), &#39;w&#39;) as f:
         f.write(&#39;&#39;.join((machine_name, &#39;\n&#39;)))
         f.write(&#39;&#39;.join((&#39;L = &#39;, str(L), &#39;\n&#39;)))
@@ -307,19 +338,38 @@ Returns:
 <span>def <span class="ident">create_path</span></span>(<span>dataname, path='run')</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Function to create new folders, if needed.
+Simply create a new path with this function. It is ensured that all folders do exist.</p>
+<pre><code>Args:
+    dataname (str) : the name of the file
+    path (str) : the path to the file without the file
+
+Returns:
+    fullpath (str) : complete path
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def create_path(dataname, path=&#39;run&#39;):
+    &#34;&#34;&#34;Function to create new folders, if needed.
+            Simply create a new path with this function. It is ensured that all folders do exist.
+
+                Args:
+                    dataname (str) : the name of the file
+                    path (str) : the path to the file without the file
+
+                Returns:
+                    fullpath (str) : complete path
+                                                        &#34;&#34;&#34;
     try:
         os.makedirs(path)
     except OSError:
         print(&#34;Creation of the directory %s failed&#34; % path)
     else:
         print(&#34;Successfully created the directory %s&#34; % path)
-    return &#39;/&#39;.join((path, dataname))</code></pre>
+    fullpath = &#39;/&#39;.join((path, dataname))
+    return fullpath</code></pre>
 </details>
 </dd>
 <dt id="helping_functions.get_operator"><code class="name flex">
@@ -423,7 +473,6 @@ Returns:
                                                             &#34;&#34;&#34;
 
     #generate starting vector
-    #ToDo find out, why I need a real vector!!!
     x = np.random.random_sample(3**L) - 0.5 #+ np.random.random_sample(3**L) * 1j - 0.5j
     x = x / np.linalg.norm(x)
     #find the eigenvector
