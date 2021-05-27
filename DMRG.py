@@ -4,7 +4,7 @@ import numpy as np
 from quimb import *
 import time
 
-def ham_heis_2D(n, m, j=1.0, bz=0.0, cyclic=False,
+def ham_heis_2D(n, m, J=-1.0, bz=0.0, cyclic=False,
                 sparse=True, S=1.):
 
     dims = [2] * m # shape (n, m)
@@ -35,8 +35,8 @@ def ham_heis_2D(n, m, j=1.0, bz=0.0, cyclic=False,
         print('pair: ', pair)
         Sxyz = spin_operator(s, S=S, sparse=True)
         print('Sxyz: ', Sxyz)
-        result = ikron([j * Sxyz, Sxyz], dims, inds=pair)
-        print('result: ', result)
+        result = ikron([J * Sxyz, Sxyz], dims, inds=pair)
+        #print('result: ', result)
         return result
 
     # function to make Z field at ``site``
