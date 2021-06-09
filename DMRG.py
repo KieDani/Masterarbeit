@@ -1,5 +1,7 @@
 from dmrgpy import spinchain
 import dmrgpy.multioperator as mo
+import numpy as np
+import os
 
 __L__=6
 
@@ -40,9 +42,33 @@ print(es)
 #print('GS-Energy', es[0])
 print('GS-Energy', es)
 
+path = 'run/DMRG'
+dataname = ''.join(('DMRG_Energy', str(__L__), '.csv'))
+try:
+  os.makedirs(path)
+except OSError:
+  print("Creation of the directory %s failed" % path)
+else:
+  print("Successfully created the directory %s" % path)
+dataname = '/'.join((path, dataname))
 
-#sc.get_dynamical_correlator(name=(sc.Sz[0],sc.Sz[0]))
+# save to csv file
+np.savetxt(dataname, np.asarray([es]), delimiter=';')
+
 
 cs = [sc.vev(sc.Sz[0]*sc.Sz[i]).real for i in range(__L__)]
 print(cs)
+
+dataname = ''.join(('DMRG_', str(__L__), '.csv'))
+
+try:
+  os.makedirs(path)
+except OSError:
+  print("Creation of the directory %s failed" % path)
+else:
+  print("Successfully created the directory %s" % path)
+dataname = '/'.join((path, dataname))
+
+# save to csv file
+np.savetxt(dataname, np.asarray(cs), delimiter=';')
 
