@@ -61,7 +61,7 @@ for l in [12, 30, 40, 50, 60, 70, 80, 90, 100]:
   #cs = [sc.vev(sc.Sz[0]*sc.Sz[i]).real for i in range(__L__)]
 
   #Measure from site L/2-i to L/2+i
-  cs = [sc.vev(sc.Sz[__L__/2-i]*sc.Sz[__L__/2+i]).real for i in range(1, int(__L__/2.) + __L__%2)]
+  cs = [sc.vev(sc.Sz[int(__L__/2)-i]*sc.Sz[int(__L__/2)+i]).real for i in range(1, int(__L__/2.) + __L__%2)]
 
   print(cs)
 
