@@ -34,46 +34,48 @@ def get_transformed_Haldanechain(L=__L__):
   return sc2
 
 
-sc = get_transformed_Haldanechain()
-es = sc.get_excited(n=1,mode="DMRG")
-print(es)
-#gap = es[1]-es[0] # compute gap
-#print("Gap of the Haldane chain",gap)
-#print('GS-Energy', es[0])
-print('GS-Energy', es)
+for l in [12, 30, 40, 50, 60, 70, 80, 90, 100]:
+  __L__ = l
+  sc = get_transformed_Haldanechain()
+  es = sc.get_excited(n=1,mode="DMRG")
+  print(es)
+  #gap = es[1]-es[0] # compute gap
+  #print("Gap of the Haldane chain",gap)
+  #print('GS-Energy', es[0])
+  print('GS-Energy', es)
 
-path = 'run/DMRG'
-dataname = ''.join(('DMRG_Energy', str(__L__), '.csv'))
-try:
-  os.makedirs(path)
-except OSError:
-  print("Creation of the directory %s failed" % path)
-else:
-  print("Successfully created the directory %s" % path)
-dataname = '/'.join((path, dataname))
+  path = 'run/DMRG'
+  dataname = ''.join(('DMRG_Energy', str(__L__), '.csv'))
+  try:
+    os.makedirs(path)
+  except OSError:
+    print("Creation of the directory %s failed" % path)
+  else:
+    print("Successfully created the directory %s" % path)
+  dataname = '/'.join((path, dataname))
 
-# save to csv file
-np.savetxt(dataname, np.asarray([es]), delimiter=';')
+  # save to csv file
+  np.savetxt(dataname, np.asarray([es]), delimiter=';')
 
-#Measure from site 0 to site i
-#cs = [sc.vev(sc.Sz[0]*sc.Sz[i]).real for i in range(__L__)]
+  #Measure from site 0 to site i
+  #cs = [sc.vev(sc.Sz[0]*sc.Sz[i]).real for i in range(__L__)]
 
-#Measure from site L/2-i to L/2+i
-cs = [sc.vev(sc.Sz[__L__/2-i]*sc.Sz[__L__/2+i]).real for i in range(1, int(__L__/2.) + __L__%2)]
+  #Measure from site L/2-i to L/2+i
+  cs = [sc.vev(sc.Sz[__L__/2-i]*sc.Sz[__L__/2+i]).real for i in range(1, int(__L__/2.) + __L__%2)]
 
-print(cs)
+  print(cs)
 
-#dataname = ''.join(('DMRG_', str(__L__), '.csv'))
-dataname = ''.join(('DMRG_symm_', str(__L__), '.csv'))
+  #dataname = ''.join(('DMRG_', str(__L__), '.csv'))
+  dataname = ''.join(('DMRG_symm_', str(__L__), '.csv'))
 
-try:
-  os.makedirs(path)
-except OSError:
-  print("Creation of the directory %s failed" % path)
-else:
-  print("Successfully created the directory %s" % path)
-dataname = '/'.join((path, dataname))
+  try:
+    os.makedirs(path)
+  except OSError:
+    print("Creation of the directory %s failed" % path)
+  else:
+    print("Successfully created the directory %s" % path)
+  dataname = '/'.join((path, dataname))
 
-# save to csv file
-np.savetxt(dataname, np.asarray(cs), delimiter=';')
+  # save to csv file
+  np.savetxt(dataname, np.asarray(cs), delimiter=';')
 
