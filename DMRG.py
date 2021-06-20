@@ -36,7 +36,7 @@ def get_transformed_Haldanechain(L=__L__):
 
 for l in [12, 30, 40, 50, 60, 70, 80, 90, 100]:
   __L__ = l
-  sc = get_transformed_Haldanechain()
+  sc = get_transformed_Haldanechain(L=__L__)
   es = sc.get_excited(n=1,mode="DMRG")
   print(es)
   #gap = es[1]-es[0] # compute gap
