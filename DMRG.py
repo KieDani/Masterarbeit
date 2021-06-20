@@ -55,11 +55,16 @@ dataname = '/'.join((path, dataname))
 # save to csv file
 np.savetxt(dataname, np.asarray([es]), delimiter=';')
 
+#Measure from site 0 to site i
+#cs = [sc.vev(sc.Sz[0]*sc.Sz[i]).real for i in range(__L__)]
 
-cs = [sc.vev(sc.Sz[0]*sc.Sz[i]).real for i in range(__L__)]
+#Measure from site L/2-i to L/2+i
+cs = [sc.vev(sc.Sz[__L__/2-i]*sc.Sz[__L__/2+i]).real for i in range(1, int(__L__/2.) + __L__%2)]
+
 print(cs)
 
-dataname = ''.join(('DMRG_', str(__L__), '.csv'))
+#dataname = ''.join(('DMRG_', str(__L__), '.csv'))
+dataname = ''.join(('DMRG_symm_', str(__L__), '.csv'))
 
 try:
   os.makedirs(path)
