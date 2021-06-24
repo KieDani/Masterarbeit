@@ -556,6 +556,17 @@ def compareDMRG(dataname, L, mode=None):
                     observables.append(float(row[0]))
         print('observables: ', observables)
         plt.plot(observables, color='red', label='exact value')
+
+        dataname_exact = ''.join(('run/exact_', 'transformed', '/L', str(L), '_exact.csv'))
+        try:
+            operator = 1 * np.loadtxt(dataname_exact)
+            x_operator = np.arange(1, len(operator) + 1)
+        except:
+            print(dataname_exact)
+            operator = 0.374 * np.ones(len(values))
+            x_operator = range(1, L)
+        plt.plot(x_operator, operator, color='green', label='exact value')
+
         plt.show()
 
 
@@ -623,7 +634,8 @@ def compareDMRG(dataname, L, mode=None):
 
 
 
-#compareDMRG('results/transformedHamiltonian/L80_observables.csv', L=80)
+#compareDMRG('results/transformedHamiltonian/L80_load_observables.csv', L=80)
+#compareDMRG('results/transformedHamiltonian/L12_observables.csv', L=12)
 #compareDMRG('results/transformedHamiltonian/L80_observables.csv', L=80, mode='symmetric')
 
 
