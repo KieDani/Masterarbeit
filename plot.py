@@ -521,6 +521,44 @@ def plotEnergyPerSize():
     print(adjusted_Energy)
 
 
+def compareDMRG(dataname, L, mode=None):
+    numbers = np.zeros(L - 1, dtype=np.int32)
+    values = np.zeros(L - 1, dtype=np.float64)
+
+    with open(dataname) as csvfile:
+        spamreader = csv.reader(csvfile)
+        for row in spamreader:
+            for i in range(0, L - 1):
+                name_observable = 'Ferro_correlation_function'
+                if row[0] == ''.join((name_observable, str(i + 1))):
+                    value = row[1].split('+')[0]
+                    if value[-1] == 'e':
+                        value = ''.join((value, row[1].split('+')[1]))
+                    value = float(value)
+                    values[i] += value
+                    numbers[i] += 1
+        print(values)
+        print(numbers)
+        print(values / numbers)
+        plt.plot(range(1, L), values / numbers, label='VMC value')
+
+        if(mode == 'symmetric'):
+            dataname_observ = ''.join(('run/DMRG/DMRG_symm_', str(L), '.csv'))
+        else:
+            dataname_observ = ''.join(('run/DMRG/DMRG_', str(L), '.csv'))
+
+        observables = list()
+        with open(dataname_observ) as csvfile:
+            spamreader = csv.reader(csvfile)
+            for row in spamreader:
+                observables.append(np.abs(float(row[0])))
+                if(mode == 'symmetric'):
+                    observables.append(float(row[0]))
+        print('observables: ', observables)
+        plt.plot(observables, color='red', label='exact value')
+        plt.show()
+
+
 #Show that the original Heisenberg model and AKLT model can not be solved properly
 #plot('results/problems/FFNN/L12.log', L = 12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title='VMC energy of the Haldane chain (N=12)')
 #plotObservables('results/problems/FFNN/L12_observables.csv', 12, observable='StringCorr', title='String order parameter for the Haldane chain (N=12)')
@@ -580,3 +618,15 @@ def plotEnergyPerSize():
 
 #TransformedFFNN
 #plot('results/TransformedFFNN/L4.log', L=4, symmetric_operator=False, observables=False, transformed_or_original='original', title='VMC energy of the Haldane chain (N=4) with the TransformedFFNN')
+
+
+
+
+
+#compareDMRG('results/transformedHamiltonian/L80_observables.csv', L=80)
+#compareDMRG('results/transformedHamiltonian/L80_observables.csv', L=80, mode='symmetric')
+
+
+
+
+
