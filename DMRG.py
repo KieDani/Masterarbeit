@@ -25,7 +25,7 @@ def get_transformed_Haldanechain(L=__L__):
   sc2 = spinchain.Spin_Chain(spins) # create spin chain object
   h = 0 # initialize Hamiltonian
   for i in range(len(spins)-1):
-    expSx = -2* sc2.Sx[i+1]*sc2.Sx[i+1] + mo.obj2MO(1)
+    expSx = -2 * sc2.Sx[i+1]*sc2.Sx[i+1] + mo.obj2MO(1)
     expSz = -2 * sc2.Sz[i] * sc2.Sz[i] + mo.obj2MO(1)
     h = h + sc2.Sx[i]*sc2.Sx[i+1]
     h = h + sc2.Sy[i]*expSz*expSx*sc2.Sy[i+1]

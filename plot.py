@@ -139,7 +139,7 @@ def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltoni
             Args:
                 dataname (str) : the dataname (including the relative path)
                 L (int) : Lattice size
-                observable (str): allowed inputs are 'FerroCorr' and 'StringCorr'
+                observable (str): allowed inputs are 'FerroCorr', 'SymmFerroCorr' and 'StringCorr'
                 title (str) : Title of the plot
                 hamiltonian (str): allowed inputs are 'Heisenberg' or 'AKLT'
                 yLabel (str): ylabel of the plot
@@ -154,6 +154,8 @@ def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltoni
             for i in range(0, L-1):
                 if observable == 'FerroCorr':
                     name_observable = 'Ferro_correlation_function'
+                elif observable == 'SymmFerroCorr':
+                    name_observable = 'Symmetric_Ferro_correlation_function'
                 elif observable == 'StringCorr':
                     name_observable = 'String_correlation_function'
                 else:
@@ -165,6 +167,10 @@ def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltoni
                         value = ''.join((value, row[1].split('+')[1]))
                     value = float(value)
                     values[i] += value
+                    if observable == 'SymmFerroCorr':
+                        values[i+1] += value
+                        numbers[i+1] += 1
+
                     numbers[i] += 1
         print(values)
         print(numbers)
@@ -179,9 +185,27 @@ def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltoni
                 operator = 1 * np.loadtxt(dataname_observable)
                 x_operator = np.arange(1, len(operator) + 1)
             except:
-                print(dataname_observable)
-                operator = 0.374 * np.ones(len(values))
-                x_operator = range(1, L)
+                try:
+                    print('KuhMachtMuh')
+                    if(observable == 'SymmFerroCorr'):
+                        dataname_observ = ''.join(('run/DMRG/DMRG_symm_', str(L), '.csv'))
+                    else:
+                        dataname_observ = ''.join(('run/DMRG/DMRG_', str(L), '.csv'))
+                    observables = list()
+                    with open(dataname_observ) as csvfile:
+                        spamreader = csv.reader(csvfile)
+                        for row in spamreader:
+                            observables.append(np.abs(float(row[0])))
+                            if(observable == 'SymmFerroCorr'):
+                                observables.append(float(row[0]))
+                    operator = np.asarray(observables)
+                    print(operator)
+                    x_operator = np.arange(1, len(operator) + 1)
+                except:
+                    print('MuhMachtKuh')
+                    print(dataname_observable)
+                    operator = 0.374 * np.ones(len(values))
+                    x_operator = range(1, L)
         plt.plot(x_operator, operator, color='red', label='exact value')
         plt.xlabel('Site distance', fontsize = 14)
         if(observable == 'FerroCorr' and yLabel == None):
@@ -555,7 +579,7 @@ def compareDMRG(dataname, L, mode=None):
                 if(mode == 'symmetric'):
                     observables.append(float(row[0]))
         print('observables: ', observables)
-        plt.plot(observables, color='red', label='exact value')
+        plt.plot(observables, color='red', label='DMRG value')
 
         dataname_exact = ''.join(('run/exact_', 'transformed', '/L', str(L), '_exact.csv'))
         try:
@@ -567,6 +591,10 @@ def compareDMRG(dataname, L, mode=None):
             x_operator = range(1, L)
         plt.plot(x_operator, operator, color='green', label='exact value')
 
+        if mode != None:
+            plt.title(mode)
+
+        plt.legend()
         plt.show()
 
 
@@ -634,11 +662,15 @@ def compareDMRG(dataname, L, mode=None):
 
 
 
-#compareDMRG('results/transformedHamiltonian/L80_load_observables.csv', L=80)
-#compareDMRG('results/transformedHamiltonian/L12_observables.csv', L=12)
-#compareDMRG('results/transformedHamiltonian/L80_observables.csv', L=80, mode='symmetric')
+
+#compareDMRG('results/transformedHamiltonian/L12_observables.csv', L=12, mode='symmetric')
+#compareDMRG('results/transformedHamiltonian/L12_observables.csv', L=12, mode='unsymmetric')
+#compareDMRG('results/transformedHamiltonian/L60_observables.csv', L=60, mode='symmetric')
+#compareDMRG('results/transformedHamiltonian/L60_observables.csv', L=60, mode='unsymmetric')
+#compareDMRG('results/transformedHamiltonian/L80_load_observables.csv', L=80, mode='symmetric')
+#compareDMRG('results/transformedHamiltonian/L80_observables.csv', L=80, mode='unsymmetric')
 
 
-
+#plotObservables('run/CompareSymmObserv/L50_load_observables.csv', L=40, observable='FerroCorr')
 
 
