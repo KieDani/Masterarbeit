@@ -191,6 +191,7 @@ def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltoni
                         dataname_observ = ''.join(('run/DMRG/DMRG_symm_', str(L), '.csv'))
                     else:
                         dataname_observ = ''.join(('run/DMRG/DMRG_', str(L), '.csv'))
+                        print(''.join(('run/DMRG/DMRG_', str(L), '.csv')))
                     observables = list()
                     with open(dataname_observ) as csvfile:
                         spamreader = csv.reader(csvfile)
@@ -598,6 +599,155 @@ def compareDMRG(dataname, L, mode=None):
         plt.show()
 
 
+
+def compareLatticeSize(L):
+
+    # Get the energy
+    average_energies = []
+    for index in range(1, 9):
+        dataname_energy = 'run/CompareSymmObserv/L' + str(L) + '_load' + str(index) + '.log'
+        data = json.load(open(dataname_energy))
+        iters = []
+        energy = []
+        for iteration in data["Output"]:
+            iters.append(iteration["Iteration"])
+            energy.append(iteration["Energy"]["Mean"])
+        def calcMean(array):
+            length = np.minimum(25, len(array))
+            sum = 0.
+            for i in range(length):
+                sum += array[-i+0]
+            return sum / float(length)
+        average_energies.append(calcMean(energy))
+    average_energy = np.mean(average_energies)
+    average_energy_std = np.std(average_energies)
+
+    with open('run/DMRG/DMRG_Energy' + str(L) + '.csv') as csvfile:
+        spamreader = csv.reader(csvfile)
+        dmrg_energy = next(spamreader)
+        dmrg_energy = float(dmrg_energy[0].split('+')[0] + dmrg_energy[0].split('+')[1])
+
+    print('VMC-Energy: ', average_energy, ' +- ', average_energy_std)
+    print('DMRG-Energy: ', dmrg_energy)
+    print('(E_dmrg - E)/E_dmrg = ', (dmrg_energy - average_energy) / dmrg_energy)
+
+
+
+    #Get the observables
+    numbers = np.zeros(L - 1, dtype=np.int32)
+    values = np.zeros(L - 1, dtype=np.float64)
+    for index in range(1, 9):
+        dataname = 'run/CompareSymmObserv/L' + str(L) + '_load' + str(index) + '_observables.csv'
+        with open(dataname) as csvfile:
+            spamreader = csv.reader(csvfile)
+            for row in spamreader:
+                for i in range(0, L - 1):
+                    name_observable = 'Ferro_correlation_function'
+                    if row[0] == ''.join((name_observable, str(i + 1))):
+                        value = row[1].split('+')[0]
+                        if value[-1] == 'e':
+                            value = ''.join((value, row[1].split('+')[1]))
+                        value = float(value)
+                        values[i] += value
+                        numbers[i] += 1
+    plt.plot(range(1, L), values / numbers, label='VMC value')
+
+    try:
+        dataname_observ = ''.join(('run/DMRG/DMRG_', str(L), '.csv'))
+        print(''.join(('run/DMRG/DMRG_', str(L), '.csv')))
+        observables = list()
+        with open(dataname_observ) as csvfile:
+            spamreader = csv.reader(csvfile)
+            for row in spamreader:
+                observables.append(np.abs(float(row[0])))
+        operator = np.asarray(observables)
+        x_operator = np.arange(1, len(operator) + 1)
+        plt.plot(x_operator, operator, color='red', label='DMRG value')
+    except:
+        print('not possible to plot DMRG data')
+
+    plt.xlabel('Site distance', fontsize=14)
+    plt.ylabel('String order parameter', fontsize=14)
+    plt.legend()
+    plt.show()
+
+
+def compareNetworkSize(alpha):
+    L=40
+    # Get the energy
+    average_energies = []
+    for index in range(1, 9):
+        dataname_energy = 'run/CompareSizes/L' + str(L) + 'a' + str(alpha) + '_load' + str(index) + '.log'
+        data = json.load(open(dataname_energy))
+        iters = []
+        energy = []
+        for iteration in data["Output"]:
+            iters.append(iteration["Iteration"])
+            energy.append(iteration["Energy"]["Mean"])
+        def calcMean(array):
+            length = np.minimum(25, len(array))
+            sum = 0.
+            for i in range(length):
+                sum += array[-i+0]
+            return sum / float(length)
+        average_energies.append(calcMean(energy))
+    average_energy = np.mean(average_energies)
+    average_energy_std = np.std(average_energies)
+
+    with open('run/DMRG/DMRG_Energy' + str(L) + '.csv') as csvfile:
+        spamreader = csv.reader(csvfile)
+        dmrg_energy = next(spamreader)
+        dmrg_energy = float(dmrg_energy[0].split('+')[0] + dmrg_energy[0].split('+')[1])
+
+    print('VMC-Energy: ', average_energy, ' +- ', average_energy_std)
+    print('DMRG-Energy: ', dmrg_energy)
+    print('(E_dmrg - E)/E_dmrg = ', (dmrg_energy - average_energy) / dmrg_energy)
+
+
+
+    #Get the observables
+    numbers = np.zeros(L - 1, dtype=np.int32)
+    values = np.zeros(L - 1, dtype=np.float64)
+    for index in range(1, 9):
+        dataname = 'run/CompareSizes/L' + str(L) + 'a' + str(alpha) + '_load' + str(index) + '_observables.csv'
+        with open(dataname) as csvfile:
+            spamreader = csv.reader(csvfile)
+            for row in spamreader:
+                for i in range(0, L - 1):
+                    name_observable = 'Ferro_correlation_function'
+                    if row[0] == ''.join((name_observable, str(i + 1))):
+                        value = row[1].split('+')[0]
+                        if value[-1] == 'e':
+                            value = ''.join((value, row[1].split('+')[1]))
+                        value = float(value)
+                        values[i] += value
+                        numbers[i] += 1
+    plt.plot(range(1, L), values / numbers, label='VMC value')
+
+    try:
+        dataname_observ = ''.join(('run/DMRG/DMRG_', str(L), '.csv'))
+        print(''.join(('run/DMRG/DMRG_', str(L), '.csv')))
+        observables = list()
+        with open(dataname_observ) as csvfile:
+            spamreader = csv.reader(csvfile)
+            for row in spamreader:
+                observables.append(np.abs(float(row[0])))
+        operator = np.asarray(observables)
+        x_operator = np.arange(1, len(operator) + 1)
+        plt.plot(x_operator, operator, color='red', label='DMRG value')
+    except:
+        print('not possible to plot DMRG data')
+
+    plt.xlabel('Site distance', fontsize=14)
+    plt.ylabel('String order parameter', fontsize=14)
+    plt.legend()
+    plt.show()
+
+
+
+
+
+
 #Show that the original Heisenberg model and AKLT model can not be solved properly
 #plot('results/problems/FFNN/L12.log', L = 12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title='VMC energy of the Haldane chain (N=12)')
 #plotObservables('results/problems/FFNN/L12_observables.csv', 12, observable='StringCorr', title='String order parameter for the Haldane chain (N=12)')
@@ -671,6 +821,10 @@ def compareDMRG(dataname, L, mode=None):
 #compareDMRG('results/transformedHamiltonian/L80_observables.csv', L=80, mode='unsymmetric')
 
 
-#plotObservables('run/CompareSymmObserv/L50_load_observables.csv', L=40, observable='FerroCorr')
+#plotObservables('run/CompareSymmObserv/L20_load8_observables.csv', L=20, observable='FerroCorr')
+
+#compareLatticeSize(L=40)
+
+#compareNetworkSize(alpha=7)
 
 
