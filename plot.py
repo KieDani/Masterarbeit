@@ -672,6 +672,78 @@ def compareLatticeSize(L):
     plt.show()
 
 
+
+def compareLatticeSizes():
+    energies_L = list()
+    dmrgenergies_L = list()
+    orderparameter_L = list()
+    dmrgorderparameter_L = list()
+    for l in [30, 40, 50, 60]:
+        average_energies = []
+        for index in range(1, 9):
+            dataname_energy = 'run/CompareSymmObserv/L' + str(l) + '_load' + str(index) + '.log'
+            data = json.load(open(dataname_energy))
+            iters = []
+            energy = []
+            for iteration in data["Output"]:
+                iters.append(iteration["Iteration"])
+                energy.append(iteration["Energy"]["Mean"])
+
+            def calcMean(array):
+                length = np.minimum(25, len(array))
+                sum = 0.
+                for i in range(length):
+                    sum += array[-i + 0]
+                return sum / float(length)
+
+            average_energies.append(calcMean(energy))
+        average_energy = np.mean(average_energies)
+        average_energy_std = np.std(average_energies)
+        energies_L.append(average_energy)
+
+        with open('run/DMRG/DMRG_Energy' + str(l) + '.csv') as csvfile:
+            spamreader = csv.reader(csvfile)
+            dmrg_energy = next(spamreader)
+            dmrg_energy = float(dmrg_energy[0].split('+')[0] + dmrg_energy[0].split('+')[1])
+        dmrgenergies_L.append(dmrg_energy)
+
+        dataname_observ = ''.join(('run/DMRG/DMRG_', str(l), '.csv'))
+        print(''.join(('run/DMRG/DMRG_', str(l), '.csv')))
+        observables = list()
+        with open(dataname_observ) as csvfile:
+            spamreader = csv.reader(csvfile)
+            for row in spamreader:
+                observables.append(np.abs(float(row[0])))
+        operator = np.asarray(observables)
+        dmrgorderparameter_L.append(operator[int(l/2-1)])
+
+        values = 0.
+        numbers = 0.
+        for index in range(1, 9):
+            dataname = 'run/CompareSymmObserv/L' + str(l) + '_load' + str(index) + '_observables.csv'
+            with open(dataname) as csvfile:
+                spamreader = csv.reader(csvfile)
+                for row in spamreader:
+                    name_observable = 'Ferro_correlation_function'
+                    if row[0] == ''.join((name_observable, str(int(l/2)))):
+                        value = row[1].split('+')[0]
+                        if value[-1] == 'e':
+                            value = ''.join((value, row[1].split('+')[1]))
+                        value = float(value)
+                        values += value
+                        numbers += 1
+        orderparameter_L.append(values/numbers)
+
+    print(energies_L)
+    print(dmrgenergies_L)
+    print(orderparameter_L)
+    print(dmrgorderparameter_L)
+
+
+
+
+
+
 def compareNetworkSize(alpha):
     L=40
     # Get the energy
@@ -825,6 +897,8 @@ def compareNetworkSize(alpha):
 
 #compareLatticeSize(L=40)
 
-#compareNetworkSize(alpha=7)
+#compareNetworkSize(alpha=13)
+
+#compareLatticeSizes()
 
 
