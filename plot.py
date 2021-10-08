@@ -668,6 +668,7 @@ def compareLatticeSize(L):
 
     plt.xlabel('Site distance', fontsize=14)
     plt.ylabel('String order parameter', fontsize=14)
+    plt.title('L = ' + str(L))
     plt.legend()
     plt.show()
 
@@ -734,10 +735,14 @@ def compareLatticeSizes():
                         numbers += 1
         orderparameter_L.append(values/numbers)
 
-    print(energies_L)
-    print(dmrgenergies_L)
-    print(orderparameter_L)
-    print(dmrgorderparameter_L)
+    print('VMC Energies:', energies_L)
+    print('DMRG Energies:', dmrgenergies_L)
+    print('(E_DMRG-E_VMC)/(E_VMC):', (np.array(dmrgenergies_L) - np.array(energies_L))/np.array(dmrgenergies_L))
+    print('(E_DMRG-E_VMC):', np.array(dmrgenergies_L) - np.array(energies_L))
+    print('VMC Order parameter:', orderparameter_L)
+    print('DMRG Order parameter:', dmrgorderparameter_L)
+    print('(O_DMRG-O_VMC)/(O_VMC):', abs(np.array(dmrgorderparameter_L) - np.array(orderparameter_L)) / np.array(dmrgorderparameter_L))
+    print('(O_DMRG-O_VMC):', abs(np.array(dmrgorderparameter_L) - np.array(orderparameter_L)))
 
 
 
@@ -812,11 +817,84 @@ def compareNetworkSize(alpha):
 
     plt.xlabel('Site distance', fontsize=14)
     plt.ylabel('String order parameter', fontsize=14)
+    plt.title('alpha = ' + str(alpha))
     plt.legend()
     plt.show()
 
 
 
+def compareNetworkSizes():
+    L = 40
+    energies_alpha = list()
+    dmrgenergies_alpha = list()
+    orderparameter_alpha = list()
+    dmrgorderparameter_alpha = list()
+    for alpha in [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]:
+        average_energies = []
+        for index in range(1, 9):
+            dataname_energy = 'run/CompareSizes/L' + str(L) + 'a' + str(alpha) + '_load' + str(index) + '.log'
+            data = json.load(open(dataname_energy))
+            iters = []
+            energy = []
+            for iteration in data["Output"]:
+                iters.append(iteration["Iteration"])
+                energy.append(iteration["Energy"]["Mean"])
+
+            def calcMean(array):
+                length = np.minimum(25, len(array))
+                sum = 0.
+                for i in range(length):
+                    sum += array[-i + 0]
+                return sum / float(length)
+
+            average_energies.append(calcMean(energy))
+        average_energy = np.mean(average_energies)
+        average_energy_std = np.std(average_energies)
+        energies_alpha.append(average_energy)
+
+        with open('run/DMRG/DMRG_Energy' + str(L) + '.csv') as csvfile:
+            spamreader = csv.reader(csvfile)
+            dmrg_energy = next(spamreader)
+            dmrg_energy = float(dmrg_energy[0].split('+')[0] + dmrg_energy[0].split('+')[1])
+        dmrgenergies_alpha.append(dmrg_energy)
+
+        dataname_observ = ''.join(('run/DMRG/DMRG_', str(L), '.csv'))
+        print(''.join(('run/DMRG/DMRG_', str(L), '.csv')))
+        observables = list()
+        with open(dataname_observ) as csvfile:
+            spamreader = csv.reader(csvfile)
+            for row in spamreader:
+                observables.append(np.abs(float(row[0])))
+        operator = np.asarray(observables)
+        dmrgorderparameter_alpha.append(operator[int(L/2-1)])
+
+        values = 0.
+        numbers = 0.
+        for index in range(1, 9):
+            dataname = 'run/CompareSizes/L' + str(L) + 'a' + str(alpha) + '_load' + str(index) + '_observables.csv'
+            with open(dataname) as csvfile:
+                spamreader = csv.reader(csvfile)
+                for row in spamreader:
+                    name_observable = 'Ferro_correlation_function'
+                    if row[0] == ''.join((name_observable, str(int(L/2)))):
+                        value = row[1].split('+')[0]
+                        if value[-1] == 'e':
+                            value = ''.join((value, row[1].split('+')[1]))
+                        value = float(value)
+                        values += value
+                        numbers += 1
+        orderparameter_alpha.append(values/numbers)
+
+    print('VMC Energies:', energies_alpha)
+    print('DMRG Energies:', dmrgenergies_alpha)
+    print('(E_DMRG-E_VMC)/(E_VMC):', (np.array(dmrgenergies_alpha) - np.array(energies_alpha))/np.array(dmrgenergies_alpha))
+    print('(E_DMRG-E_VMC):',np.array(dmrgenergies_alpha) - np.array(energies_alpha))
+    print('VMC Order parameter:', orderparameter_alpha)
+    print('DMRG Order parameter:', dmrgorderparameter_alpha)
+    print('(O_DMRG-O_VMC)/(O_VMC):', abs(np.array(dmrgorderparameter_alpha) - np.array(orderparameter_alpha)) / np.array(dmrgorderparameter_alpha))
+    print('(O_DMRG-O_VMC):',abs(np.array(dmrgorderparameter_alpha) - np.array(orderparameter_alpha)))
+    plt.plot(abs(np.array(dmrgorderparameter_alpha) - np.array(orderparameter_alpha)))
+    plt.show()
 
 
 
@@ -895,10 +973,15 @@ def compareNetworkSize(alpha):
 
 #plotObservables('run/CompareSymmObserv/L20_load8_observables.csv', L=20, observable='FerroCorr')
 
-#compareLatticeSize(L=40)
+#compareLatticeSize(L=30)
 
-#compareNetworkSize(alpha=13)
+#for a in [11, 13, 15, 17]:
+    #compareNetworkSize(alpha=a)
+
+#compareNetworkSize(alpha=15)
 
 #compareLatticeSizes()
+
+#compareNetworkSizes()
 
 
