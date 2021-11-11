@@ -749,8 +749,8 @@ def compareLatticeSizes():
 
 
 
-def compareNetworkSize(alpha):
-    L=40
+def compareNetworkSize(alpha, L=40, shift=0):
+    #L=40
     # Get the energy
     average_energies = []
     for index in range(1, 9):
@@ -799,7 +799,7 @@ def compareNetworkSize(alpha):
                         value = float(value)
                         values[i] += value
                         numbers[i] += 1
-    plt.plot(range(1, L), values / numbers, label='VMC value')
+    plt.plot(range(2, L+1), values / numbers + shift, label='VMC value')
 
     try:
         dataname_observ = ''.join(('run/DMRG/DMRG_', str(L), '.csv'))
@@ -823,13 +823,14 @@ def compareNetworkSize(alpha):
 
 
 
-def compareNetworkSizes():
-    L = 40
+def compareNetworkSizes(L=40):
+    #L = 40
     energies_alpha = list()
     dmrgenergies_alpha = list()
     orderparameter_alpha = list()
     dmrgorderparameter_alpha = list()
-    for alpha in [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]:
+    alphas = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21] if L==40 else [11, 13, 15, 17, 19, 21, 23, 25]
+    for alpha in alphas:
         average_energies = []
         for index in range(1, 9):
             dataname_energy = 'run/CompareSizes/L' + str(L) + 'a' + str(alpha) + '_load' + str(index) + '.log'
@@ -893,7 +894,7 @@ def compareNetworkSizes():
     print('DMRG Order parameter:', dmrgorderparameter_alpha)
     print('(O_DMRG-O_VMC)/(O_VMC):', abs(np.array(dmrgorderparameter_alpha) - np.array(orderparameter_alpha)) / np.array(dmrgorderparameter_alpha))
     print('(O_DMRG-O_VMC):',abs(np.array(dmrgorderparameter_alpha) - np.array(orderparameter_alpha)))
-    plt.plot(abs(np.array(dmrgorderparameter_alpha) - np.array(orderparameter_alpha)))
+    plt.plot(alphas, abs(np.array(dmrgorderparameter_alpha) - np.array(orderparameter_alpha)))
     plt.show()
 
 
@@ -978,10 +979,10 @@ def compareNetworkSizes():
 #for a in [11, 13, 15, 17]:
     #compareNetworkSize(alpha=a)
 
-#compareNetworkSize(alpha=15)
+compareNetworkSize(alpha=21, L=40, shift=-0.05)
 
 #compareLatticeSizes()
 
-#compareNetworkSizes()
+#compareNetworkSizes(L=30)
 
 
