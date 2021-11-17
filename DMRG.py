@@ -70,48 +70,53 @@ def get_transformed_AKLT(L=__L__):
   return sc2
 
 
-for l in [12, 30, 40, 50, 60, 70, 80, 90, 100]:
+for l in [12, 14, 16, 30, 40, 50]:
   __L__ = l
-  sc = get_transformed_Haldanechain(L=__L__)
-  es = sc.get_excited(n=1,mode="DMRG")
-  print(es)
-  #gap = es[1]-es[0] # compute gap
-  #print("Gap of the Haldane chain",gap)
-  #print('GS-Energy', es[0])
-  print('GS-Energy', es)
+  tH = (get_transformed_Haldanechain(L=__L__), 'transformed_Heisenberg')
+  tA = (get_transformed_AKLT(L=__L__), 'transformed_AKLT')
+  for sc, sc_name in [tH, tA]:
+    #sc = get_transformed_Haldanechain(L=__L__)
+    es = sc.get_excited(n=1,mode="DMRG")
+    print(es)
+    #gap = es[1]-es[0] # compute gap
+    #print("Gap of the Haldane chain",gap)
+    #print('GS-Energy', es[0])
+    print('GS-Energy', es)
 
-  path = 'run/DMRG'
-  dataname = ''.join(('DMRG_Energy', str(__L__), '.csv'))
-  try:
-    os.makedirs(path)
-  except OSError:
-    print("Creation of the directory %s failed" % path)
-  else:
-    print("Successfully created the directory %s" % path)
-  dataname = '/'.join((path, dataname))
+    path = 'run/DMRG'
+    dataname = ''.join(('DMRG_Energy_', str(__L__), '_', sc_name, '.csv'))
+    try:
+      os.makedirs(path)
+    except OSError:
+      print("Creation of the directory %s failed" % path)
+    else:
+      print("Successfully created the directory %s" % path)
+    dataname = '/'.join((path, dataname))
 
-  # save to csv file
-  np.savetxt(dataname, np.asarray([es]), delimiter=';')
+    # save to csv file
+    np.savetxt(dataname, np.asarray([es]), delimiter=';')
 
-  #Measure from site 0 to site i
-  #cs = [sc.vev(sc.Sz[0]*sc.Sz[i]).real for i in range(__L__)]
+    #Measure StringCorr from site 0 to site i
+    cs = [sc.vev(sc.Sz[0]*sc.Sz[i]).real for i in range(__L__)]
+    print(cs)
+    dataname = ''.join(('DMRG_StringCorr_', str(__L__), '_', sc_name, '.csv'))
 
-  #Measure from site L/2-i to L/2+i
-  cs = [sc.vev(sc.Sz[int(__L__/2)-i]*sc.Sz[int(__L__/2)+i]).real for i in range(1, int(__L__/2.) + __L__%2)]
+    #Measure Sz^2 on each site
+    cs2 = [sc.vev(sc.Sz[i] * sc.Sz[i]).real for i in range(__L__)]
+    print(cs2)
+    dataname2 = ''.join(('DMRG_Sz2_', str(__L__), '_', sc_name, '.csv'))
 
-  print(cs)
 
-  #dataname = ''.join(('DMRG_', str(__L__), '.csv'))
-  dataname = ''.join(('DMRG_symm_', str(__L__), '.csv'))
+    try:
+      os.makedirs(path)
+    except OSError:
+      print("Creation of the directory %s failed" % path)
+    else:
+      print("Successfully created the directory %s" % path)
+    dataname = '/'.join((path, dataname))
+    dataname2 = '/'.join((path, dataname2))
 
-  try:
-    os.makedirs(path)
-  except OSError:
-    print("Creation of the directory %s failed" % path)
-  else:
-    print("Successfully created the directory %s" % path)
-  dataname = '/'.join((path, dataname))
-
-  # save to csv file
-  np.savetxt(dataname, np.asarray(cs), delimiter=';')
+    # save to csv file
+    np.savetxt(dataname, np.asarray(cs), delimiter=';')
+    np.savetxt(dataname2, np.asarray(cs2), delimiter=';')
 
