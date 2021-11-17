@@ -979,7 +979,7 @@ def compareNetworkSizes(L=40):
 #for a in [11, 13, 15, 17]:
     #compareNetworkSize(alpha=a)
 
-compareNetworkSize(alpha=21, L=40, shift=-0.05)
+compareNetworkSize(alpha=15, L=40, shift=-0.05)
 
 #compareLatticeSizes()
 
