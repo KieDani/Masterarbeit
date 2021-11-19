@@ -214,7 +214,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
     v = functions.power_method(ha.to_sparse(), L, w[0])
 
     if(symmetric == True):
-        results = np.empty(int(L/2) -1 + L%2, dtype=np.float64)
+        results1 = np.empty(int(L/2) -1 + L%2, dtype=np.float64)
         for index, i in enumerate(range(1, int(L / 2.) + L%2)):
             if (hamiltonian_name == 'transformed_Heisenberg' or hamiltonian_name == 'transformed_AKLT'):
                 observable = operators.FerroCorrelationZ(hilbert=hi, j=int(L / 2.) - i, k=int(L / 2.) + i).to_sparse()
@@ -223,25 +223,37 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
                 sys.stdout.flush()
                 observable = None
             result_l = observable.dot(v).dot(v).real
-            results[index] = result_l
+            results1[index] = result_l
     else:
-        results = np.empty(L-1, dtype=np.float64)
+        results1 = np.empty(L-1, dtype=np.float64)
         for index, i in enumerate(range(1, L)):
             if (hamiltonian_name == 'transformed_Heisenberg' or hamiltonian_name == 'transformed_AKLT'):
                 observable = operators.FerroCorrelationZ(hilbert=hi, j=0, k=i).to_sparse()
             else:
                 observable = operators.StringCorrelation(hilbert=hi, j=0, k=i).to_sparse()
             result_l = observable.dot(v).dot(v).real
-            results[index] = result_l
+            results1[index] = result_l
     if(dataname == None):
         dataname = ''.join(('L', str(L), '_exact'))
     dataname = functions.create_path(dataname, path=path)
-    dataname = ''.join((dataname, '.csv'))
+    dataname1 = ''.join((dataname, '_stringcorrelationfunction', '.csv'))
     # save to csv file
-    np.savetxt(dataname, results, delimiter=';')
-    print(results)
+    np.savetxt(dataname1, results1, delimiter=';')
+    print('String correlation function: ', results1)
     sys.stdout.flush()
-    return results
+
+    results2 = np.empty(L, dtype=np.float64)
+    for index, i in enumerate(range(0, L)):
+        observable = operators.S_Z_squared(hilbert=hi, j=i).to_sparse()
+        result_l = observable.dot(v).dot(v).real
+        results2[index] = result_l
+    dataname2 = ''.join((dataname, '_szsquared', '.csv'))
+    # save to csv file
+    np.savetxt(dataname2, results2, delimiter=';')
+    print('Sz_squared: ', results2)
+    sys.stdout.flush()
+
+    return results1, results2
 
 
 
