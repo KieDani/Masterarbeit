@@ -131,7 +131,6 @@ def plot(dataname, L, observables=True, symmetric_operator = False, periodic=Fal
         plt.show()
 
 
-
 def plotObservables(dataname, L, observable='FerroCorr', title = None, hamiltonian = 'Heisenberg', yLabel = None):
     """Function to plot the results of the function measureObservables().
         The csv file is loaded and evaluated.
@@ -899,6 +898,184 @@ def compareNetworkSizes(L=40):
 
 
 
+def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plot_exact=False, plot_dmrg=True, hamiltonian='transformed_Heisenberg'):
+    if plot_energy:
+        # plot VMC-energy
+        if L==40:
+            a = 21
+        else:
+            a = 60
+        dataname = 'run/finalResults/VMC/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '.log'))
+        data = json.load(open(dataname))
+        # Extract the relevant information
+        iters = []
+        energy = []
+        for iteration in data["Output"]:
+            iters.append(iteration["Iteration"])
+            energy.append(iteration["Energy"]["Mean"])
+        plt.plot(iters, energy, color='green', label='VMC energy')
+
+        #plot exact energy (Lanczos)
+        if plot_exact:
+            tmp = [None, None, -1.999, -3.000, -4.646, -5.830, -7.370, -8.635, -10.125, -11.433, -12.895, -14.230,
+                   -15.674, -17.028, -18.459, -19.827, -21.250, -22.626]
+            if hamiltonian.split('_')[1] == 'Heisenberg':
+                if L>len(tmp):
+                    factor = (L - 1) * (-1.4)
+                else:
+                    factor = tmp[L]
+            else:
+                factor = -2. / 3 * (L - 1)
+            expected_energy = np.ones_like(np.asarray(iters)) * factor
+            plt.plot(iters, expected_energy, color='red', label='exact energy', marker='s')
+
+        #plot dmrg-energy
+        if plot_dmrg:
+            print('DMRG results were only calculated for the transformed hamiltonian!!!')
+            dataname_observ = ''.join(('run/finalResults/DMRG/DMRG_Energy_', str(L), '_transformed_', hamiltonian.split('_')[1], '.csv'))
+            factor = 0
+            with open(dataname_observ) as csvfile:
+                spamreader = csv.reader(csvfile)
+                for row in spamreader:
+                    factor = float(row[0])
+            expected_energy = np.ones_like(np.asarray(iters)) * factor
+            plt.plot(iters, expected_energy, color='blue', label='DMRG value')
+
+        plt.title('Energy L='+str(L)+' '+hamiltonian)
+        plt.xlabel('Iteration', fontsize=14)
+        plt.ylabel('Energy', fontsize=14)
+        plt.legend()
+        plt.show()
+
+    if plot_corr:
+        #plot VMC observable
+        dataname = 'run/finalResults/VMC/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '_observables.csv'))
+        numbers = np.zeros(L - 1, dtype=np.int32)
+        values = np.zeros(L - 1, dtype=np.float64)
+        with open(dataname) as csvfile:
+            spamreader = csv.reader(csvfile)
+            for row in spamreader:
+                for i in range(0, L - 1):
+                    if hamiltonian.split('_')[0] == 'transformed':
+                        name_observable = 'Ferro_correlation_function'
+                    else:
+                        name_observable = 'String_correlation_function'
+                    if row[0] == ''.join((name_observable, str(i + 1))):
+                        value = row[1].split('+')[0]
+                        if value[-1] == 'e':
+                            value = ''.join((value, row[1].split('+')[1]))
+                        value = float(value)
+                        values[i] += value
+                        numbers[i] += 1
+        plt.plot(range(2, L+1), values / numbers, color='green', label='VMC value')
+
+        if plot_exact:
+            if L == 14:
+                name_observable = 'stringcorrelationfunction'
+                dataname_exact = ''.join(('run/finalResults/exact/L', str(L), '_exact_', hamiltonian, '_', name_observable, '.csv'))
+                try:
+                    operator = 1 * np.loadtxt(dataname_exact)
+                    x_operator = np.arange(1, len(operator) + 1)
+                    plt.plot(range(2, L+1), operator, color='red', label='exact value', marker='s')
+                except:
+                    print('Exact observable could not be loaded')
+            else:
+                print('Exact results are only available for L=14')
+
+        if plot_dmrg:
+            print('DMRG observables were only calculated for the transformed models!!!')
+            dataname_observ = 'run/finalResults/DMRG/DMRG_StringCorr_' + str(L) + '_transformed_' + hamiltonian.split('_')[1] + '.csv'
+            observables = list()
+            with open(dataname_observ) as csvfile:
+                spamreader = csv.reader(csvfile)
+                for row in spamreader:
+                    observables.append(np.abs(float(row[0])))
+            plt.plot(range(1, L+1), observables, color='blue', label='DMRG value', marker='o', linestyle='None')
+
+        plt.title('String correlation parameter L=' + str(L) + ' ' + hamiltonian)
+        plt.xlabel('lattice distance', fontsize=14)
+        plt.ylabel('string correlation parameter', fontsize=14)
+        plt.legend()
+        plt.show()
+
+    if plot_sz:
+        numbers = np.zeros(L, dtype=np.int32)
+        values = np.zeros(L, dtype=np.float64)
+        dataname = 'run/finalResults/VMC/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '_observables.csv'))
+        with open(dataname) as csvfile:
+            spamreader = csv.reader(csvfile)
+            name_observable = 'S_Z_squared'
+            for row in spamreader:
+                for i in range(0, L):
+                    if row[0] == ''.join((name_observable, str(i))):
+                        value = row[1].split('+')[0]
+                        if value[-1] == 'e':
+                            value = ''.join((value, row[1].split('+')[1]))
+                        value = float(value)
+                        values[i] += value
+                        numbers[i] += 1
+        plt.plot(range(0, L), values / numbers, color='green', label='VMC value')
+        number_nonzero = values / numbers
+        number_nonzero = np.sum(number_nonzero)
+        print('Number non-zero VMC', number_nonzero)
+        print('Number zero VMC', L - number_nonzero)
+
+        if plot_exact:
+            if L == 14:
+                name_observable = 'szsquared'
+                dataname_exact = ''.join(('run/finalResults/exact/L', str(L), '_exact_', hamiltonian, '_', 'szsquared', '.csv'))
+                try:
+                    operator = 1 * np.loadtxt(dataname_exact)
+                    plt.plot(range(0, L), operator, color='red', label='exact value', marker='s')
+                    number_nonzero = np.sum(operator)
+                    print('Number non-zero exact', number_nonzero)
+                    print('Number zero exact', L - number_nonzero)
+                except:
+                    print('Exact observable could not be loaded')
+            else:
+                print('Exact results are only available for L=14')
+
+        if plot_dmrg:
+            print('DMRG observables were only calculated for the transformed models!!!')
+            dataname_observ = 'run/finalResults/DMRG/DMRG_Sz2_' + str(L) + '_transformed_' + hamiltonian.split('_')[1] + '.csv'
+            observables = list()
+            with open(dataname_observ) as csvfile:
+                spamreader = csv.reader(csvfile)
+                for row in spamreader:
+                    observables.append(np.abs(float(row[0])))
+            plt.plot(range(0, L), observables, color='blue', label='DMRG value', marker='o', linestyle='None')
+            number_nonzero = np.sum(observables)
+            print('Number non-zero DMRG', number_nonzero)
+            print('Number zero DMRG', L - number_nonzero)
+
+        plt.title(r'(S_z)^2' + ' L=' + str(L) + ' ' + hamiltonian, fontsize=14)
+        plt.xlabel(r'lattice site $i$', fontsize=14)
+        plt.ylabel(r'$< { S_i^{(z)} } ^2 >$', fontsize=14)
+        plt.legend()
+        plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #Show that the original Heisenberg model and AKLT model can not be solved properly
 #plot('results/problems/FFNN/L12.log', L = 12, symmetric_operator=False, observables=False, periodic=False, transformed_or_original='original', title='VMC energy of the Haldane chain (N=12)')
 #plotObservables('results/problems/FFNN/L12_observables.csv', 12, observable='StringCorr', title='String order parameter for the Haldane chain (N=12)')
@@ -979,10 +1156,14 @@ def compareNetworkSizes(L=40):
 #for a in [11, 13, 15, 17]:
     #compareNetworkSize(alpha=a)
 
-compareNetworkSize(alpha=15, L=40, shift=-0.05)
+#compareNetworkSize(alpha=15, L=40, shift=-0.05)
 
 #compareLatticeSizes()
 
 #compareNetworkSizes(L=30)
+
+
+
+plotFinalResults(L=40, plot_energy=True, plot_corr=True, plot_sz=True, plot_exact=True, plot_dmrg=True, hamiltonian='transformed_AKLT')
 
 
