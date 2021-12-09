@@ -898,14 +898,14 @@ def compareNetworkSizes(L=40):
 
 
 
-def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plot_exact=False, plot_dmrg=True, hamiltonian='transformed_Heisenberg'):
+def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plot_exact=False, plot_dmrg=True, hamiltonian='transformed_Heisenberg', machine='FFNN'):
     if plot_energy:
         # plot VMC-energy
-        if L==40:
+        if machine=='DeepConvNN':
             a = 21
         else:
             a = 60
-        dataname = 'run/finalResults/VMC/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '.log'))
+        dataname = 'run/finalResults/VMC/' + machine + '/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '.log'))
         data = json.load(open(dataname))
         # Extract the relevant information
         iters = []
@@ -949,7 +949,7 @@ def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plo
 
     if plot_corr:
         #plot VMC observable
-        dataname = 'run/finalResults/VMC/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '_observables.csv'))
+        dataname = 'run/finalResults/VMC/' + machine + '/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '_observables.csv'))
         numbers = np.zeros(L - 1, dtype=np.int32)
         values = np.zeros(L - 1, dtype=np.float64)
         with open(dataname) as csvfile:
@@ -1001,7 +1001,7 @@ def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plo
     if plot_sz:
         numbers = np.zeros(L, dtype=np.int32)
         values = np.zeros(L, dtype=np.float64)
-        dataname = 'run/finalResults/VMC/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '_observables.csv'))
+        dataname = 'run/finalResults/VMC/' + machine + '/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '_observables.csv'))
         with open(dataname) as csvfile:
             spamreader = csv.reader(csvfile)
             name_observable = 'S_Z_squared'
@@ -1164,6 +1164,6 @@ def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plo
 
 
 
-plotFinalResults(L=40, plot_energy=True, plot_corr=True, plot_sz=True, plot_exact=True, plot_dmrg=True, hamiltonian='transformed_AKLT')
+plotFinalResults(L=40, plot_energy=True, plot_corr=True, plot_sz=True, plot_exact=False, plot_dmrg=True, hamiltonian='transformed_Heisenberg', machine='DeepConvNN')
 
 
