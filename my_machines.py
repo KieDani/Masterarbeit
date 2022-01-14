@@ -851,6 +851,59 @@ def JaxDeepConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sample
     return ma, op, sa, machine_name
 
 
+def JaxModernConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
+    """Complex deep convolutional Neural Network Machine implemented in Jax.
+        Conv1d, complexReLU, Conv1d, complexReLU, Conv1d, complexReLU,
+        Conv1d, complexReLU, Dense, complexReLU, Dense
+
+            Args:
+                hilbert (netket.hilbert) : hilbert space
+                hamiltonian (netket.hamiltonian) : hamiltonian
+                alpha (int) : hidden layer density
+                optimizer (str) : possible choices are 'Sgd', 'Adam', or 'AdaMax'
+                lr (float) : learning rate
+                sampler (str) : possible choices are 'Local', 'Exact', 'VBS', 'Inverse'
+
+            Returns:
+                ma (netket.machine) : machine
+                op (netket.optimizer) : optimizer
+                sa (netket.sampler) : sampler
+                machine_name (str) : name of the machine, see get_operator
+                                                    """
+    print('JaxDeepConvNN is used')
+    input_size = hilbert.size
+    init_fun, apply_fun = stax.serial(FixSrLayer, InputForConvLayer, Conv1d(alpha, (3,), strides=(2,)), ComplexReLu,
+                                      Conv1d(alpha, (3,)), ComplexReLu, Conv1d(2*alpha, (3,), strides=(2,)), ComplexReLu,
+                                      Conv1d(2*alpha, (3,)), ComplexReLu, stax.Flatten,
+                                      Dense(input_size//2 * alpha), ComplexReLu, Dense(1), FormatLayer)
+
+    ma = nk.machine.Jax(
+        hilbert,
+        (init_fun, apply_fun), dtype=complex
+    )
+    ma.init_random_parameters(seed=12, sigma=0.01)
+    # Optimizer
+    if (optimizer == 'Sgd'):
+        op = Wrap(ma, SgdJax(lr))
+    elif (optimizer == 'Adam'):
+        op = Wrap(ma, AdamJax(lr))
+    else:
+        op = Wrap(ma, AdaMaxJax(lr))
+    # Sampler
+    if (sampler == 'Local'):
+        sa = nk.sampler.MetropolisLocal(machine=ma)
+    elif (sampler == 'Exact'):
+        sa = nk.sampler.ExactSampler(machine=ma)
+    elif (sampler == 'VBS'):
+        sa = my_sampler.getVBSSampler(machine=ma)
+    elif (sampler == 'Inverse'):
+        sa = my_sampler.getInverseSampler(machine=ma)
+    else:
+        sa = nk.sampler.MetropolisHamiltonian(machine=ma, hamiltonian=hamiltonian, n_chains=16)
+    machine_name = 'JaxModernConvNN'
+    return ma, op, sa, machine_name
+
+
 def JaxResConvNN(hilbert, hamiltonian, alpha=1, optimizer='Sgd', lr=0.1, sampler='Local'):
     """Complex deep residual convolutional Neural Network Machine implemented in Jax.
         Conv1d, complexReLU, ResConv, complexReLU, ResConv, complexReLU, ResConv, complexReLU, ResConv, Dense
@@ -1250,6 +1303,8 @@ def get_machine(machine_name):
         return  JaxDeepConvNN
     elif (machine_name == 'JaxTransformedFFNN'):
         return  JaxTransformedFFNN
+    elif (machine_name == 'JaxModernConvNN'):
+        return JaxModernConvNN
     else:
         print('The desired machine was spelled wrong!')
         sys.stdout.flush()

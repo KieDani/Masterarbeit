@@ -493,7 +493,7 @@ def exact(L = __L__, symmetric = True, dataname = None, path = 'run', hamiltonia
 
 
 #Show that the original Heisenberg model and AKLT model can not be solved properly
-#run(L=12, alpha=20, machine_name='JaxRBM', sampler='Local', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=200, path='results/problems/RBM')
+#run(L=12, alpha=20, machine_name='JaxModernConvNN', sampler='Local', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=200, path='run/dummy')
 #run(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=500, path='results/problems/FFNN')
 #measureObservable(L=12, alpha=20, machine_name='JaxRBM', sampler='Local', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=20, path='results/problems/RBM', append=False)
 #measureObservable(L=12, alpha=20, machine_name='JaxFFNN', sampler='Local', hamiltonian_name='original_Heisenberg', n_samples=1000, n_iterations=100, path='results/problems/FFNN', append=False, operator='StringCorr')
