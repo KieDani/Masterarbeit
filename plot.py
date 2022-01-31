@@ -898,14 +898,15 @@ def compareNetworkSizes(L=40):
 
 
 
-def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plot_exact=False, plot_dmrg=True, hamiltonian='transformed_Heisenberg', machine='FFNN'):
+def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plot_exact=False, plot_dmrg=True, hamiltonian='transformed_Heisenberg', machine='FFNN', extraPower=False):
+    run = ('run_extraPower' if extraPower else 'run')
     if plot_energy:
         # plot VMC-energy
         if machine=='DeepConvNN':
             a = 21
         else:
             a = 60
-        dataname = 'run/finalResults/VMC/' + machine + '/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '.log'))
+        dataname = run + '/finalResults/VMC/' + machine + '/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '.log'))
         data = json.load(open(dataname))
         # Extract the relevant information
         iters = []
@@ -932,7 +933,7 @@ def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plo
         #plot dmrg-energy
         if plot_dmrg:
             print('DMRG results were only calculated for the transformed hamiltonian!!!')
-            dataname_observ = ''.join(('run/finalResults/DMRG/DMRG_Energy_', str(L), '_transformed_', hamiltonian.split('_')[1], '.csv'))
+            dataname_observ = ''.join((run, '/finalResults/DMRG/DMRG_Energy_', str(L), '_transformed_', hamiltonian.split('_')[1], '.csv'))
             factor = 0
             with open(dataname_observ) as csvfile:
                 spamreader = csv.reader(csvfile)
@@ -949,7 +950,7 @@ def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plo
 
     if plot_corr:
         #plot VMC observable
-        dataname = 'run/finalResults/VMC/' + machine + '/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '_observables.csv'))
+        dataname = run + '/finalResults/VMC/' + machine + '/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '_observables.csv'))
         numbers = np.zeros(L - 1, dtype=np.int32)
         values = np.zeros(L - 1, dtype=np.float64)
         with open(dataname) as csvfile:
@@ -972,7 +973,7 @@ def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plo
         if plot_exact:
             if L == 14:
                 name_observable = 'stringcorrelationfunction'
-                dataname_exact = ''.join(('run/finalResults/exact/L', str(L), '_exact_', hamiltonian, '_', name_observable, '.csv'))
+                dataname_exact = ''.join((run, '/finalResults/exact/L', str(L), '_exact_', hamiltonian, '_', name_observable, '.csv'))
                 try:
                     operator = 1 * np.loadtxt(dataname_exact)
                     x_operator = np.arange(1, len(operator) + 1)
@@ -984,7 +985,7 @@ def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plo
 
         if plot_dmrg:
             print('DMRG observables were only calculated for the transformed models!!!')
-            dataname_observ = 'run/finalResults/DMRG/DMRG_StringCorr_' + str(L) + '_transformed_' + hamiltonian.split('_')[1] + '.csv'
+            dataname_observ = run + '/finalResults/DMRG/DMRG_StringCorr_' + str(L) + '_transformed_' + hamiltonian.split('_')[1] + '.csv'
             observables = list()
             with open(dataname_observ) as csvfile:
                 spamreader = csv.reader(csvfile)
@@ -1001,7 +1002,7 @@ def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plo
     if plot_sz:
         numbers = np.zeros(L, dtype=np.int32)
         values = np.zeros(L, dtype=np.float64)
-        dataname = 'run/finalResults/VMC/' + machine + '/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '_observables.csv'))
+        dataname = run + '/finalResults/VMC/' + machine + '/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '_observables.csv'))
         with open(dataname) as csvfile:
             spamreader = csv.reader(csvfile)
             name_observable = 'S_Z_squared'
@@ -1023,7 +1024,7 @@ def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plo
         if plot_exact:
             if L == 14:
                 name_observable = 'szsquared'
-                dataname_exact = ''.join(('run/finalResults/exact/L', str(L), '_exact_', hamiltonian, '_', 'szsquared', '.csv'))
+                dataname_exact = ''.join((run, '/finalResults/exact/L', str(L), '_exact_', hamiltonian, '_', 'szsquared', '.csv'))
                 try:
                     operator = 1 * np.loadtxt(dataname_exact)
                     plt.plot(range(0, L), operator, color='red', label='exact value', marker='s')
@@ -1037,7 +1038,7 @@ def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plo
 
         if plot_dmrg:
             print('DMRG observables were only calculated for the transformed models!!!')
-            dataname_observ = 'run/finalResults/DMRG/DMRG_Sz2_' + str(L) + '_transformed_' + hamiltonian.split('_')[1] + '.csv'
+            dataname_observ = run + '/finalResults/DMRG/DMRG_Sz2_' + str(L) + '_transformed_' + hamiltonian.split('_')[1] + '.csv'
             observables = list()
             with open(dataname_observ) as csvfile:
                 spamreader = csv.reader(csvfile)
@@ -1164,6 +1165,6 @@ def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plo
 
 
 
-plotFinalResults(L=40, plot_energy=True, plot_corr=True, plot_sz=True, plot_exact=False, plot_dmrg=True, hamiltonian='transformed_Heisenberg', machine='DeepConvNN')
+plotFinalResults(L=14, plot_energy=True, plot_corr=True, plot_sz=True, plot_exact=True, plot_dmrg=True, hamiltonian='original_Heisenberg', machine='FFNN', extraPower=True)
 
 
