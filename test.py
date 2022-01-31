@@ -143,7 +143,7 @@ def measureObservable(L=__L__, alpha=__alpha__, dataname = None, path = 'run', m
                     n_samples (int) : The number of samples used in every iteration step
                     n_iterations (int) : The number of iterations (training steps)
                     append (bool) : If True, the old .csv file is deleted. If False, the results are appended to the old .csv file
-                    operator (str) : allowed inputs are 'FerroCorr', 'StringCorr' and 'S_Z_squared'
+                    operator (str) : allowed inputs are 'FerroCorr', 'StringCorr', 'S_Z_squared' and 'all'
 
                     """
     if (dataname == None):

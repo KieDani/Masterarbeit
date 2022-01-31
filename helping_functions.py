@@ -50,7 +50,7 @@ def get_operator(hilbert, L, operator = None, symmetric = True):
             Args:
                 hilbert (netket.hilbert) : hilbert space
                 L (int) : Lattice size
-                operator (str) : allowed inputs are 'FerroCorr', 'StringCorr' and 'S_Z_squared'
+                operator (str) : allowed inputs are 'FerroCorr', 'StringCorr', 'S_Z_squared' and 'all'
                 symmetric (bool) : If True, the observable is measured symmetric to the center of the lattice.
                                     If False, the measurement is started at the 0-th site.
 
@@ -70,10 +70,16 @@ def get_operator(hilbert, L, operator = None, symmetric = True):
                 name_fast = 'Symmetric_Ferro_correlation_function' + str(int(2*i)) #because k-j=2*i
                 observables[name_fast] = observ_fast
     elif(operator == 'StringCorr'):
-        for i in range(1, L):
-            observ_fast = operators.StringCorrelation(hilbert=hilbert, j=0, k=i)
-            name_fast = 'String_correlation_function' + str(i)
-            observables[name_fast] = observ_fast
+        if(symmetric == False):
+            for i in range(1, L):
+                observ_fast = operators.StringCorrelation(hilbert=hilbert, j=0, k=i)
+                name_fast = 'String_correlation_function' + str(i)
+                observables[name_fast] = observ_fast
+        else:
+            for i in range(1, int(L / 2.) + L % 2):
+                observ_fast = operators.StringCorrelation(hilbert=hilbert, j=int(L/2.)-i, k=int(L/2.)+i)
+                name_fast = 'Symmetric_String_correlation_function' + str(int(2*i))
+                observables[name_fast] = observ_fast
     elif(operator == 'FerroCorr_slow'):
         for i in range(2, np.minimum(L + 1, 9)):
             observ = operators.FerroCorrelationZ_slow(hilbert, l = i)
@@ -84,6 +90,13 @@ def get_operator(hilbert, L, operator = None, symmetric = True):
             observ_fast = operators.S_Z_squared(hilbert=hilbert, j=i)
             name_fast = 'S_Z_squared' + str(i)
             observables[name_fast] = observ_fast
+    elif(operator == 'all'):
+        observables = {**observables, **get_operator(hilbert, L, operator='FerroCorr', symmetric=False),
+            **get_operator(hilbert, L, operator='FerroCorr', symmetric=True),
+            **get_operator(hilbert, L, operator='StringCorr', symmetric=False),
+            **get_operator(hilbert, L, operator='StringCorr', symmetric=True),
+            **get_operator(hilbert, L, operator='S_Z_squared')
+                       }
     return observables
 
 
