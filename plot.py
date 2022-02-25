@@ -899,11 +899,19 @@ def compareNetworkSizes(L=40):
 
 
 def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plot_exact=False, plot_dmrg=True, hamiltonian='transformed_Heisenberg', machine='FFNN', extraPower=False):
-    run = ('run_extraPower' if extraPower else 'run')
+    if extraPower is None:
+        run = 'run_final'
+    elif extraPower:
+        run = 'run_extraPower'
+    else:
+        run = 'run'
+    #run = ('run_extraPower' if elif extraPower else 'run')
     if plot_energy:
         # plot VMC-energy
         if machine=='DeepConvNN':
             a = 21
+        elif machine == 'ModernConvNN':
+            a = 32
         else:
             a = 60
         dataname = run + '/finalResults/VMC/' + machine + '/' + ''.join(('L', str(L), 'a', str(a), '_', hamiltonian, '.log'))
@@ -1165,6 +1173,6 @@ def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plo
 
 
 
-plotFinalResults(L=14, plot_energy=True, plot_corr=True, plot_sz=True, plot_exact=True, plot_dmrg=True, hamiltonian='original_Heisenberg', machine='FFNN', extraPower=True)
+plotFinalResults(L=20, plot_energy=True, plot_corr=True, plot_sz=True, plot_exact=True, plot_dmrg=False, hamiltonian='transformed_AKLT', machine='ModernConvNN', extraPower=None)
 
 
