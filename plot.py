@@ -909,7 +909,7 @@ def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plo
     if plot_energy:
         # plot VMC-energy
         if machine=='DeepConvNN':
-            a = 21
+            a = 24
         elif machine == 'ModernConvNN':
             a = 32
         else:
@@ -1173,6 +1173,6 @@ def plotFinalResults(L=40, plot_energy=True, plot_corr=False, plot_sz=False, plo
 
 
 
-plotFinalResults(L=20, plot_energy=True, plot_corr=True, plot_sz=True, plot_exact=True, plot_dmrg=False, hamiltonian='transformed_AKLT', machine='ModernConvNN', extraPower=None)
+plotFinalResults(L=60, plot_energy=True, plot_corr=True, plot_sz=True, plot_exact=True, plot_dmrg=True, hamiltonian='transformed_Heisenberg', machine='DeepConvNN', extraPower=None)
 
 
