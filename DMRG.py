@@ -71,7 +71,7 @@ def get_transformed_AKLT(L=__L__):
 
 
 #for l in [12, 14, 16, 30, 40, 50]:
-for l in [20, 60, 80]:
+for l in [14, 20, 40, 60, 80]:
   __L__ = l
   tH = (get_transformed_Haldanechain(L=__L__), 'transformed_Heisenberg')
   tA = (get_transformed_AKLT(L=__L__), 'transformed_AKLT')
