@@ -70,6 +70,8 @@ def get_transformed_AKLT(L=__L__):
   return sc2
 
 
+
+
 #for l in [12, 14, 16, 30, 40, 50]:
 for l in [14, 20, 40, 60, 80]:
   __L__ = l
@@ -101,11 +103,14 @@ for l in [14, 20, 40, 60, 80]:
     cs = [sc.vev(sc.Sz[0]*sc.Sz[i]).real for i in range(__L__)]
     print(cs)
     dataname = ''.join(('DMRG_StringCorr_', str(__L__), '_', sc_name, '.csv'))
+    cs2 = [sc.vev(sc.Sz[int(__L__/2.)-i]*sc.Sz[int(__L__/2.)+i]).real for i in range(1, int(__L__/2.) + __L__%2)]
+    print(cs2)
+    dataname2 = ''.join(('DMRG_StringCorr_symmetric', str(__L__), '_', sc_name, '.csv'))
 
     #Measure Sz^2 on each site
-    cs2 = [sc.vev(sc.Sz[i] * sc.Sz[i]).real for i in range(__L__)]
-    print(cs2)
-    dataname2 = ''.join(('DMRG_Sz2_', str(__L__), '_', sc_name, '.csv'))
+    cs3 = [sc.vev(sc.Sz[i] * sc.Sz[i]).real for i in range(__L__)]
+    print(cs3)
+    dataname3 = ''.join(('DMRG_Sz2_', str(__L__), '_', sc_name, '.csv'))
 
 
     try:
@@ -116,8 +121,10 @@ for l in [14, 20, 40, 60, 80]:
       print("Successfully created the directory %s" % path)
     dataname = '/'.join((path, dataname))
     dataname2 = '/'.join((path, dataname2))
+    dataname3 = '/'.join((path, dataname3))
 
     # save to csv file
     np.savetxt(dataname, np.asarray(cs), delimiter=';')
     np.savetxt(dataname2, np.asarray(cs2), delimiter=';')
+    np.savetxt(dataname3, np.asarray(cs3), delimiter=';')
 
